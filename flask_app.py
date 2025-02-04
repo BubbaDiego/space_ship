@@ -25,14 +25,22 @@ from calc_services import CalcServices
 from price_monitor import PriceMonitor
 from alert_manager import AlertManager
 
-# ================================
-# Twilio Configuration (set as string literals)
-# ================================
-TWILIO_ACCOUNT_SID = "ACb606788ada5dccbfeeebed0f440099b3"
-TWILIO_AUTH_TOKEN = "f2cee9e20e844a42157cfccbc5df5648"
-TWILIO_FLOW_SID = "FW5b3bf49ee04af4d23a118b613bbc0df2"
-TWILIO_TO_PHONE = "+16199804758"
-TWILIO_FROM_PHONE = "+18336913467"
+# Build absolute paths
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+CONFIG_PATH = os.path.join(BASE_DIR, "sonic_config.json")
+DB_PATH = os.path.join(BASE_DIR, "mother_brain.db")
+
+# Load configuration from JSON file
+with open(CONFIG_PATH, "r") as f:
+    config = json.load(f)
+
+# Extract Twilio configuration from the JSON data
+twilio_config = config.get("twilio_config", {})
+TWILIO_ACCOUNT_SID = twilio_config.get("account_sid")
+TWILIO_AUTH_TOKEN = twilio_config.get("auth_token")
+TWILIO_FLOW_SID = twilio_config.get("flow_sid")
+TWILIO_TO_PHONE = twilio_config.get("to_phone")
+TWILIO_FROM_PHONE = twilio_config.get("from_phone")
 
 # ================================
 # Logging Configuration

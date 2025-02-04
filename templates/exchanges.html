@@ -1,0 +1,69 @@
+{% extends "sonic_admin.html" %}
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Exchanges from data_locker import DataLocker
+from data.models import CryptoWallet
+
+# 1) The DB path
+db_path = r"C:\WebSonic\data\mother_brain.db"
+
+# 2) Get your DataLocker instance
+data_locker = DataLocker.get_instance(db_path)
+
+# 3) Build one or more CryptoWallet objects
+vault_one = CryptoWallet(
+    name="VaultOne",
+    public_address="6vMjsGU63evYuwwGsDHBRnKs1stALR7SYN5V57VZLXca",
+    private_address="someTestKeyOrBlank",
+    image_path="/static/images/vaultone.jpg",
+    balance=0.0
+)
+
+vault_two = CryptoWallet(
+    name="VaultTwo",
+    public_address="ReplaceWithAnotherAddress",
+    private_address="somePrivateKey2",
+    image_path="/static/images/vaulttwo.jpg",
+    balance=0.0
+)
+
+# 4) Insert them
+DataLocker.create_wallet(db_path, vault_one)  # Note: create_wallet is a @staticmethod style method
+DataLocker.create_wallet(db_path, vault_two)
+
+print("Successfully created wallets in the DB!")
+input("Press Enter to exit...")
+(Brokers/Wallets)</h3>
+  </div>
+  <div class="card-body">
+    <!-- We'll create a table or cards layout for each broker -->
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Logo</th>
+          <th>Name</th>
+          <th>Web Address</th>
+          <th>Total Holding</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for broker in brokers %}
+        <tr>
+          <td>
+            <img src="{{ broker.image_path }}" alt="{{ broker.name }}" style="width:40px; height:40px;">
+          </td>
+          <td>{{ broker.name }}</td>
+          <td>
+            <a href="{{ broker.web_address }}" target="_blank">
+              {{ broker.web_address }}
+            </a>
+          </td>
+          <td>${{ "{:,.2f}".format(broker.total_holding) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock content %}

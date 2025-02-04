@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Sonic Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Fonts -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
+      integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q="
+      crossorigin="anonymous"
+    />
+    <!-- OverlayScrollbars CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/styles/overlayscrollbars.min.css"
+      integrity="sha256-tZHrRjVqNSRyWg2wbppGnT833E/Ys0DHWGwT04GiqQg="
+      crossorigin="anonymous"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      integrity="sha256-9kPW/n5nn53j4WMRYAxe9c1rCY96Oogo/MKSVdKzPmI="
+      crossorigin="anonymous"
+    />
+    <!-- AdminLTE CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='AdminLTE/dist/css/adminlte.css') }}" />
+    {% block extra_styles %}{% endblock %}
+  </head>
+  <body class="layout-fixed sidebar-expand-lg sidebar-mini sidebar-collapse bg-body-tertiary">
+    <div class="app-wrapper">
+      <!-- Header -->
+      <nav class="app-header navbar navbar-expand bg-body">
+        <div class="container-fluid">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+                <i class="bi bi-list"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+            </li>
+          </ul>
+          <ul class="navbar-nav ms-auto">
+            {% block header_extra %}{% endblock %}
+          </ul>
+        </div>
+      </nav>
+      <!-- End Header -->
+
+      <!-- Sidebar -->
+      <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+        <div class="sidebar-brand">
+          <a href="{{ url_for('index') }}" class="brand-link">
+            <img src="{{ url_for('static', filename='images/corner_logo_owl.jpg') }}" alt="Sonic Logo" class="brand-image rounded-circle shadow" />
+            <span class="brand-text fw-light">Sonic Admin</span>
+          </a>
+        </div>
+        <div class="sidebar-wrapper">
+          <!-- Sidebar Navigation -->
+          <nav class="mt-2">
+            <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
+              <li class="nav-item">
+                <a href="{{ url_for('index') }}" class="nav-link">
+                  <i class="nav-icon bi bi-speedometer"></i>
+                  <p>Dashboard</p>
+                </a>
+              </li>
+              <!-- Additional sidebar menu items -->
+              {% block sidebar_extra %}{% endblock %}
+            </ul>
+          </nav>
+        </div>
+      </aside>
+      <!-- End Sidebar -->
+
+      <!-- Main Content -->
+      <main class="app-main">
+        {% block content %}{% endblock %}
+      </main>
+      <!-- End Main Content -->
+
+      <!-- Footer -->
+      <footer class="app-footer">
+        <div class="float-end d-none d-sm-inline">Sonic</div>
+        <strong>
+          Copyright &copy; 2014-2024&nbsp;
+          <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>.
+        </strong>
+        All rights reserved.
+      </footer>
+      <!-- End Footer -->
+    </div>
+    <!-- End App Wrapper -->
+
+    <!-- Scripts -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/browser/overlayscrollbars.browser.es6.min.js"
+      integrity="sha256-dghWARbRe2eLlIJ56wNB+b760ywulqK3DzZYEpsg2fQ="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha256-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+      integrity="sha256-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+      crossorigin="anonymous"
+    ></script>
+    <script src="{{ url_for('static', filename='AdminLTE/dist/js/adminlte.js') }}"></script>
+
+    <!-- Global Theme Script -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // Retrieve stored theme profiles from localStorage
+        const sidebarTheme = localStorage.getItem("sidebar_theme");
+        const navbarTheme = localStorage.getItem("navbar_theme");
+
+        // Array of possible background classes
+        const themeBg = [
+          'bg-primary', 'bg-primary-subtle', 'bg-secondary', 'bg-secondary-subtle',
+          'bg-success', 'bg-success-subtle', 'bg-danger', 'bg-danger-subtle',
+          'bg-warning', 'bg-warning-subtle', 'bg-info', 'bg-info-subtle',
+          'bg-light', 'bg-light-subtle', 'bg-dark', 'bg-dark-subtle',
+          'bg-body-secondary', 'bg-body-tertiary', 'bg-body', 'bg-black',
+          'bg-white', 'bg-transparent'
+        ];
+
+        // Apply Sidebar Theme Globally
+        if (sidebarTheme) {
+          const theme = JSON.parse(sidebarTheme);
+          const appSidebar = document.querySelector('.app-sidebar');
+          if (appSidebar) {
+            // Remove any existing background classes
+            themeBg.forEach(cls => appSidebar.classList.remove(cls));
+            appSidebar.setAttribute('data-bs-theme', theme.color_mode);
+            if (theme.bg) {
+              appSidebar.classList.add(theme.bg);
+            }
+          }
+        }
+
+        // Apply Navbar Theme Globally
+        if (navbarTheme) {
+          const theme = JSON.parse(navbarTheme);
+          const appNavbar = document.querySelector('.app-header');
+          if (appNavbar) {
+            themeBg.forEach(cls => appNavbar.classList.remove(cls));
+            appNavbar.setAttribute('data-bs-theme', theme.color_mode);
+            if (theme.bg) {
+              appNavbar.classList.add(theme.bg);
+            }
+          }
+        }
+      });
+    </script>
+    {% block extra_scripts %}{% endblock %}
+  </body>
+</html>

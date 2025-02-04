@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1 class="mb-4">Price Charts (Last {{ timeframe }} Hours)</h1>
+
+  <!-- Timeframe Selection Form -->
+  <form id="timeframeForm" method="GET" class="mb-4">
+    <label for="timeframeSelect">Select Timeframe (Hours):</label>
+    <select id="timeframeSelect" name="hours" onchange="document.getElementById('timeframeForm').submit();">
+      <option value="1" {% if timeframe == 1 %}selected{% endif %}>1</option>
+      <option value="3" {% if timeframe == 3 %}selected{% endif %}>3</option>
+      <option value="6" {% if timeframe == 6 %}selected{% endif %}>6</option>
+      <option value="12" {% if timeframe == 12 %}selected{% endif %}>12</option>
+      <option value="24" {% if timeframe == 24 %}selected{% endif %}>24</option>
+    </select>
+  </form>
+
+  <!-- Charts Row -->
+  <div class="row">
+    <!-- BTC Chart -->
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC Logo" style="height: 30px; margin-right: 8px;">
+            <strong>BTC Price</strong>
+          </div>
+          <div id="btc-change" class="ms-auto" style="text-align: right; font-size: 20px; font-weight: bold;"></div>
+        </div>
+        <div class="card-body">
+          <div id="chart-btc"></div>
+        </div>
+      </div>
+    </div>
+    <!-- ETH Chart -->
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH Logo" style="height: 30px; margin-right: 8px;">
+            <strong>ETH Price</strong>
+          </div>
+          <div id="eth-change" class="ms-auto" style="text-align: right; font-size: 20px; font-weight: bold;"></div>
+        </div>
+        <div class="card-body">
+          <div id="chart-eth"></div>
+        </div>
+      </div>
+    </div>
+    <!-- SOL Chart -->
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL Logo" style="height: 30px; margin-right: 8px;">
+            <strong>SOL Price</strong>
+          </div>
+          <div id="sol-change" class="ms-auto" style="text-align: right; font-size: 20px; font-weight: bold;"></div>
+        </div>
+        <div class="card-body">
+          <div id="chart-sol"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Market Snapshot Section -->
+  <div class="mt-4">
+    <div class="card" style="background-color: #f2f2f2;">
+      <div class="card-body">
+        <div class="row text-center">
+          <div class="col-md-3 col-6 border-end d-flex align-items-center justify-content-center">
+            <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="height: 20px; margin-right: 5px;">
+            <div>
+              <span class="text-success"><i class="bi bi-caret-up-fill"></i> 17%</span>
+              <h5 class="fw-bold mb-0">$35,210.43</h5>
+              <span class="text-uppercase">BITCOIN</span>
+            </div>
+          </div>
+          <div class="col-md-3 col-6 border-end d-flex align-items-center justify-content-center">
+            <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="height: 20px; margin-right: 5px;">
+            <div>
+              <span class="text-info"><i class="bi bi-caret-left-fill"></i> 0%</span>
+              <h5 class="fw-bold mb-0">$10,390.90</h5>
+              <span class="text-uppercase">ETHEREUM</span>
+            </div>
+          </div>
+          <div class="col-md-3 col-6 border-end d-flex align-items-center justify-content-center">
+            <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="height: 20px; margin-right: 5px;">
+            <div>
+              <span class="text-success"><i class="bi bi-caret-up-fill"></i> 20%</span>
+              <h5 class="fw-bold mb-0">$24,813.53</h5>
+              <span class="text-uppercase">SOLANA</span>
+            </div>
+          </div>
+          <div class="col-md-3 col-6 d-flex align-items-center justify-content-center">
+            <div>
+              <span class="text-danger"><i class="bi bi-caret-down-fill"></i> 18%</span>
+              <h5 class="fw-bold mb-0">1,200</h5>
+              <span class="text-uppercase">S&P 500</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Include ApexCharts from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+  console.log("Chart Data:", {{ chart_data | tojson }});
+  var chartData = {{ chart_data | tojson }};
+  var currentTimeframe = {{ timeframe }};
+
+  // Function to format numbers with commas and two decimals.
+  function formatNumberWithCommas(val) {
+    return Number(val).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  // Calculate the percentage change for a dataset.
+  function calculatePercentageChange(data) {
+    if (!data || data.length === 0) return null;
+    var first = data[0][1];
+    var last = data[data.length - 1][1];
+    if (first === 0) return null;
+    return ((last - first) / first) * 100;
+  }
+
+  // Update the percentage change display.
+  function updatePercentageDisplay(elementId, pctChange) {
+    var el = document.getElementById(elementId);
+    if (pctChange === null) {
+      el.innerHTML = 'N/A';
+      return;
+    }
+    var formatted = formatNumberWithCommas(pctChange) + '%';
+    if (pctChange > 0) {
+      el.innerHTML = '<i class="bi bi-caret-up-fill" style="color: green; font-size: 20px;"></i> <span style="color: green;">' + formatted + '</span>';
+    } else if (pctChange < 0) {
+      el.innerHTML = '<i class="bi bi-caret-down-fill" style="color: red; font-size: 20px;"></i> <span style="color: red;">' + formatted + '</span>';
+    } else {
+      el.innerHTML = '<i class="bi bi-caret-right-fill" style="font-size: 20px;"></i> ' + formatted;
+    }
+  }
+
+  // Get the color for an asset.
+  function getAssetColor(asset) {
+    if (asset === "BTC") return "#FFD700";  // Gold
+    if (asset === "ETH") return "#0000FF";    // Blue
+    if (asset === "SOL") return "#800080";    // Purple
+    return "#000000";
+  }
+
+  // Generate chart options.
+  function createChartOptions(asset, data) {
+    return {
+      chart: {
+        type: 'area',
+        height: 300,
+        zoom: { enabled: false }
+      },
+      stroke: {
+        curve: 'smooth',
+        width: 4
+      },
+      markers: { size: 0 },
+      grid: { borderColor: 'transparent' },
+      colors: [getAssetColor(asset)],
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shade: 'dark',
+          type: 'vertical',
+          shadeIntensity: 0.7,
+          opacityFrom: 0.6,
+          opacityTo: 0.3,
+          stops: [0, 100]
+        }
+      },
+      dataLabels: { enabled: false },
+      series: [{
+        name: asset + " Price",
+        data: data
+      }],
+      xaxis: {
+        type: 'datetime',
+        labels: {
+          formatter: function(val) {
+            return new Date(val).toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+              timeZone: "America/Los_Angeles"
+            });
+          },
+          style: { fontWeight: 'bold' }
+        },
+        tooltip: { enabled: false }
+      },
+      yaxis: {
+        labels: {
+          formatter: function(val) {
+            return formatNumberWithCommas(val);
+          },
+          style: { fontWeight: 'bold' }
+        }
+      },
+      title: {
+        text: asset + ' Price (Last ' + currentTimeframe + ' Hours)',
+        align: 'center',
+        style: { fontSize: '16px', fontWeight: 'bold' }
+      },
+      tooltip: {
+        y: {
+          formatter: function(val) {
+            return formatNumberWithCommas(val);
+          }
+        }
+      }
+    };
+  }
+
+  // Render the charts.
+  var btcChart = new ApexCharts(document.querySelector("#chart-btc"), createChartOptions("BTC", chartData["BTC"]));
+  var ethChart = new ApexCharts(document.querySelector("#chart-eth"), createChartOptions("ETH", chartData["ETH"]));
+  var solChart = new ApexCharts(document.querySelector("#chart-sol"), createChartOptions("SOL", chartData["SOL"]));
+
+  btcChart.render();
+  ethChart.render();
+  solChart.render();
+
+  // Calculate and update percentage changes.
+  var btcPct = calculatePercentageChange(chartData["BTC"]);
+  var ethPct = calculatePercentageChange(chartData["ETH"]);
+  var solPct = calculatePercentageChange(chartData["SOL"]);
+
+  updatePercentageDisplay("btc-change", btcPct);
+  updatePercentageDisplay("eth-change", ethPct);
+  updatePercentageDisplay("sol-change", solPct);
+</script>
+{% endblock %}

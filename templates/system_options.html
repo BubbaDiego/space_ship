@@ -1,0 +1,338 @@
+{% extends "sonic_admin.html" %}
+{% block content %}
+
+<style>
+  /* Match the color scheme from your other pages */
+  .card {
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  .card-header {
+    background-color: #e5ffe5 !important;
+    border-bottom: 2px solid #ccc;
+    font-weight: bold;
+  }
+  .card-body {
+    background-color: #F0F0F0 !important;
+  }
+</style>
+
+<!-- Title Row -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="text-dark mb-0">System Options</h2>
+  <span style="font-size:2rem;">⚙️</span>
+</div>
+
+<form method="POST" action="{{ url_for('system_options') }}" enctype="multipart/form-data">
+  <!-- === Card: System Config === -->
+  <div class="card">
+    <div class="card-header">System Config</div>
+    <div class="card-body">
+      <div class="row g-3">
+        <!-- logging_enabled -->
+        <div class="col-md-6">
+          <label for="logging_enabled" class="form-label fw-bold">
+            Logging Enabled?
+          </label>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="logging_enabled"
+              id="logging_enabled"
+              value="on"
+              {% if config.system_config.logging_enabled %} checked {% endif %}
+            />
+            <label class="form-check-label" for="logging_enabled">
+              Enable Logging
+            </label>
+          </div>
+        </div>
+        <!-- log_level -->
+        <div class="col-md-6">
+          <label for="log_level" class="form-label fw-bold">Log Level</label>
+          <select class="form-select" id="log_level" name="log_level">
+            {% set current_level = config.system_config.log_level %}
+            <option value="DEBUG" {% if current_level == "DEBUG" %}selected{% endif %}>DEBUG</option>
+            <option value="INFO" {% if current_level == "INFO" %}selected{% endif %}>INFO</option>
+            <option value="WARNING" {% if current_level == "WARNING" %}selected{% endif %}>WARNING</option>
+            <option value="ERROR" {% if current_level == "ERROR" %}selected{% endif %}>ERROR</option>
+            <option value="CRITICAL" {% if current_level == "CRITICAL" %}selected{% endif %}>CRITICAL</option>
+          </select>
+        </div>
+
+        <!-- db_path -->
+        <div class="col-md-6">
+          <label for="db_path" class="form-label fw-bold">DB Path</label>
+          <input
+            type="text"
+            class="form-control"
+            id="db_path"
+            name="db_path"
+            value="{{ config.system_config.db_path }}"
+          />
+        </div>
+
+        <!-- sonic_monitor_loop_time -->
+        <div class="col-md-6">
+          <label for="sonic_monitor_loop_time" class="form-label fw-bold">Monitor Loop Time (sec)</label>
+          <input
+            type="number"
+            class="form-control"
+            id="sonic_monitor_loop_time"
+            name="sonic_monitor_loop_time"
+            value="{{ config.system_config.sonic_monitor_loop_time }}"
+          />
+        </div>
+
+        <!-- price_monitor_enabled -->
+        <div class="col-md-6">
+          <label for="price_monitor_enabled" class="form-label fw-bold">
+            Price Monitor Enabled?
+          </label>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="price_monitor_enabled"
+              id="price_monitor_enabled"
+              value="on"
+              {% if config.system_config.price_monitor_enabled %} checked {% endif %}
+            />
+            <label class="form-check-label" for="price_monitor_enabled">
+              Enable Price Monitor
+            </label>
+          </div>
+        </div>
+
+        <!-- alert_monitor_enabled -->
+        <div class="col-md-6">
+          <label for="alert_monitor_enabled" class="form-label fw-bold">
+            Alert Monitor Enabled?
+          </label>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="alert_monitor_enabled"
+              id="alert_monitor_enabled"
+              value="on"
+              {% if config.system_config.alert_monitor_enabled %} checked {% endif %}
+            />
+            <label class="form-check-label" for="alert_monitor_enabled">
+              Enable Alert Monitor
+            </label>
+          </div>
+        </div>
+
+        <!-- log_file -->
+        <div class="col-md-6">
+          <label for="log_file" class="form-label fw-bold">Log File Path</label>
+          <input
+            type="text"
+            class="form-control"
+            id="log_file"
+            name="log_file"
+            value="{{ config.system_config.log_file }}"
+          />
+        </div>
+
+        <!-- last_price_update_time (optional) -->
+        <div class="col-md-6">
+          <label for="last_price_update_time" class="form-label fw-bold">Last Price Update Time</label>
+          <input
+            type="text"
+            class="form-control"
+            id="last_price_update_time"
+            name="last_price_update_time"
+            value="{{ config.system_config.last_price_update_time or '' }}"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === Card: Price Config === -->
+  <div class="card">
+    <div class="card-header">Price Config</div>
+    <div class="card-body">
+      <div class="row g-3">
+        <!-- assets -->
+        <div class="col-md-6">
+          <label for="assets" class="form-label fw-bold">Assets (comma-separated)</label>
+          <input
+            type="text"
+            class="form-control"
+            id="assets"
+            name="assets"
+            value="{{ ','.join(config.price_config.assets) }}"
+          />
+        </div>
+        <!-- currency -->
+        <div class="col-md-6">
+          <label for="currency" class="form-label fw-bold">Currency</label>
+          <input
+            type="text"
+            class="form-control"
+            id="currency"
+            name="currency"
+            value="{{ config.price_config.currency }}"
+          />
+        </div>
+        <!-- fetch_timeout -->
+        <div class="col-md-6">
+          <label for="fetch_timeout" class="form-label fw-bold">Fetch Timeout (sec)</label>
+          <input
+            type="number"
+            class="form-control"
+            id="fetch_timeout"
+            name="fetch_timeout"
+            value="{{ config.price_config.fetch_timeout }}"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === Card: API Config === -->
+  <div class="card">
+    <div class="card-header">API Config</div>
+    <div class="card-body">
+      <div class="row g-3">
+        <!-- coingecko_api_enabled -->
+        <div class="col-md-6">
+          <label for="coingecko_api_enabled" class="form-label fw-bold">
+            CoinGecko API Enabled?
+          </label>
+          <select class="form-select" id="coingecko_api_enabled" name="coingecko_api_enabled">
+            {% set cge = config.api_config.coingecko_api_enabled %}
+            <option value="ENABLE" {% if cge == "ENABLE" %}selected{% endif %}>ENABLE</option>
+            <option value="DISABLE" {% if cge == "DISABLE" %}selected{% endif %}>DISABLE</option>
+          </select>
+        </div>
+        <!-- binance_api_enabled -->
+        <div class="col-md-6">
+          <label for="binance_api_enabled" class="form-label fw-bold">
+            Binance API Enabled?
+          </label>
+          <select class="form-select" id="binance_api_enabled" name="binance_api_enabled">
+            {% set bae = config.api_config.binance_api_enabled %}
+            <option value="ENABLE" {% if bae == "ENABLE" %}selected{% endif %}>ENABLE</option>
+            <option value="DISABLE" {% if bae == "DISABLE" %}selected{% endif %}>DISABLE</option>
+          </select>
+        </div>
+        <!-- coinmarketcap_api_key -->
+        <div class="col-md-6">
+          <label for="coinmarketcap_api_key" class="form-label fw-bold">CoinMarketCap API Key</label>
+          <input
+            type="text"
+            class="form-control"
+            id="coinmarketcap_api_key"
+            name="coinmarketcap_api_key"
+            value="{{ config.api_config.coinmarketcap_api_key }}"
+          />
+        </div>
+      </div>
+
+      <!-- 
+        Add a row with a "Reset API Counters" button 
+        that triggers a dedicated form action.
+      -->
+      <div class="row g-3 mt-3">
+        <div class="col text-end">
+          <!-- We'll use a button that sets 'action=reset_counters' 
+               so the back end knows we want to reset counters. 
+           -->
+          <button type="submit" class="btn btn-danger fw-bold"
+                  name="action" value="reset_counters">
+            Reset API Report Counters
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === Card: Alert Ranges (Example) === -->
+  <div class="card">
+    <div class="card-header">Alert Ranges</div>
+    <div class="card-body">
+      <div class="row g-3">
+        <!-- heat_index low/medium/high -->
+        <div class="col-md-4">
+          <label for="heat_index_low" class="form-label fw-bold">Heat Index Low</label>
+          <input
+            type="number"
+            step="0.1"
+            class="form-control"
+            id="heat_index_low"
+            name="heat_index_low"
+            value="{{ config.alert_ranges.heat_index_ranges.low }}"
+          />
+        </div>
+        <div class="col-md-4">
+          <label for="heat_index_medium" class="form-label fw-bold">Heat Index Med</label>
+          <input
+            type="number"
+            step="0.1"
+            class="form-control"
+            id="heat_index_medium"
+            name="heat_index_medium"
+            value="{{ config.alert_ranges.heat_index_ranges.medium }}"
+          />
+        </div>
+        <div class="col-md-4">
+          <label for="heat_index_high" class="form-label fw-bold">Heat Index High</label>
+          <input
+            type="number"
+            step="0.1"
+            class="form-control"
+            id="heat_index_high"
+            name="heat_index_high"
+            value="{{ config.alert_ranges.heat_index_ranges.high }}"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === Card: Import/Export Config === -->
+  <div class="card">
+    <div class="card-header">Import / Export Config</div>
+    <div class="card-body">
+      <div class="row g-3 align-items-center">
+        <!-- Import field -->
+        <div class="col-md-6">
+          <label for="import_file" class="form-label fw-bold">
+            Import from JSON
+          </label>
+          <input
+            class="form-control"
+            type="file"
+            id="import_file"
+            name="import_file"
+            accept=".json"
+          />
+        </div>
+        <!-- Export button could just be a link or separate form -->
+        <div class="col-md-6 text-end">
+          <a
+            href="{{ url_for('export_config') }}"
+            class="btn btn-outline-primary"
+          >
+            Export Current Config
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === Save All Changes at the bottom === -->
+  <div class="text-end">
+    <button type="submit" class="btn btn-success fw-bold">
+      Save All Changes
+    </button>
+  </div>
+</form>
+
+{% endblock content %}

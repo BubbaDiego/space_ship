@@ -1,0 +1,276 @@
+{% extends "sonic_admin.html" %}
+{% block content %}
+
+<style>
+  /* Same color scheme for top boxes and card backgrounds */
+  .price-box.card {
+    background-color: #F0F0F0 !important;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+  }
+  .price-box .card-header {
+    background-color: #e5ffe5 !important;
+    font-weight: bold;
+  }
+  .price-box .display-4 {
+    font-size: 2.5rem; /* Big price font */
+  }
+
+  /* Recent Prices table: striped full-width */
+  .recent-prices-table.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  /* Light purple background for the "title-row" in BOTH tables */
+  .recent-prices-table thead tr.title-row,
+  .api-status-table thead tr.title-row {
+    background-color: #f0e5ff !important; /* Light purple */
+  }
+  .recent-prices-table thead tr.title-row th,
+  .api-status-table thead tr.title-row th {
+    font-weight: bold;
+  }
+
+  /* Add Price Card styling */
+  .card.add-price {
+    background-color: #F0F0F0 !important;
+  }
+  .card.add-price .card-header {
+    background-color: #e5ffe5 !important;
+    font-weight: bold;
+  }
+</style>
+
+<!-- ====== SECTION 1: Title + Update Button + Boxes ====== -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="text-dark mb-0">Prices</h2>
+  <!-- POST to /update_prices -->
+  <form method="POST" action="{{ url_for('update_prices') }}" id="updatePricesForm">
+    <button type="submit" class="btn btn-success">Update Prices</button>
+  </form>
+</div>
+
+<!-- Row of up to 3 “info boxes” from your “prices” list -->
+<div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+  {% for p in prices[:3] %}
+  <div class="col">
+    <div class="card price-box h-100">
+      <div class="card-header d-flex align-items-center justify-content-center">
+        {% if p.asset_type in ["BTC", "Bitcoin"] %}
+          <img src="/static/images/btc_logo.png" alt="BTC" 
+               style="width: 30px; height: 30px; margin-right: 10px;">
+        {% elif p.asset_type in ["ETH", "Ethereum"] %}
+          <img src="/static/images/eth_logo.png" alt="ETH" 
+               style="width: 30px; height: 30px; margin-right: 10px;">
+        {% elif p.asset_type in ["SOL", "Solana"] %}
+          <img src="/static/images/sol_logo.png" alt="SOL" 
+               style="width: 30px; height: 30px; margin-right: 10px;">
+        {% endif %}
+
+        <!-- Keep your original span, but hide it -->
+        <span style="display: none;">{{ p.asset_type }}</span>
+
+        <!-- Show a nicer label instead -->
+        {% if p.asset_type == "BTC" or p.asset_type == "AssetType.BTC" %}
+          <span>Bitcoin</span>
+        {% elif p.asset_type == "ETH" or p.asset_type == "AssetType.ETH" %}
+          <span>Ethereum</span>
+        {% elif p.asset_type == "SOL" or p.asset_type == "AssetType.SOL" %}
+          <span>Solana</span>
+        {% else %}
+          <span>{{ p.asset_type }}</span>
+        {% endif %}
+      </div>
+      <div class="card-body text-center">
+        <div class="display-4 mb-2">
+          {{ p.current_price|round(2) }}
+        </div>
+        <small class="text-muted">
+          Last Updated: {{ p.last_update_time_pst or "N/A" }}
+        </small>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- ====== SECTION 2: MAIN ROW with "Recent Prices" on LEFT, "API Status" on RIGHT ====== -->
+<div class="row">
+  <!-- LEFT COLUMN: Existing "Recent Prices" card -->
+  <div class="col-md-6">
+    <div class="card mb-4" style="background-color: #F0F0F0;">
+      <div class="card-body p-2">
+        <table class="table table-striped recent-prices-table w-100 mb-0">
+          <thead>
+            <!-- Title row with “Recent Prices” & pagination -->
+            <tr class="title-row">
+              <th colspan="2">Recent Prices</th>
+              <th class="text-end">
+                <!-- Pagination UI placeholder -->
+                <nav>
+                  <ul class="pagination justify-content-end m-0">
+                    <li class="page-item disabled">
+                      <a class="page-link" href="#" tabindex="-1">«</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">»</a></li>
+                  </ul>
+                </nav>
+              </th>
+            </tr>
+            <!-- Column headers row -->
+            <tr class="column-header-row">
+              <th>Asset</th>
+              <th>Update Time</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if recent_prices is not defined %}
+              {% set recent_prices = [] %}
+            {% endif %}
+            {% for rp in recent_prices[::-1][:10] %}
+            <tr>
+              <td>
+                {% if rp.asset_type in ["BTC", "Bitcoin"] %}
+                  <img src="/static/images/btc_logo.png" alt="BTC"
+                       style="width:20px; height:20px; margin-right:5px;">
+                {% elif rp.asset_type in ["ETH", "Ethereum"] %}
+                  <img src="/static/images/eth_logo.png" alt="ETH"
+                       style="width:20px; height:20px; margin-right:5px;">
+                {% elif rp.asset_type in ["SOL", "Solana"] %}
+                  <img src="/static/images/sol_logo.png" alt="SOL"
+                       style="width:20px; height:20px; margin-right:5px;">
+                {% endif %}
+                <span style="display: none;">{{ rp.asset_type }}</span>
+                {% if rp.asset_type == "BTC" or rp.asset_type == "AssetType.BTC" %}
+                  <span>Bitcoin</span>
+                {% elif rp.asset_type == "ETH" or rp.asset_type == "AssetType.ETH" %}
+                  <span>Ethereum</span>
+                {% elif rp.asset_type == "SOL" or rp.asset_type == "AssetType.SOL" %}
+                  <span>Solana</span>
+                {% else %}
+                  <span>{{ rp.asset_type }}</span>
+                {% endif %}
+              </td>
+              <td>{{ rp.last_update_time_pst or "N/A" }}</td>
+              <td>{{ rp.current_price|round(2) }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN: New "API Status" panel/table -->
+  <div class="col-md-6">
+    <div class="card mb-4" style="background-color: #F0F0F0;">
+      <div class="card-body p-2">
+        <table class="table table-striped w-100 mb-0 api-status-table">
+          <thead>
+            <!-- Title row for “API Status” (light purple) -->
+            <tr class="title-row">
+              <th colspan="4">
+                <i class="fas fa-broadcast-tower"></i> API Status
+              </th>
+            </tr>
+            <!-- Column headers -->
+            <tr class="column-header-row">
+              <th>API</th>
+              <th>Status</th>
+              <th>Last Updated</th>
+              <th>Total Reports</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in api_counters %}
+              <tr>
+                <td>{{ row.api_name }}</td>
+                <td>Online</td>
+                <td>N/A</td>
+                <td>{{ row.total_reports }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /row for recent-prices + api-status -->
+
+<!-- ====== SECTION 3: Add New Price Panel ====== -->
+<div class="card add-price">
+  <div class="card-header">Add New Price</div>
+  <div class="card-body">
+    <form method="POST" action="{{ url_for('prices') }}">
+      <div class="row g-3">
+        <!-- Asset -->
+        <div class="col-md-4">
+          <label for="asset" class="form-label fw-bold">Asset</label>
+          <select class="form-select" id="asset" name="asset" required>
+            <option value="BTC">BTC</option>
+            <option value="ETH">ETH</option>
+            <option value="SOL">SOL</option>
+          </select>
+        </div>
+        <!-- Price -->
+        <div class="col-md-4">
+          <label for="price" class="form-label fw-bold">Price</label>
+          <input
+            type="number"
+            step="0.01"
+            class="form-control"
+            id="price"
+            name="price"
+            required
+          />
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary w-100">Add Price</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ====== SECTION 4: JavaScript to Intercept “Update Prices” & Reload ====== -->
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const updatePricesForm = document.getElementById('updatePricesForm');
+    if (updatePricesForm) {
+      updatePricesForm.addEventListener('submit', (event) => {
+        event.preventDefault(); // Stop normal form submission
+
+        fetch('{{ url_for("update_prices") }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          // If your /update-prices endpoint expects any data, pass it in the body:
+          // body: JSON.stringify({ foo: "bar" })
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Server returned status ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Update Prices response:', data);
+          // Reload the page to see new data
+          window.location.reload();
+        })
+        .catch(err => {
+          console.error('Error updating prices:', err);
+          alert(`Failed to update prices: ${err.message}`);
+        });
+      });
+    }
+  });
+</script>
+
+{% endblock %}

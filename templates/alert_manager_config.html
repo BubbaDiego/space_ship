@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1 class="mb-4">Alert Manager Configuration</h1>
+
+  <!-- Alert Ranges Section -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3 class="card-title">Alert Ranges</h3>
+    </div>
+    <div class="card-body">
+      <form id="alert-config-form" method="POST" action="{{ url_for('update_alert_config') }}">
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead class="bg-light text-dark">
+              <tr>
+                <th>Metric</th>
+                <th>Enabled</th>
+                <th>Low Threshold</th>
+                <th>Low Notifications<br>(Call/SMS/Email)</th>
+                <th>Medium Threshold</th>
+                <th>Medium Notifications<br>(Call/SMS/Email)</th>
+                <th>High Threshold</th>
+                <th>High Notifications<br>(Call/SMS/Email)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% set metrics = [
+                {'name': 'Heat Index', 'field': 'heat_index_ranges'},
+                {'name': 'Collateral', 'field': 'collateral_ranges'},
+                {'name': 'Value', 'field': 'value_ranges'},
+                {'name': 'Size', 'field': 'size_ranges'},
+                {'name': 'Leverage', 'field': 'leverage_ranges'},
+                {'name': 'Liquidation Distance', 'field': 'liquidation_distance_ranges'},
+                {'name': 'Travel Percent Liquid', 'field': 'travel_percent_liquid_ranges'},
+                {'name': 'Travel Percent Profit', 'field': 'travel_percent_profit_ranges'},
+                {'name': 'Profit', 'field': 'profit_ranges'}
+              ] %}
+              {% for metric in metrics %}
+              <tr>
+                <td>{{ metric.name }}</td>
+                <td>
+                  <input type="checkbox" id="{{ metric.field }}_enabled" name="alert_ranges[{{ metric.field }}][enabled]" class="form-check-input">
+                </td>
+                <td>
+                  <input type="number" step="any" id="{{ metric.field }}_low" name="alert_ranges[{{ metric.field }}][low]" class="form-control">
+                </td>
+                <td>
+                  <div class="form-check form-check-inline">
+                    <input type="checkbox" id="{{ metric.field }}_low_call" name="alert_ranges[{{ metric.field }}][low_notifications][call]" class="form-check-input">
+                    <label class="form-check-label">Call</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input type="checkbox" id="{{ metric.field }}_low_sms" name="alert_ranges[{{ metric.field }}][low_notifications][sms]" class="form-check-input">
+                    <label class="form-check-label">SMS</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input type="checkbox" id="{{ metric.field }}_low_email" name="alert_ranges[{{ metric.field }}][low_notifications][email]" class="form-check-input">
+                    <label class="form-check-label">Email</label>
+                  </div>
+                </td>
+                <td>
+                  <input type="number" step="any" id="{{ metric.field }}_medium" name="alert_ranges[{{ metric.field }}][medium]" class="form-control">
+                </td>
+                <td>
+                  <div class="form-check form-check-inline">
+                    <input type="checkbox" id="{{ metric.field }}_medium_call" name="alert_ranges[{{ metric.field }}][medium_notifications][call]" class="form-check-input">
+                    <label class="form-check-label">Call</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input type="checkbox" id="{{ metric.field }}_medium_sms" name="alert_ranges[{{ metric.field }}][medium_notifications][sms]" class="form-check-input">
+                    <label class="form-check-label">SMS</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input type="checkbox" id="{{ metric.field }}_medium_email" name="alert_ranges[{{ metric.field }}][medium_notifications][email]" class="form-check-input">
+                    <label class="form-check-label">Email</label>
+                  </div>
+                </td>
+                <td>
+                  <input type="number" step="any" id="{{ metric.field }}_high" name="alert_ranges[{{ metric.field }}][high]" class="form-control">
+                </td>
+                <td>
+                  <div class="form-check form-check-inline">
+                    <input type="checkbox" id="{{ metric.field }}_high_call" name="alert_ranges[{{ metric.field }}][high_notifications][call]" class="form-check-input">
+                    <label class="form-check-label">Call</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input type="checkbox" id="{{ metric.field }}_high_sms" name="alert_ranges[{{ metric.field }}][high_notifications][sms]" class="form-check-input">
+                    <label class="form-check-label">SMS</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input type="checkbox" id="{{ metric.field }}_high_email" name="alert_ranges[{{ metric.field }}][high_notifications][email]" class="form-check-input">
+                    <label class="form-check-label">Email</label>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-3">
+          <button type="submit" class="btn btn-primary">Save Alert Ranges</button>
+          <button type="reset" class="btn btn-secondary">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- System Options Section -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3 class="card-title">System Options</h3>
+    </div>
+    <div class="card-body">
+      <form id="system-options-form" method="POST" action="{{ url_for('update_system_options') }}">
+        <div class="mb-3">
+          <label for="alert_cooldown_seconds" class="form-label">Alert Cooldown (seconds)</label>
+          <input type="number" step="1" id="alert_cooldown_seconds" name="alert_cooldown_seconds" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label for="call_refractory_period" class="form-label">Call Refractory Period (seconds)</label>
+          <input type="number" step="1" id="call_refractory_period" name="call_refractory_period" class="form-control">
+        </div>
+        <div class="mb-3">
+          <button type="button" id="reset-refractory" class="btn btn-warning">Reset Refractory Clock</button>
+        </div>
+        <div class="mt-3">
+          <button type="submit" class="btn btn-primary">Save System Options</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block extra_scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/js/OverlayScrollbars.min.js"></script>
+<script src="{{ url_for('static', filename='AdminLTE/dist/js/adminlte.js') }}"></script>
+<script>
+  // Function to load configuration from the backend and populate the form
+  function loadConfig() {
+    $.getJSON("{{ url_for('api_get_config') }}", function(config) {
+      // Populate system options
+      if (config.alert_cooldown_seconds)
+        $("#alert_cooldown_seconds").val(config.alert_cooldown_seconds);
+      if (config.call_refractory_period)
+        $("#call_refractory_period").val(config.call_refractory_period);
+
+      if (config.alert_ranges) {
+        const metrics = ["heat_index_ranges", "collateral_ranges", "value_ranges", "size_ranges", "leverage_ranges", "liquidation_distance_ranges", "travel_percent_liquid_ranges", "travel_percent_profit_ranges", "profit_ranges"];
+        metrics.forEach(function(metric) {
+          if (config.alert_ranges[metric]) {
+            $("#" + metric + "_enabled").prop("checked", config.alert_ranges[metric].enabled);
+            $("#" + metric + "_low").val(config.alert_ranges[metric].low);
+            $("#" + metric + "_medium").val(config.alert_ranges[metric].medium);
+            $("#" + metric + "_high").val(config.alert_ranges[metric].high);
+            if (config.alert_ranges[metric].low_notifications) {
+              $("#" + metric + "_low_call").prop("checked", config.alert_ranges[metric].low_notifications.call);
+              $("#" + metric + "_low_sms").prop("checked", config.alert_ranges[metric].low_notifications.sms);
+              $("#" + metric + "_low_email").prop("checked", config.alert_ranges[metric].low_notifications.email);
+            }
+            if (config.alert_ranges[metric].medium_notifications) {
+              $("#" + metric + "_medium_call").prop("checked", config.alert_ranges[metric].medium_notifications.call);
+              $("#" + metric + "_medium_sms").prop("checked", config.alert_ranges[metric].medium_notifications.sms);
+              $("#" + metric + "_medium_email").prop("checked", config.alert_ranges[metric].medium_notifications.email);
+            }
+            if (config.alert_ranges[metric].high_notifications) {
+              $("#" + metric + "_high_call").prop("checked", config.alert_ranges[metric].high_notifications.call);
+              $("#" + metric + "_high_sms").prop("checked", config.alert_ranges[metric].high_notifications.sms);
+              $("#" + metric + "_high_email").prop("checked", config.alert_ranges[metric].high_notifications.email);
+            }
+          }
+        });
+      }
+    });
+  }
+
+  $(document).ready(function(){
+    loadConfig();
+
+    // Handle System Options Form submission
+    $('#system-options-form').on('submit', function(e){
+      e.preventDefault();
+      const formData = $(this).serialize();
+      $.post("{{ url_for('update_system_options') }}", formData)
+        .done(function(data) {
+          alert('System options updated successfully!');
+        })
+        .fail(function() {
+          alert('Failed to update system options.');
+        });
+    });
+
+    // Reset Refractory Clock button
+    $('#reset-refractory').on('click', function(e){
+      e.preventDefault();
+      $.post("{{ url_for('reset_refractory') }}")
+        .done(function(data){
+          alert('Refractory clock reset successfully!');
+        })
+        .fail(function(){
+          alert('Failed to reset refractory clock.');
+        });
+    });
+
+    // Handle Alert Ranges Form submission
+    $('#alert-config-form').on('submit', function(e){
+      e.preventDefault();
+      const formData = $(this).serialize();
+      $.post("{{ url_for('update_alert_config') }}", formData)
+        .done(function(data){
+          alert('Alert configuration updated successfully!');
+        })
+        .fail(function(){
+          alert('Failed to update alert configuration.');
+        });
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% set all_tables = db_data | dictsort(by='key') %}
+
+{#
+  We separate "positions" and "prices" tables from everything else,
+  so we can display them in the custom order:
+  1) positions, 2) prices, 3) the rest (including alerts).
+#}
+{% set positions_table = all_tables | selectattr("0", "equalto", "positions") | list %}
+{% set prices_table = all_tables | selectattr("0", "equalto", "prices") | list %}
+{% set rest_tables = all_tables
+   | rejectattr("0", "in", ["positions","prices"])
+   | list
+%}
+
+<div class="row">
+  <div class="col-12">
+    <h1 class="mb-4">Database Viewer</h1>
+  </div>
+</div>
+
+{# 1) RENDER POSITIONS FIRST #}
+{% for table_name, data in positions_table %}
+  <div class="card mb-4" style="background-color: #EEEEEE;">
+    <div class="card-header d-flex align-items-center" style="background-color: #d2f4be;">
+      <!-- Collapsible toggle icon on the left -->
+      <button
+        class="btn btn-sm btn-outline-dark me-2"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapse-{{ table_name }}"
+        aria-expanded="true"
+        aria-controls="collapse-{{ table_name }}"
+      >
+        <i class="bi bi-chevron-double-down"></i>
+      </button>
+      <h3 class="card-title mb-0" style="font-weight: bold;">{{ table_name }}</h3>
+    </div>
+    <div id="collapse-{{ table_name }}" class="collapse show">
+      <div class="card-body" style="background-color: #EEEEEE;">
+        {% if data.rows %}
+          <div class="table-responsive">
+            <table class="table table-hover" style="background-color: #FFFFFF;">
+              <thead>
+                <tr>
+                  {% for col in data.columns %}
+                    <th scope="col">{{ col }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in data.rows %}
+                  <tr>
+                    {% for col in data.columns %}
+                      <td>{{ row[col] }}</td>
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted">No rows in <b>{{ table_name }}</b> table.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endfor %}
+
+{# 2) RENDER PRICES SECOND, sorted descending by "last_update_time" #}
+{% for table_name, data in prices_table %}
+  <div class="card mb-4" style="background-color: #EEEEEE;">
+    <div class="card-header d-flex align-items-center" style="background-color: #d2f4be;">
+      <button
+        class="btn btn-sm btn-outline-dark me-2"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapse-{{ table_name }}"
+        aria-expanded="true"
+        aria-controls="collapse-{{ table_name }}"
+      >
+        <i class="bi bi-chevron-double-down"></i>
+      </button>
+      <h3 class="card-title mb-0" style="font-weight: bold;">{{ table_name }}</h3>
+    </div>
+    <div id="collapse-{{ table_name }}" class="collapse show">
+      <div class="card-body" style="background-color: #EEEEEE;">
+        {% if data.rows %}
+          <div class="table-responsive">
+            <table class="table table-hover" style="background-color: #FFFFFF;">
+              <thead>
+                <tr>
+                  {% for col in data.columns %}
+                    <th scope="col">{{ col }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {# Sort by last_update_time descending #}
+                {% for row in data.rows | sort(attribute='last_update_time', reverse=True) %}
+                  <tr>
+                    {% for col in data.columns %}
+                      <td>{{ row[col] }}</td>
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted">No rows in <b>{{ table_name }}</b> table.</p>
+        {% endif %}
+
+        <!-- "Clear ALL Prices" button -->
+        <div class="mt-3 text-end">
+          <form action="/delete-all-prices" method="POST" onsubmit="return confirm('Are you sure you want to delete ALL prices?');">
+            <button type="submit" class="btn btn-danger">
+              Clear ALL Prices
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+
+{# 3) RENDER EVERYTHING ELSE LAST (including alerts) #}
+{% for table_name, data in rest_tables %}
+  <div class="card mb-4" style="background-color: #EEEEEE;">
+    <div class="card-header d-flex align-items-center" style="background-color: #d2f4be;">
+      <button
+        class="btn btn-sm btn-outline-dark me-2"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapse-{{ table_name }}"
+        aria-expanded="true"
+        aria-controls="collapse-{{ table_name }}"
+      >
+        <i class="bi bi-chevron-double-down"></i>
+      </button>
+      <h3 class="card-title mb-0" style="font-weight: bold;">{{ table_name }}</h3>
+    </div>
+    <div id="collapse-{{ table_name }}" class="collapse show">
+      <div class="card-body" style="background-color: #EEEEEE;">
+        {% if data.rows %}
+          <div class="table-responsive">
+            <table class="table table-hover" style="background-color: #FFFFFF;">
+              <thead>
+                <tr>
+                  {% for col in data.columns %}
+                    <th scope="col">{{ col }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in data.rows %}
+                  <tr>
+                    {% for col in data.columns %}
+                      <td>{{ row[col] }}</td>
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted">No rows in <b>{{ table_name }}</b> table.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endfor %}
+
+{% endblock content %}

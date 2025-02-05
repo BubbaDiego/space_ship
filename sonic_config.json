@@ -29,15 +29,13 @@
   },
   "alert_ranges": {
     "heat_index_ranges": {
-      "low": 233.0,
-      "medium": 111.11,
-      "high": 0.0,
-      "enabled": false,
+      "enabled": true,
+      "low": 190.0,
       "low_notifications": {
-        "call": false,
-        "sms": false,
-        "email": false
+        "call": true
       },
+      "medium": 444.0,
+      "high": 777.0,
       "medium_notifications": {
         "call": false,
         "sms": false,
@@ -189,24 +187,18 @@
       }
     },
     "profit_ranges": {
-      "low": 0.0,
-      "medium": 0.0,
-      "high": 0.0,
-      "enabled": false,
+      "enabled": true,
+      "low": 11.0,
       "low_notifications": {
-        "call": false,
-        "sms": false,
-        "email": false
+        "call": true
       },
+      "medium": 33.0,
       "medium_notifications": {
-        "call": false,
-        "sms": false,
-        "email": false
+        "call": true
       },
+      "high": 0.0,
       "high_notifications": {
-        "call": false,
-        "sms": false,
-        "email": false
+        "call": true
       }
     }
   },
@@ -237,7 +229,7 @@
   },
   "twilio_config": {
     "account_sid": "ACb606788ada5dccbfeeebed0f440099b3",
-    "auth_token": "f2cee9e20e844a42157cfccbc5df5648",
+    "auth_token": "d3e5a69821872a3ff9d5c90a5c59eafa",
     "flow_sid": "FW5b3bf49ee04af4d23a118b613bbc0df2",
     "to_phone": "+16199804758",
     "from_phone": "+18336913467"

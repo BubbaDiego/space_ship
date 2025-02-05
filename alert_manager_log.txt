@@ -8552,3 +8552,709 @@ ValueError: Missing one or more Twilio configuration variables.
 2025-02-04 16:52:34,362 - AlertManagerLogger - DEBUG - Call refractory period: 4444 seconds
 2025-02-04 16:52:34,362 - AlertManagerLogger - DEBUG - Alert monitoring enabled: True
 2025-02-04 16:52:34,362 - AlertManagerLogger - INFO - AlertManager started with poll_interval=60, cooldown=900, call_refractory_period=4444
+2025-02-04 17:02:57,130 - AlertManagerLogger - DEBUG - Read 5 positions for alert checks.
+2025-02-04 17:02:57,130 - AlertManagerLogger - INFO - Pos b1e7a808-c097-48e6-b588-6a0951c0eab0: Travel percent alerts disabled in configuration.
+2025-02-04 17:02:57,130 - AlertManagerLogger - DEBUG - Pos c6c92aa6-adb5-4287-a025-f41a5408e03e: Travel percent 0.20 >= 0; no alert needed.
+2025-02-04 17:02:57,130 - AlertManagerLogger - INFO - Pos f0b95c01-0993-4f33-9120-d6adf8a5ed71: Travel percent alerts disabled in configuration.
+2025-02-04 17:02:57,130 - AlertManagerLogger - INFO - Pos 6e4f0f8c-7f8f-4256-ad20-67ee8b71e216: Travel percent alerts disabled in configuration.
+2025-02-04 17:02:57,130 - AlertManagerLogger - DEBUG - Pos 94c439d0-4db0-4260-a3c9-eb6b4f509192: Travel percent 10.56 >= 0; no alert needed.
+2025-02-04 17:02:57,131 - AlertManagerLogger - DEBUG - Found 0 active price alerts.
+2025-02-04 17:11:40,684 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-04 17:11:40,685 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-04 17:11:40,685 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-04 17:11:40,685 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-04 17:11:40,686 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=900 sec, Call Refractory=4444 sec
+2025-02-04 17:11:40,686 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-04 17:11:40,686 - AlertManagerLogger - INFO - Alert settings: Cooldown=900 sec, Refractory Period=4444 sec
+2025-02-04 17:11:40,686 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-04 17:11:41,454 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-04 17:11:41,454 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-04 17:11:41,454 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-04 17:11:41,454 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-04 17:11:41,455 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=900 sec, Call Refractory=4444 sec
+2025-02-04 17:11:41,455 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-04 17:11:41,455 - AlertManagerLogger - INFO - Alert settings: Cooldown=900 sec, Refractory Period=4444 sec
+2025-02-04 17:11:41,455 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-04 17:12:43,885 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:12:43,885 - AlertManagerLogger - INFO - Pos 7c0afc9e-c2b9-4d43-ad04-0c98a0b28990: Travel percent alerts disabled in configuration.
+2025-02-04 17:12:43,885 - AlertManagerLogger - INFO - Pos 25337b37-27c2-43b7-8a1c-592f7aa0c3ed: Travel percent (2.55%) is non-negative; no alert.
+2025-02-04 17:12:43,885 - AlertManagerLogger - INFO - Pos 3236ace0-6725-4ee7-ab44-0039d285397d: Travel percent alerts disabled in configuration.
+2025-02-04 17:12:43,885 - AlertManagerLogger - INFO - Pos 5dfdd32a-003b-46b6-8fae-95ab759821aa: Travel percent alerts disabled in configuration.
+2025-02-04 17:12:43,885 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:15:04,116 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:15:04,117 - AlertManagerLogger - INFO - Pos 29725a32-09b3-487d-867c-fa0fe51ac1ac: Travel percent alerts disabled in configuration.
+2025-02-04 17:15:04,117 - AlertManagerLogger - INFO - Pos b24829e9-153c-428d-a92b-93d68c03b43f: Travel percent (1.80%) is non-negative; no alert.
+2025-02-04 17:15:04,117 - AlertManagerLogger - INFO - Pos b1c6fd7d-6079-4771-a92b-f979e5006597: Travel percent alerts disabled in configuration.
+2025-02-04 17:15:04,117 - AlertManagerLogger - INFO - Pos 84ce859f-d954-4d94-a4e1-a95ec143264b: Travel percent alerts disabled in configuration.
+2025-02-04 17:15:04,117 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:20:07,242 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-04 17:20:07,242 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-04 17:20:07,242 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-04 17:20:07,242 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-04 17:20:07,245 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=900 sec, Call Refractory=4444 sec
+2025-02-04 17:20:07,245 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-04 17:20:07,245 - AlertManagerLogger - INFO - Alert settings: Cooldown=900 sec, Refractory Period=4444 sec
+2025-02-04 17:20:07,245 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-04 17:20:07,245 - AlertManagerLogger - INFO - Starting alert monitoring loop.
+2025-02-04 17:20:07,246 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:20:07,246 - AlertManagerLogger - INFO - Pos 29725a32-09b3-487d-867c-fa0fe51ac1ac: Travel percent alerts disabled in configuration.
+2025-02-04 17:20:07,246 - AlertManagerLogger - INFO - Pos 29725a32-09b3-487d-867c-fa0fe51ac1ac: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:20:07,246 - AlertManagerLogger - INFO - Pos 29725a32-09b3-487d-867c-fa0fe51ac1ac: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:20:07,246 - AlertManagerLogger - INFO - Pos 29725a32-09b3-487d-867c-fa0fe51ac1ac: Profit alerts disabled.
+2025-02-04 17:20:07,246 - AlertManagerLogger - INFO - Pos b24829e9-153c-428d-a92b-93d68c03b43f: Travel percent (3.52%) is non-negative; no alert.
+2025-02-04 17:20:07,246 - AlertManagerLogger - INFO - Pos b24829e9-153c-428d-a92b-93d68c03b43f: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:20:07,246 - AlertManagerLogger - INFO - Pos b24829e9-153c-428d-a92b-93d68c03b43f: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:20:07,246 - AlertManagerLogger - INFO - Pos b24829e9-153c-428d-a92b-93d68c03b43f: Profit alerts disabled.
+2025-02-04 17:20:07,246 - AlertManagerLogger - INFO - Pos b1c6fd7d-6079-4771-a92b-f979e5006597: Travel percent alerts disabled in configuration.
+2025-02-04 17:20:07,246 - AlertManagerLogger - INFO - Pos b1c6fd7d-6079-4771-a92b-f979e5006597: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:20:07,246 - AlertManagerLogger - INFO - Pos b1c6fd7d-6079-4771-a92b-f979e5006597: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:20:07,246 - AlertManagerLogger - INFO - Pos b1c6fd7d-6079-4771-a92b-f979e5006597: Profit alerts disabled.
+2025-02-04 17:20:07,246 - AlertManagerLogger - INFO - Pos 84ce859f-d954-4d94-a4e1-a95ec143264b: Travel percent alerts disabled in configuration.
+2025-02-04 17:20:07,246 - AlertManagerLogger - INFO - Pos 84ce859f-d954-4d94-a4e1-a95ec143264b: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:20:07,246 - AlertManagerLogger - INFO - Pos 84ce859f-d954-4d94-a4e1-a95ec143264b: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:20:07,246 - AlertManagerLogger - INFO - Pos 84ce859f-d954-4d94-a4e1-a95ec143264b: Profit alerts disabled.
+2025-02-04 17:20:07,246 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:20:07,970 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-04 17:20:07,970 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-04 17:20:07,970 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-04 17:20:07,970 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-04 17:20:07,971 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=900 sec, Call Refractory=4444 sec
+2025-02-04 17:20:07,971 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-04 17:20:07,971 - AlertManagerLogger - INFO - Alert settings: Cooldown=900 sec, Refractory Period=4444 sec
+2025-02-04 17:20:07,971 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-04 17:20:47,180 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:20:47,180 - AlertManagerLogger - INFO - Pos 56fd620b-a25a-42be-b6fe-4a8a699e6d8b: Travel percent alerts disabled in configuration.
+2025-02-04 17:20:47,181 - AlertManagerLogger - INFO - Pos 56fd620b-a25a-42be-b6fe-4a8a699e6d8b: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:20:47,181 - AlertManagerLogger - INFO - Pos 56fd620b-a25a-42be-b6fe-4a8a699e6d8b: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:20:47,182 - AlertManagerLogger - INFO - Pos 56fd620b-a25a-42be-b6fe-4a8a699e6d8b: Profit alerts disabled.
+2025-02-04 17:20:47,183 - AlertManagerLogger - INFO - Pos a2bee0e0-921b-4c5e-8733-582b103042c7: Travel percent (1.31%) is non-negative; no alert.
+2025-02-04 17:20:47,183 - AlertManagerLogger - INFO - Pos a2bee0e0-921b-4c5e-8733-582b103042c7: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:20:47,183 - AlertManagerLogger - INFO - Pos a2bee0e0-921b-4c5e-8733-582b103042c7: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:20:47,183 - AlertManagerLogger - INFO - Pos a2bee0e0-921b-4c5e-8733-582b103042c7: Profit alerts disabled.
+2025-02-04 17:20:47,183 - AlertManagerLogger - INFO - Pos 422e39be-050b-42c6-936a-2586c9762920: Travel percent alerts disabled in configuration.
+2025-02-04 17:20:47,183 - AlertManagerLogger - INFO - Pos 422e39be-050b-42c6-936a-2586c9762920: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:20:47,183 - AlertManagerLogger - INFO - Pos 422e39be-050b-42c6-936a-2586c9762920: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:20:47,183 - AlertManagerLogger - INFO - Pos 422e39be-050b-42c6-936a-2586c9762920: Profit alerts disabled.
+2025-02-04 17:20:47,184 - AlertManagerLogger - INFO - Pos 75daed0a-af52-419a-af76-767c0de2b7a9: Travel percent alerts disabled in configuration.
+2025-02-04 17:20:47,184 - AlertManagerLogger - INFO - Pos 75daed0a-af52-419a-af76-767c0de2b7a9: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:20:47,184 - AlertManagerLogger - INFO - Pos 75daed0a-af52-419a-af76-767c0de2b7a9: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:20:47,184 - AlertManagerLogger - INFO - Pos 75daed0a-af52-419a-af76-767c0de2b7a9: Profit alerts disabled.
+2025-02-04 17:20:47,185 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:21:07,248 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:21:07,249 - AlertManagerLogger - INFO - Pos 56fd620b-a25a-42be-b6fe-4a8a699e6d8b: Travel percent alerts disabled in configuration.
+2025-02-04 17:21:07,249 - AlertManagerLogger - INFO - Pos 56fd620b-a25a-42be-b6fe-4a8a699e6d8b: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:21:07,249 - AlertManagerLogger - INFO - Pos 56fd620b-a25a-42be-b6fe-4a8a699e6d8b: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:21:07,249 - AlertManagerLogger - INFO - Pos 56fd620b-a25a-42be-b6fe-4a8a699e6d8b: Profit alerts disabled.
+2025-02-04 17:21:07,250 - AlertManagerLogger - INFO - Pos a2bee0e0-921b-4c5e-8733-582b103042c7: Travel percent (3.57%) is non-negative; no alert.
+2025-02-04 17:21:07,250 - AlertManagerLogger - INFO - Pos a2bee0e0-921b-4c5e-8733-582b103042c7: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:21:07,250 - AlertManagerLogger - INFO - Pos a2bee0e0-921b-4c5e-8733-582b103042c7: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:21:07,250 - AlertManagerLogger - INFO - Pos a2bee0e0-921b-4c5e-8733-582b103042c7: Profit alerts disabled.
+2025-02-04 17:21:07,250 - AlertManagerLogger - INFO - Pos 422e39be-050b-42c6-936a-2586c9762920: Travel percent alerts disabled in configuration.
+2025-02-04 17:21:07,250 - AlertManagerLogger - INFO - Pos 422e39be-050b-42c6-936a-2586c9762920: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:21:07,250 - AlertManagerLogger - INFO - Pos 422e39be-050b-42c6-936a-2586c9762920: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:21:07,251 - AlertManagerLogger - INFO - Pos 422e39be-050b-42c6-936a-2586c9762920: Profit alerts disabled.
+2025-02-04 17:21:07,251 - AlertManagerLogger - INFO - Pos 75daed0a-af52-419a-af76-767c0de2b7a9: Travel percent alerts disabled in configuration.
+2025-02-04 17:21:07,251 - AlertManagerLogger - INFO - Pos 75daed0a-af52-419a-af76-767c0de2b7a9: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:21:07,251 - AlertManagerLogger - INFO - Pos 75daed0a-af52-419a-af76-767c0de2b7a9: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:21:07,252 - AlertManagerLogger - INFO - Pos 75daed0a-af52-419a-af76-767c0de2b7a9: Profit alerts disabled.
+2025-02-04 17:21:07,255 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:21:33,051 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:21:33,052 - AlertManagerLogger - INFO - Pos 971b92d4-ee66-44ff-9488-5210d7f26103: Travel percent alerts disabled in configuration.
+2025-02-04 17:21:33,052 - AlertManagerLogger - INFO - Pos 971b92d4-ee66-44ff-9488-5210d7f26103: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:21:33,052 - AlertManagerLogger - INFO - Pos 971b92d4-ee66-44ff-9488-5210d7f26103: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:21:33,052 - AlertManagerLogger - INFO - Pos 971b92d4-ee66-44ff-9488-5210d7f26103: Profit alerts disabled.
+2025-02-04 17:21:33,053 - AlertManagerLogger - INFO - Pos 3b6fa831-e788-45ba-99dc-ec0325d1c6b9: Travel percent (0.87%) is non-negative; no alert.
+2025-02-04 17:21:33,053 - AlertManagerLogger - INFO - Pos 3b6fa831-e788-45ba-99dc-ec0325d1c6b9: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:21:33,053 - AlertManagerLogger - INFO - Pos 3b6fa831-e788-45ba-99dc-ec0325d1c6b9: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:21:33,054 - AlertManagerLogger - INFO - Pos 3b6fa831-e788-45ba-99dc-ec0325d1c6b9: Profit alerts disabled.
+2025-02-04 17:21:33,054 - AlertManagerLogger - INFO - Pos 5f712ebd-de3a-4598-a85f-bcd717e6fbc5: Travel percent alerts disabled in configuration.
+2025-02-04 17:21:33,054 - AlertManagerLogger - INFO - Pos 5f712ebd-de3a-4598-a85f-bcd717e6fbc5: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:21:33,054 - AlertManagerLogger - INFO - Pos 5f712ebd-de3a-4598-a85f-bcd717e6fbc5: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:21:33,054 - AlertManagerLogger - INFO - Pos 5f712ebd-de3a-4598-a85f-bcd717e6fbc5: Profit alerts disabled.
+2025-02-04 17:21:33,054 - AlertManagerLogger - INFO - Pos 8aa29e75-4631-40e9-9f30-fc1df90defa1: Travel percent alerts disabled in configuration.
+2025-02-04 17:21:33,054 - AlertManagerLogger - INFO - Pos 8aa29e75-4631-40e9-9f30-fc1df90defa1: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:21:33,054 - AlertManagerLogger - INFO - Pos 8aa29e75-4631-40e9-9f30-fc1df90defa1: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:21:33,054 - AlertManagerLogger - INFO - Pos 8aa29e75-4631-40e9-9f30-fc1df90defa1: Profit alerts disabled.
+2025-02-04 17:21:33,056 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:22:07,258 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:22:07,258 - AlertManagerLogger - INFO - Pos 971b92d4-ee66-44ff-9488-5210d7f26103: Travel percent alerts disabled in configuration.
+2025-02-04 17:22:07,258 - AlertManagerLogger - INFO - Pos 971b92d4-ee66-44ff-9488-5210d7f26103: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:22:07,258 - AlertManagerLogger - INFO - Pos 971b92d4-ee66-44ff-9488-5210d7f26103: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:22:07,258 - AlertManagerLogger - INFO - Pos 971b92d4-ee66-44ff-9488-5210d7f26103: Profit alerts disabled.
+2025-02-04 17:22:07,258 - AlertManagerLogger - INFO - Pos 3b6fa831-e788-45ba-99dc-ec0325d1c6b9: Travel percent (3.24%) is non-negative; no alert.
+2025-02-04 17:22:07,258 - AlertManagerLogger - INFO - Pos 3b6fa831-e788-45ba-99dc-ec0325d1c6b9: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:22:07,258 - AlertManagerLogger - INFO - Pos 3b6fa831-e788-45ba-99dc-ec0325d1c6b9: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:22:07,259 - AlertManagerLogger - INFO - Pos 3b6fa831-e788-45ba-99dc-ec0325d1c6b9: Profit alerts disabled.
+2025-02-04 17:22:07,259 - AlertManagerLogger - INFO - Pos 5f712ebd-de3a-4598-a85f-bcd717e6fbc5: Travel percent alerts disabled in configuration.
+2025-02-04 17:22:07,259 - AlertManagerLogger - INFO - Pos 5f712ebd-de3a-4598-a85f-bcd717e6fbc5: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:22:07,259 - AlertManagerLogger - INFO - Pos 5f712ebd-de3a-4598-a85f-bcd717e6fbc5: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:22:07,259 - AlertManagerLogger - INFO - Pos 5f712ebd-de3a-4598-a85f-bcd717e6fbc5: Profit alerts disabled.
+2025-02-04 17:22:07,259 - AlertManagerLogger - INFO - Pos 8aa29e75-4631-40e9-9f30-fc1df90defa1: Travel percent alerts disabled in configuration.
+2025-02-04 17:22:07,259 - AlertManagerLogger - INFO - Pos 8aa29e75-4631-40e9-9f30-fc1df90defa1: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:22:07,259 - AlertManagerLogger - INFO - Pos 8aa29e75-4631-40e9-9f30-fc1df90defa1: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:22:07,259 - AlertManagerLogger - INFO - Pos 8aa29e75-4631-40e9-9f30-fc1df90defa1: Profit alerts disabled.
+2025-02-04 17:22:07,263 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:23:03,288 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-04 17:23:03,288 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-04 17:23:03,288 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-04 17:23:03,289 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-04 17:23:03,290 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=900 sec, Call Refractory=4444 sec
+2025-02-04 17:23:03,290 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-04 17:23:03,290 - AlertManagerLogger - INFO - Alert settings: Cooldown=900 sec, Refractory Period=4444 sec
+2025-02-04 17:23:03,290 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-04 17:23:04,048 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-04 17:23:04,048 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-04 17:23:04,048 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-04 17:23:04,048 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-04 17:23:04,049 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=900 sec, Call Refractory=4444 sec
+2025-02-04 17:23:04,049 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-04 17:23:04,049 - AlertManagerLogger - INFO - Alert settings: Cooldown=900 sec, Refractory Period=4444 sec
+2025-02-04 17:23:04,049 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-04 17:23:07,264 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:23:07,265 - AlertManagerLogger - INFO - Pos 971b92d4-ee66-44ff-9488-5210d7f26103: Travel percent alerts disabled in configuration.
+2025-02-04 17:23:07,265 - AlertManagerLogger - INFO - Pos 971b92d4-ee66-44ff-9488-5210d7f26103: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:23:07,265 - AlertManagerLogger - INFO - Pos 971b92d4-ee66-44ff-9488-5210d7f26103: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:23:07,265 - AlertManagerLogger - INFO - Pos 971b92d4-ee66-44ff-9488-5210d7f26103: Profit alerts disabled.
+2025-02-04 17:23:07,265 - AlertManagerLogger - INFO - Pos 3b6fa831-e788-45ba-99dc-ec0325d1c6b9: Travel percent (3.24%) is non-negative; no alert.
+2025-02-04 17:23:07,265 - AlertManagerLogger - INFO - Pos 3b6fa831-e788-45ba-99dc-ec0325d1c6b9: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:23:07,265 - AlertManagerLogger - INFO - Pos 3b6fa831-e788-45ba-99dc-ec0325d1c6b9: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:23:07,265 - AlertManagerLogger - INFO - Pos 3b6fa831-e788-45ba-99dc-ec0325d1c6b9: Profit alerts disabled.
+2025-02-04 17:23:07,265 - AlertManagerLogger - INFO - Pos 5f712ebd-de3a-4598-a85f-bcd717e6fbc5: Travel percent alerts disabled in configuration.
+2025-02-04 17:23:07,265 - AlertManagerLogger - INFO - Pos 5f712ebd-de3a-4598-a85f-bcd717e6fbc5: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:23:07,265 - AlertManagerLogger - INFO - Pos 5f712ebd-de3a-4598-a85f-bcd717e6fbc5: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:23:07,265 - AlertManagerLogger - INFO - Pos 5f712ebd-de3a-4598-a85f-bcd717e6fbc5: Profit alerts disabled.
+2025-02-04 17:23:07,265 - AlertManagerLogger - INFO - Pos 8aa29e75-4631-40e9-9f30-fc1df90defa1: Travel percent alerts disabled in configuration.
+2025-02-04 17:23:07,265 - AlertManagerLogger - INFO - Pos 8aa29e75-4631-40e9-9f30-fc1df90defa1: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:23:07,265 - AlertManagerLogger - INFO - Pos 8aa29e75-4631-40e9-9f30-fc1df90defa1: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:23:07,265 - AlertManagerLogger - INFO - Pos 8aa29e75-4631-40e9-9f30-fc1df90defa1: Profit alerts disabled.
+2025-02-04 17:23:07,267 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Travel percent alerts disabled in configuration.
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Profit call alert for level 'MEDIUM' is disabled.
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Travel percent (0.85%) is non-negative; no alert.
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Profit call alert for level 'MEDIUM' is disabled.
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Travel percent alerts disabled in configuration.
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Profit call alert for level 'MEDIUM' is disabled.
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Travel percent alerts disabled in configuration.
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:24:06,655 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Profit call alert for level 'MEDIUM' is disabled.
+2025-02-04 17:24:06,656 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:24:07,269 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:24:07,269 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Travel percent alerts disabled in configuration.
+2025-02-04 17:24:07,269 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:24:07,269 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:24:07,269 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Profit alerts disabled.
+2025-02-04 17:24:07,269 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Travel percent (2.61%) is non-negative; no alert.
+2025-02-04 17:24:07,269 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:24:07,270 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:24:07,270 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Profit alerts disabled.
+2025-02-04 17:24:07,270 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Travel percent alerts disabled in configuration.
+2025-02-04 17:24:07,270 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:24:07,270 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:24:07,270 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Profit alerts disabled.
+2025-02-04 17:24:07,270 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Travel percent alerts disabled in configuration.
+2025-02-04 17:24:07,270 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:24:07,270 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:24:07,270 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Profit alerts disabled.
+2025-02-04 17:24:07,275 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:25:07,275 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:25:07,276 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Travel percent alerts disabled in configuration.
+2025-02-04 17:25:07,276 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:25:07,276 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:25:07,276 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Profit alerts disabled.
+2025-02-04 17:25:07,276 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Travel percent (2.61%) is non-negative; no alert.
+2025-02-04 17:25:07,276 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:25:07,276 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:25:07,276 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Profit alerts disabled.
+2025-02-04 17:25:07,276 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Travel percent alerts disabled in configuration.
+2025-02-04 17:25:07,276 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:25:07,276 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:25:07,276 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Profit alerts disabled.
+2025-02-04 17:25:07,276 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Travel percent alerts disabled in configuration.
+2025-02-04 17:25:07,276 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:25:07,276 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:25:07,276 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Profit alerts disabled.
+2025-02-04 17:25:07,280 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:26:07,282 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:26:07,282 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Travel percent alerts disabled in configuration.
+2025-02-04 17:26:07,282 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:26:07,282 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:26:07,282 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Profit alerts disabled.
+2025-02-04 17:26:07,283 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Travel percent (2.61%) is non-negative; no alert.
+2025-02-04 17:26:07,283 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:26:07,283 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:26:07,283 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Profit alerts disabled.
+2025-02-04 17:26:07,283 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Travel percent alerts disabled in configuration.
+2025-02-04 17:26:07,283 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:26:07,283 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:26:07,283 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Profit alerts disabled.
+2025-02-04 17:26:07,283 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Travel percent alerts disabled in configuration.
+2025-02-04 17:26:07,283 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:26:07,283 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:26:07,283 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Profit alerts disabled.
+2025-02-04 17:26:07,285 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:27:07,285 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:27:07,286 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Travel percent alerts disabled in configuration.
+2025-02-04 17:27:07,286 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:27:07,286 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:27:07,286 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Profit alerts disabled.
+2025-02-04 17:27:07,286 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Travel percent (2.61%) is non-negative; no alert.
+2025-02-04 17:27:07,286 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:27:07,286 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:27:07,286 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Profit alerts disabled.
+2025-02-04 17:27:07,286 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Travel percent alerts disabled in configuration.
+2025-02-04 17:27:07,286 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:27:07,286 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:27:07,286 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Profit alerts disabled.
+2025-02-04 17:27:07,286 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Travel percent alerts disabled in configuration.
+2025-02-04 17:27:07,286 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:27:07,286 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:27:07,286 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Profit alerts disabled.
+2025-02-04 17:27:07,289 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:27:58,563 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-04 17:27:58,563 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-04 17:27:58,563 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-04 17:27:58,563 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-04 17:27:58,564 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=900 sec, Call Refractory=4444 sec
+2025-02-04 17:27:58,564 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-04 17:27:58,564 - AlertManagerLogger - INFO - Alert settings: Cooldown=900 sec, Refractory Period=4444 sec
+2025-02-04 17:27:58,564 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-04 17:27:59,317 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-04 17:27:59,317 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-04 17:27:59,317 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-04 17:27:59,317 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-04 17:27:59,318 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=900 sec, Call Refractory=4444 sec
+2025-02-04 17:27:59,318 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-04 17:27:59,318 - AlertManagerLogger - INFO - Alert settings: Cooldown=900 sec, Refractory Period=4444 sec
+2025-02-04 17:27:59,318 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-04 17:28:07,290 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:28:07,290 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Travel percent alerts disabled in configuration.
+2025-02-04 17:28:07,290 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:28:07,290 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:28:07,290 - AlertManagerLogger - INFO - Pos 71dc5a01-6ece-4aec-9c3a-3bfc119d285b: Profit alerts disabled.
+2025-02-04 17:28:07,290 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Travel percent (2.61%) is non-negative; no alert.
+2025-02-04 17:28:07,290 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:28:07,290 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:28:07,290 - AlertManagerLogger - INFO - Pos 67af2ab9-19c6-494d-a094-94dbb04cb30b: Profit alerts disabled.
+2025-02-04 17:28:07,290 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Travel percent alerts disabled in configuration.
+2025-02-04 17:28:07,290 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:28:07,290 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:28:07,290 - AlertManagerLogger - INFO - Pos 4d4e67e4-fe77-473d-a2f8-581b6c01dc14: Profit alerts disabled.
+2025-02-04 17:28:07,290 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Travel percent alerts disabled in configuration.
+2025-02-04 17:28:07,290 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:28:07,290 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:28:07,290 - AlertManagerLogger - INFO - Pos a3a623fe-9de2-465d-b261-18ad561a8fde: Profit alerts disabled.
+2025-02-04 17:28:07,293 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:28:19,133 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:28:19,133 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Travel percent alerts disabled in configuration.
+2025-02-04 17:28:19,133 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:28:19,133 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:28:19,134 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:28:19,134 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Profit ALERT: Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3 - Profit=0.00, Level=MEDIUM
+2025-02-04 17:28:19,134 - AlertManagerLogger - DEBUG - Triggering Twilio Flow with message: 'Profit ALERT: Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3 - Profit=0.00, Level=MEDIUM'
+2025-02-04 17:28:19,134 - AlertManagerLogger - DEBUG - TWILIO_CONFIG: account_sid=ACb606788ada5dccbfeeebed0f440099b3, flow_sid=FW5b3bf49ee04af4d23a118b613bbc0df2, to=+16199804758, from=+18336913467
+2025-02-04 17:28:19,548 - AlertManagerLogger - ERROR - Twilio error for 'c60e65d2-b35f-490c-bbc9-c67bc9f55ca3-profit-MEDIUM': HTTP 401 error: Unable to create record: Authenticate
+Traceback (most recent call last):
+  File "C:\space_ship\alert_manager.py", line 381, in send_call
+    execution_sid = trigger_twilio_flow(body, self.twilio_config)
+  File "C:\space_ship\alert_manager.py", line 55, in trigger_twilio_flow
+    execution = client.studio.v2.flows(flow_sid).executions.create(
+        to=to_phone,
+        from_=from_phone,
+        parameters={"custom_message": custom_message}
+    )
+  File "C:\SonicStation\.venv\Lib\site-packages\twilio\rest\studio\v2\flow\execution\__init__.py", line 437, in create
+    payload = self._version.create(
+        method="POST", uri=self._uri, data=data, headers=headers
+    )
+  File "C:\SonicStation\.venv\Lib\site-packages\twilio\base\version.py", line 463, in create
+    return self._parse_create(method, uri, response)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SonicStation\.venv\Lib\site-packages\twilio\base\version.py", line 435, in _parse_create
+    raise self.exception(method, uri, response, "Unable to create record")
+twilio.base.exceptions.TwilioRestException: HTTP 401 error: Unable to create record: Authenticate
+2025-02-04 17:28:19,550 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Travel percent (0.92%) is non-negative; no alert.
+2025-02-04 17:28:19,550 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:28:19,550 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:28:19,550 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:28:19,550 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Profit ALERT: Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d - Profit=0.00, Level=MEDIUM
+2025-02-04 17:28:19,550 - AlertManagerLogger - DEBUG - Triggering Twilio Flow with message: 'Profit ALERT: Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d - Profit=0.00, Level=MEDIUM'
+2025-02-04 17:28:19,550 - AlertManagerLogger - DEBUG - TWILIO_CONFIG: account_sid=ACb606788ada5dccbfeeebed0f440099b3, flow_sid=FW5b3bf49ee04af4d23a118b613bbc0df2, to=+16199804758, from=+18336913467
+2025-02-04 17:28:19,689 - AlertManagerLogger - ERROR - Twilio error for 'f42aadfd-cbc5-470b-a8bc-b9a687817d9d-profit-MEDIUM': HTTP 401 error: Unable to create record: Authenticate
+Traceback (most recent call last):
+  File "C:\space_ship\alert_manager.py", line 381, in send_call
+    execution_sid = trigger_twilio_flow(body, self.twilio_config)
+  File "C:\space_ship\alert_manager.py", line 55, in trigger_twilio_flow
+    execution = client.studio.v2.flows(flow_sid).executions.create(
+        to=to_phone,
+        from_=from_phone,
+        parameters={"custom_message": custom_message}
+    )
+  File "C:\SonicStation\.venv\Lib\site-packages\twilio\rest\studio\v2\flow\execution\__init__.py", line 437, in create
+    payload = self._version.create(
+        method="POST", uri=self._uri, data=data, headers=headers
+    )
+  File "C:\SonicStation\.venv\Lib\site-packages\twilio\base\version.py", line 463, in create
+    return self._parse_create(method, uri, response)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SonicStation\.venv\Lib\site-packages\twilio\base\version.py", line 435, in _parse_create
+    raise self.exception(method, uri, response, "Unable to create record")
+twilio.base.exceptions.TwilioRestException: HTTP 401 error: Unable to create record: Authenticate
+2025-02-04 17:28:19,691 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Travel percent alerts disabled in configuration.
+2025-02-04 17:28:19,691 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:28:19,691 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:28:19,691 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:28:19,691 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Profit ALERT: Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f - Profit=0.00, Level=MEDIUM
+2025-02-04 17:28:19,691 - AlertManagerLogger - DEBUG - Triggering Twilio Flow with message: 'Profit ALERT: Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f - Profit=0.00, Level=MEDIUM'
+2025-02-04 17:28:19,691 - AlertManagerLogger - DEBUG - TWILIO_CONFIG: account_sid=ACb606788ada5dccbfeeebed0f440099b3, flow_sid=FW5b3bf49ee04af4d23a118b613bbc0df2, to=+16199804758, from=+18336913467
+2025-02-04 17:28:19,844 - AlertManagerLogger - ERROR - Twilio error for '8ad6ca01-2cc4-4add-9694-070c3511e02f-profit-MEDIUM': HTTP 401 error: Unable to create record: Authenticate
+Traceback (most recent call last):
+  File "C:\space_ship\alert_manager.py", line 381, in send_call
+    execution_sid = trigger_twilio_flow(body, self.twilio_config)
+  File "C:\space_ship\alert_manager.py", line 55, in trigger_twilio_flow
+    execution = client.studio.v2.flows(flow_sid).executions.create(
+        to=to_phone,
+        from_=from_phone,
+        parameters={"custom_message": custom_message}
+    )
+  File "C:\SonicStation\.venv\Lib\site-packages\twilio\rest\studio\v2\flow\execution\__init__.py", line 437, in create
+    payload = self._version.create(
+        method="POST", uri=self._uri, data=data, headers=headers
+    )
+  File "C:\SonicStation\.venv\Lib\site-packages\twilio\base\version.py", line 463, in create
+    return self._parse_create(method, uri, response)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SonicStation\.venv\Lib\site-packages\twilio\base\version.py", line 435, in _parse_create
+    raise self.exception(method, uri, response, "Unable to create record")
+twilio.base.exceptions.TwilioRestException: HTTP 401 error: Unable to create record: Authenticate
+2025-02-04 17:28:19,845 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Travel percent alerts disabled in configuration.
+2025-02-04 17:28:19,845 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:28:19,845 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:28:19,845 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:28:19,845 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Profit ALERT: Pos 4139c875-da22-43c6-af97-26029dfaf6a8 - Profit=0.00, Level=MEDIUM
+2025-02-04 17:28:19,845 - AlertManagerLogger - DEBUG - Triggering Twilio Flow with message: 'Profit ALERT: Pos 4139c875-da22-43c6-af97-26029dfaf6a8 - Profit=0.00, Level=MEDIUM'
+2025-02-04 17:28:19,845 - AlertManagerLogger - DEBUG - TWILIO_CONFIG: account_sid=ACb606788ada5dccbfeeebed0f440099b3, flow_sid=FW5b3bf49ee04af4d23a118b613bbc0df2, to=+16199804758, from=+18336913467
+2025-02-04 17:28:19,978 - AlertManagerLogger - ERROR - Twilio error for '4139c875-da22-43c6-af97-26029dfaf6a8-profit-MEDIUM': HTTP 401 error: Unable to create record: Authenticate
+Traceback (most recent call last):
+  File "C:\space_ship\alert_manager.py", line 381, in send_call
+    execution_sid = trigger_twilio_flow(body, self.twilio_config)
+  File "C:\space_ship\alert_manager.py", line 55, in trigger_twilio_flow
+    execution = client.studio.v2.flows(flow_sid).executions.create(
+        to=to_phone,
+        from_=from_phone,
+        parameters={"custom_message": custom_message}
+    )
+  File "C:\SonicStation\.venv\Lib\site-packages\twilio\rest\studio\v2\flow\execution\__init__.py", line 437, in create
+    payload = self._version.create(
+        method="POST", uri=self._uri, data=data, headers=headers
+    )
+  File "C:\SonicStation\.venv\Lib\site-packages\twilio\base\version.py", line 463, in create
+    return self._parse_create(method, uri, response)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SonicStation\.venv\Lib\site-packages\twilio\base\version.py", line 435, in _parse_create
+    raise self.exception(method, uri, response, "Unable to create record")
+twilio.base.exceptions.TwilioRestException: HTTP 401 error: Unable to create record: Authenticate
+2025-02-04 17:28:19,979 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:29:07,293 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:29:07,294 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Travel percent alerts disabled in configuration.
+2025-02-04 17:29:07,294 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:29:07,294 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:29:07,294 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Profit alerts disabled.
+2025-02-04 17:29:07,294 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Travel percent (1.45%) is non-negative; no alert.
+2025-02-04 17:29:07,294 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:29:07,294 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:29:07,294 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Profit alerts disabled.
+2025-02-04 17:29:07,294 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Travel percent alerts disabled in configuration.
+2025-02-04 17:29:07,294 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:29:07,294 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:29:07,294 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Profit alerts disabled.
+2025-02-04 17:29:07,294 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Travel percent alerts disabled in configuration.
+2025-02-04 17:29:07,294 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:29:07,294 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:29:07,294 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Profit alerts disabled.
+2025-02-04 17:29:07,297 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:30:07,299 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:30:07,299 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Travel percent alerts disabled in configuration.
+2025-02-04 17:30:07,299 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:30:07,299 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:30:07,299 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Profit alerts disabled.
+2025-02-04 17:30:07,299 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Travel percent (1.45%) is non-negative; no alert.
+2025-02-04 17:30:07,299 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:30:07,299 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:30:07,299 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Profit alerts disabled.
+2025-02-04 17:30:07,300 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Travel percent alerts disabled in configuration.
+2025-02-04 17:30:07,300 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:30:07,300 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:30:07,300 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Profit alerts disabled.
+2025-02-04 17:30:07,300 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Travel percent alerts disabled in configuration.
+2025-02-04 17:30:07,300 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:30:07,300 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:30:07,300 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Profit alerts disabled.
+2025-02-04 17:30:07,301 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:31:07,303 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:31:07,303 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Travel percent alerts disabled in configuration.
+2025-02-04 17:31:07,303 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:31:07,303 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:31:07,303 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Profit alerts disabled.
+2025-02-04 17:31:07,303 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Travel percent (1.45%) is non-negative; no alert.
+2025-02-04 17:31:07,303 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:31:07,304 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:31:07,304 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Profit alerts disabled.
+2025-02-04 17:31:07,304 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Travel percent alerts disabled in configuration.
+2025-02-04 17:31:07,304 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:31:07,304 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:31:07,304 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Profit alerts disabled.
+2025-02-04 17:31:07,304 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Travel percent alerts disabled in configuration.
+2025-02-04 17:31:07,304 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:31:07,304 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:31:07,304 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Profit alerts disabled.
+2025-02-04 17:31:07,308 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:32:07,311 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:32:07,311 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Travel percent alerts disabled in configuration.
+2025-02-04 17:32:07,311 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:32:07,311 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:32:07,311 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Profit alerts disabled.
+2025-02-04 17:32:07,311 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Travel percent (1.45%) is non-negative; no alert.
+2025-02-04 17:32:07,311 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:32:07,311 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:32:07,311 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Profit alerts disabled.
+2025-02-04 17:32:07,311 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Travel percent alerts disabled in configuration.
+2025-02-04 17:32:07,312 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:32:07,312 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:32:07,312 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Profit alerts disabled.
+2025-02-04 17:32:07,312 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Travel percent alerts disabled in configuration.
+2025-02-04 17:32:07,312 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:32:07,312 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:32:07,312 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Profit alerts disabled.
+2025-02-04 17:32:07,317 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:33:07,319 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:33:07,319 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Travel percent alerts disabled in configuration.
+2025-02-04 17:33:07,319 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:33:07,319 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:33:07,319 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Profit alerts disabled.
+2025-02-04 17:33:07,320 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Travel percent (1.45%) is non-negative; no alert.
+2025-02-04 17:33:07,320 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:33:07,320 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:33:07,320 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Profit alerts disabled.
+2025-02-04 17:33:07,320 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Travel percent alerts disabled in configuration.
+2025-02-04 17:33:07,320 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:33:07,320 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:33:07,320 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Profit alerts disabled.
+2025-02-04 17:33:07,320 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Travel percent alerts disabled in configuration.
+2025-02-04 17:33:07,320 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:33:07,320 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:33:07,320 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Profit alerts disabled.
+2025-02-04 17:33:07,323 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:33:45,142 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-04 17:33:45,142 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-04 17:33:45,142 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-04 17:33:45,142 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-04 17:33:45,143 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=900 sec, Call Refractory=4444 sec
+2025-02-04 17:33:45,143 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-04 17:33:45,143 - AlertManagerLogger - INFO - Alert settings: Cooldown=900 sec, Refractory Period=4444 sec
+2025-02-04 17:33:45,143 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-04 17:34:07,325 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:34:07,325 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Travel percent alerts disabled in configuration.
+2025-02-04 17:34:07,325 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:34:07,325 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:34:07,325 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Profit alerts disabled.
+2025-02-04 17:34:07,325 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Travel percent (1.45%) is non-negative; no alert.
+2025-02-04 17:34:07,325 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:34:07,325 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:34:07,325 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Profit alerts disabled.
+2025-02-04 17:34:07,325 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Travel percent alerts disabled in configuration.
+2025-02-04 17:34:07,326 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:34:07,326 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:34:07,326 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Profit alerts disabled.
+2025-02-04 17:34:07,326 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Travel percent alerts disabled in configuration.
+2025-02-04 17:34:07,326 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:34:07,326 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:34:07,326 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Profit alerts disabled.
+2025-02-04 17:34:07,328 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:35:07,329 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:35:07,329 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Travel percent alerts disabled in configuration.
+2025-02-04 17:35:07,330 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:35:07,330 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:35:07,330 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Profit alerts disabled.
+2025-02-04 17:35:07,330 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Travel percent (1.45%) is non-negative; no alert.
+2025-02-04 17:35:07,330 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:35:07,330 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:35:07,330 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Profit alerts disabled.
+2025-02-04 17:35:07,330 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Travel percent alerts disabled in configuration.
+2025-02-04 17:35:07,330 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:35:07,330 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:35:07,330 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Profit alerts disabled.
+2025-02-04 17:35:07,330 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Travel percent alerts disabled in configuration.
+2025-02-04 17:35:07,330 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:35:07,330 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:35:07,330 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Profit alerts disabled.
+2025-02-04 17:35:07,334 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:35:19,628 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-04 17:35:19,628 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-04 17:35:19,628 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-04 17:35:19,628 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-04 17:35:19,629 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=900 sec, Call Refractory=4444 sec
+2025-02-04 17:35:19,629 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-04 17:35:19,629 - AlertManagerLogger - INFO - Alert settings: Cooldown=900 sec, Refractory Period=4444 sec
+2025-02-04 17:35:19,629 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-04 17:36:07,335 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:36:07,336 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Travel percent alerts disabled in configuration.
+2025-02-04 17:36:07,336 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:36:07,336 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:36:07,336 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Profit alerts disabled.
+2025-02-04 17:36:07,336 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Travel percent (1.45%) is non-negative; no alert.
+2025-02-04 17:36:07,336 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:36:07,336 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:36:07,336 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Profit alerts disabled.
+2025-02-04 17:36:07,336 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Travel percent alerts disabled in configuration.
+2025-02-04 17:36:07,336 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:36:07,336 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:36:07,336 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Profit alerts disabled.
+2025-02-04 17:36:07,336 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Travel percent alerts disabled in configuration.
+2025-02-04 17:36:07,337 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:36:07,337 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:36:07,337 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Profit alerts disabled.
+2025-02-04 17:36:07,343 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:37:07,346 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:37:07,346 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Travel percent alerts disabled in configuration.
+2025-02-04 17:37:07,346 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:37:07,346 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:37:07,346 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Profit alerts disabled.
+2025-02-04 17:37:07,346 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Travel percent (1.45%) is non-negative; no alert.
+2025-02-04 17:37:07,346 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:37:07,346 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:37:07,346 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Profit alerts disabled.
+2025-02-04 17:37:07,346 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Travel percent alerts disabled in configuration.
+2025-02-04 17:37:07,346 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:37:07,346 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:37:07,346 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Profit alerts disabled.
+2025-02-04 17:37:07,347 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Travel percent alerts disabled in configuration.
+2025-02-04 17:37:07,347 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:37:07,347 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:37:07,347 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Profit alerts disabled.
+2025-02-04 17:37:07,362 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:38:07,364 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:38:07,364 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Travel percent alerts disabled in configuration.
+2025-02-04 17:38:07,364 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:38:07,364 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:38:07,364 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Profit alerts disabled.
+2025-02-04 17:38:07,365 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Travel percent (1.45%) is non-negative; no alert.
+2025-02-04 17:38:07,365 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:38:07,365 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:38:07,365 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Profit alerts disabled.
+2025-02-04 17:38:07,365 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Travel percent alerts disabled in configuration.
+2025-02-04 17:38:07,365 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:38:07,365 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:38:07,365 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Profit alerts disabled.
+2025-02-04 17:38:07,365 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Travel percent alerts disabled in configuration.
+2025-02-04 17:38:07,365 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:38:07,365 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:38:07,365 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Profit alerts disabled.
+2025-02-04 17:38:07,372 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:38:30,544 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-04 17:38:30,544 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-04 17:38:30,544 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-04 17:38:30,544 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-04 17:38:30,545 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=900 sec, Call Refractory=4444 sec
+2025-02-04 17:38:30,545 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-04 17:38:30,545 - AlertManagerLogger - INFO - Alert settings: Cooldown=900 sec, Refractory Period=4444 sec
+2025-02-04 17:38:30,545 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-04 17:38:54,312 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-04 17:38:54,312 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-04 17:38:54,312 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-04 17:38:54,312 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-04 17:38:54,316 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=900 sec, Call Refractory=4444 sec
+2025-02-04 17:38:54,316 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-04 17:38:54,316 - AlertManagerLogger - INFO - Alert settings: Cooldown=900 sec, Refractory Period=4444 sec
+2025-02-04 17:38:54,316 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-04 17:38:54,316 - AlertManagerLogger - INFO - Starting alert monitoring loop.
+2025-02-04 17:38:54,316 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:38:54,316 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Travel percent alerts disabled in configuration.
+2025-02-04 17:38:54,316 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:38:54,316 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:38:54,317 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:38:54,317 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Profit ALERT: Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3 - Profit=0.00, Level=MEDIUM
+2025-02-04 17:38:54,317 - AlertManagerLogger - DEBUG - Triggering Twilio Flow with message: 'Profit ALERT: Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3 - Profit=0.00, Level=MEDIUM'
+2025-02-04 17:38:54,317 - AlertManagerLogger - DEBUG - TWILIO_CONFIG: account_sid=ACb606788ada5dccbfeeebed0f440099b3, flow_sid=FW5b3bf49ee04af4d23a118b613bbc0df2, to=+16199804758, from=+18336913467
+2025-02-04 17:38:58,812 - AlertManagerLogger - DEBUG - Twilio Flow execution created: SID=FN5fd53228e9e7b54091d65959ab2ff070
+2025-02-04 17:38:58,813 - AlertManagerLogger - INFO - Call alert sent for 'c60e65d2-b35f-490c-bbc9-c67bc9f55ca3-profit-MEDIUM'; Execution SID: FN5fd53228e9e7b54091d65959ab2ff070
+2025-02-04 17:38:58,813 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Travel percent (1.45%) is non-negative; no alert.
+2025-02-04 17:38:58,813 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:38:58,813 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:38:58,813 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:38:58,813 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Profit ALERT: Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d - Profit=0.00, Level=MEDIUM
+2025-02-04 17:38:58,813 - AlertManagerLogger - DEBUG - Triggering Twilio Flow with message: 'Profit ALERT: Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d - Profit=0.00, Level=MEDIUM'
+2025-02-04 17:38:58,813 - AlertManagerLogger - DEBUG - TWILIO_CONFIG: account_sid=ACb606788ada5dccbfeeebed0f440099b3, flow_sid=FW5b3bf49ee04af4d23a118b613bbc0df2, to=+16199804758, from=+18336913467
+2025-02-04 17:38:59,173 - AlertManagerLogger - INFO - Call alert for 'f42aadfd-cbc5-470b-a8bc-b9a687817d9d-profit-MEDIUM' already active; new call suppressed.
+2025-02-04 17:38:59,173 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Travel percent alerts disabled in configuration.
+2025-02-04 17:38:59,173 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:38:59,173 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:38:59,173 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:38:59,173 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Profit ALERT: Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f - Profit=0.00, Level=MEDIUM
+2025-02-04 17:38:59,173 - AlertManagerLogger - DEBUG - Triggering Twilio Flow with message: 'Profit ALERT: Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f - Profit=0.00, Level=MEDIUM'
+2025-02-04 17:38:59,173 - AlertManagerLogger - DEBUG - TWILIO_CONFIG: account_sid=ACb606788ada5dccbfeeebed0f440099b3, flow_sid=FW5b3bf49ee04af4d23a118b613bbc0df2, to=+16199804758, from=+18336913467
+2025-02-04 17:38:59,370 - AlertManagerLogger - INFO - Call alert for '8ad6ca01-2cc4-4add-9694-070c3511e02f-profit-MEDIUM' already active; new call suppressed.
+2025-02-04 17:38:59,370 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Travel percent alerts disabled in configuration.
+2025-02-04 17:38:59,370 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:38:59,370 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:38:59,370 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:38:59,370 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Profit ALERT: Pos 4139c875-da22-43c6-af97-26029dfaf6a8 - Profit=0.00, Level=MEDIUM
+2025-02-04 17:38:59,370 - AlertManagerLogger - DEBUG - Triggering Twilio Flow with message: 'Profit ALERT: Pos 4139c875-da22-43c6-af97-26029dfaf6a8 - Profit=0.00, Level=MEDIUM'
+2025-02-04 17:38:59,370 - AlertManagerLogger - DEBUG - TWILIO_CONFIG: account_sid=ACb606788ada5dccbfeeebed0f440099b3, flow_sid=FW5b3bf49ee04af4d23a118b613bbc0df2, to=+16199804758, from=+18336913467
+2025-02-04 17:38:59,573 - AlertManagerLogger - INFO - Call alert for '4139c875-da22-43c6-af97-26029dfaf6a8-profit-MEDIUM' already active; new call suppressed.
+2025-02-04 17:38:59,574 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:39:59,576 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:39:59,576 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Travel percent alerts disabled in configuration.
+2025-02-04 17:39:59,576 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:39:59,576 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:39:59,576 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:39:59,576 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Profit alert 'MEDIUM' skipped (cooldown).
+2025-02-04 17:39:59,576 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Travel percent (1.45%) is non-negative; no alert.
+2025-02-04 17:39:59,576 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:39:59,576 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:39:59,576 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:39:59,576 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Profit alert 'MEDIUM' skipped (cooldown).
+2025-02-04 17:39:59,576 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Travel percent alerts disabled in configuration.
+2025-02-04 17:39:59,576 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:39:59,576 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:39:59,576 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:39:59,577 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Profit alert 'MEDIUM' skipped (cooldown).
+2025-02-04 17:39:59,578 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Travel percent alerts disabled in configuration.
+2025-02-04 17:39:59,578 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:39:59,578 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:39:59,578 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:39:59,578 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Profit alert 'MEDIUM' skipped (cooldown).
+2025-02-04 17:39:59,579 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-04 17:40:59,580 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-04 17:40:59,580 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Travel percent alerts disabled in configuration.
+2025-02-04 17:40:59,580 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:40:59,581 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:40:59,581 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:40:59,581 - AlertManagerLogger - INFO - Pos c60e65d2-b35f-490c-bbc9-c67bc9f55ca3: Profit alert 'MEDIUM' skipped (cooldown).
+2025-02-04 17:40:59,581 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Travel percent (1.45%) is non-negative; no alert.
+2025-02-04 17:40:59,581 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:40:59,581 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:40:59,581 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:40:59,581 - AlertManagerLogger - INFO - Pos f42aadfd-cbc5-470b-a8bc-b9a687817d9d: Profit alert 'MEDIUM' skipped (cooldown).
+2025-02-04 17:40:59,581 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Travel percent alerts disabled in configuration.
+2025-02-04 17:40:59,581 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:40:59,581 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:40:59,581 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:40:59,581 - AlertManagerLogger - INFO - Pos 8ad6ca01-2cc4-4add-9694-070c3511e02f: Profit alert 'MEDIUM' skipped (cooldown).
+2025-02-04 17:40:59,584 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Travel percent alerts disabled in configuration.
+2025-02-04 17:40:59,584 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat Index=0.00; Thresholds: LOW=190.00, MEDIUM=444.00, HIGH=777.00
+2025-02-04 17:40:59,584 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Heat index 0.00 does not trigger any alert.
+2025-02-04 17:40:59,584 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Profit=0.00; Thresholds: LOW=11.00, MEDIUM=33.00, HIGH=0.00
+2025-02-04 17:40:59,584 - AlertManagerLogger - INFO - Pos 4139c875-da22-43c6-af97-26029dfaf6a8: Profit alert 'MEDIUM' skipped (cooldown).
+2025-02-04 17:40:59,585 - AlertManagerLogger - INFO - Found 0 active price alerts.

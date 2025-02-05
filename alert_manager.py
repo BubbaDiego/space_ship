@@ -15,20 +15,18 @@ from twilio.base.exceptions import TwilioRestException
 logger = logging.getLogger("AlertManagerLogger")
 logger.setLevel(logging.DEBUG)
 
-# Create a console handler
+# Console handler: use INFO level for concise output to console
 console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.DEBUG)
+console_handler.setLevel(logging.INFO)
 
-# Create a file handler for persistent logs
+# File handler: keep DEBUG level logs for detailed records
 file_handler = logging.FileHandler("alert_manager_log.txt")
 file_handler.setLevel(logging.DEBUG)
 
-# Create a formatter and set it for both handlers
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 console_handler.setFormatter(formatter)
 file_handler.setFormatter(formatter)
 
-# Add handlers if not already attached
 if not logger.handlers:
     logger.addHandler(console_handler)
     logger.addHandler(file_handler)
@@ -93,7 +91,7 @@ def get_alert_class(value: float, low_thresh: float, med_thresh: float, high_thr
         return "alert-low"
 
 # ================================
-# AlertManager Class with Cleaner Debugging
+# AlertManager Class with Added Support for Heat Index and Profit
 # ================================
 class AlertManager:
     ASSET_FULL_NAMES = {
@@ -108,10 +106,10 @@ class AlertManager:
         self.poll_interval = poll_interval
         self.config_path = config_path
 
-        logger.debug("Initializing AlertManager:")
-        logger.debug("  DB Path          : %s", db_path)
-        logger.debug("  Poll Interval    : %d seconds", poll_interval)
-        logger.debug("  Config Path      : %s", config_path)
+        logger.info("Initializing AlertManager...")
+        logger.info("  DB Path       : %s", db_path)
+        logger.info("  Poll Interval : %d seconds", poll_interval)
+        logger.info("  Config Path   : %s", os.path.abspath(config_path))
 
         # Setup DataLocker and CalcServices (assumed available in your project)
         from data_locker import DataLocker
@@ -123,51 +121,43 @@ class AlertManager:
         from config_manager import load_config
         db_conn = self.data_locker.get_db_connection()
         self.config = load_config(self.config_path, db_conn)
-        logger.debug("Loaded configuration:\n%s", json.dumps(self.config, indent=2))
+        logger.info("Configuration: Alert Cooldown=%s sec, Call Refractory=%s sec",
+                    self.config.get("alert_cooldown_seconds"),
+                    self.config.get("call_refractory_period"))
 
-        config_path = os.path.abspath(self.config_path)
-        logger.debug("Loading configuration from: %s", config_path)
-
-        # Extract Twilio configuration from the merged config
+        # Extract Twilio configuration (sensitive details hidden)
         self.twilio_config = self.config.get("twilio_config", {})
-        logger.debug("Loaded Twilio configuration:\n%s", json.dumps(self.twilio_config, indent=2))
-
-        # Get travel percent liquidation configuration with fallback defaults
-        self.liquid_cfg = self.config.get("alert_ranges", {}).get(
-            "travel_percent_liquid_ranges",
-            {"low": -25.0, "medium": -50.0, "high": -75.0}
-        )
-        logger.debug("Liquidation configuration:\n%s", json.dumps(self.liquid_cfg, indent=2))
+        logger.info("Twilio configuration: %s", "Present" if self.twilio_config else "Missing")
 
         # Global alert settings
         self.cooldown = self.config.get("alert_cooldown_seconds", 900)
-        logger.debug("Alert cooldown: %d seconds", self.cooldown)
         self.call_refractory_period = self.config.get("call_refractory_period", 3600)
-        logger.debug("Call refractory period: %d seconds", self.call_refractory_period)
+        logger.info("Alert settings: Cooldown=%d sec, Refractory Period=%d sec",
+                    self.cooldown, self.call_refractory_period)
 
         self.last_call_triggered: Dict[str, float] = {}
         self.monitor_enabled = self.config.get("system_config", {}).get("alert_monitor_enabled", True)
-        logger.debug("Alert monitoring enabled: %s", self.monitor_enabled)
         self.last_triggered: Dict[str, float] = {}
 
-        logger.info("AlertManager started with poll_interval=%d, cooldown=%d, call_refractory_period=%d",
-                    self.poll_interval, self.cooldown, self.call_refractory_period)
+        logger.info("AlertManager is ready.")
 
     def run(self):
-        logger.debug("Entering AlertManager run loop.")
+        logger.info("Starting alert monitoring loop.")
         while True:
             self.check_alerts()
             time.sleep(self.poll_interval)
 
     def check_alerts(self):
         if not self.monitor_enabled:
-            logger.debug("Alert monitoring disabled; skipping alert checks.")
+            logger.info("Alert monitoring is disabled; skipping checks.")
             return
 
         positions = self.data_locker.read_positions()
-        logger.debug("Read %d positions for alert checks.", len(positions))
+        logger.info("Checking alerts for %d positions.", len(positions))
         for pos in positions:
             self.check_travel_percent_liquid(pos)
+            self.check_heat_index(pos)
+            self.check_profit(pos)
         self.check_price_alerts()
 
     def check_travel_percent_liquid(self, pos: Dict[str, Any]):
@@ -176,10 +166,10 @@ class AlertManager:
             current_val = float(pos.get("current_travel_percent", 0.0))
         except Exception as e:
             logger.error("Pos %s: Error converting travel percent: %s", pos_id, e)
-            current_val = 0.0
+            return
 
         if current_val >= 0:
-            logger.debug("Pos %s: Travel percent %.2f >= 0; no alert needed.", pos_id, current_val)
+            logger.info("Pos %s: Travel percent (%.2f%%) is non-negative; no alert.", pos_id, current_val)
             return
 
         tpli_config = self.config.get("alert_ranges", {}).get("travel_percent_liquid_ranges", {})
@@ -197,12 +187,12 @@ class AlertManager:
             medium = float(tpli_config.get("medium", -50.0))
             high = float(tpli_config.get("high", -75.0))
         except Exception as e:
-            logger.error("Pos %s: Error parsing thresholds: %s", pos_id, e)
-            low, medium, high = -25.0, -50.0, -75.0
+            logger.error("Pos %s: Error parsing travel percent thresholds: %s", pos_id, e)
+            return
 
-        logger.debug("Pos %s thresholds: low=%.2f, medium=%.2f, high=%.2f", pos_id, low, medium, high)
+        logger.info("Pos %s: Travel%%=%.2f%%; Thresholds: LOW=%.2f, MEDIUM=%.2f, HIGH=%.2f",
+                    pos_id, current_val, low, medium, high)
 
-        # Determine alert level based on current value
         alert_level = None
         if current_val <= high:
             alert_level = "HIGH"
@@ -211,24 +201,126 @@ class AlertManager:
         elif current_val <= low:
             alert_level = "LOW"
         else:
-            logger.debug("Pos %s: Travel percent %.2f does not cross thresholds.", pos_id, current_val)
+            logger.info("Pos %s: No travel percent threshold breached.", pos_id)
             return
 
-        if not tpli_config.get("call_on_" + alert_level.lower(), False):
-            logger.info("Pos %s: Call alert for level '%s' disabled in configuration.", pos_id, alert_level)
+        # Use the notifications mapping from the JSON
+        if not tpli_config.get(alert_level.lower() + "_notifications", {}).get("call", False):
+            logger.info("Pos %s: Travel percent call alert for level '%s' is disabled.", pos_id, alert_level)
             return
 
-        key = f"{pos_id}-{alert_level}"
+        key = f"{pos_id}-travel-{alert_level}"
         now = time.time()
         if now - self.last_triggered.get(key, 0) < self.cooldown:
-            logger.debug("Pos %s: Cooldown active for key '%s'; alert skipped.", pos_id, key)
+            logger.info("Pos %s: Travel percent alert '%s' skipped (cooldown).", pos_id, alert_level)
             return
 
         self.last_triggered[key] = now
-        msg = (f"Travel Percent Liquid ALERT\n"
-               f"Asset: {asset_full} {position_type}, Wallet: {wallet_name}\n"
-               f"Current Travel%% = {current_val:.2f}%% => {alert_level} zone.")
-        logger.info("Pos %s: Alert triggered:\n%s", pos_id, msg)
+        msg = (f"Travel Percent Liquid ALERT: {asset_full} {position_type} (Wallet: {wallet_name}) "
+               f"- Current Travel%% = {current_val:.2f}%, Level = {alert_level}")
+        logger.info("Pos %s: %s", pos_id, msg)
+        self.send_call(msg, key)
+
+    def check_heat_index(self, pos: Dict[str, Any]):
+        pos_id = pos.get("id", "unknown")
+        try:
+            current_heat = float(pos.get("heat_index", 0.0))
+        except Exception as e:
+            logger.error("Pos %s: Error converting heat index: %s", pos_id, e)
+            return
+
+        hi_config = self.config.get("alert_ranges", {}).get("heat_index_ranges", {})
+        if not hi_config.get("enabled", False):
+            logger.info("Pos %s: Heat index alerts disabled.", pos_id)
+            return
+
+        try:
+            low = float(hi_config.get("low", 0.0))
+            medium = float(hi_config.get("medium", 0.0))
+            high = float(hi_config.get("high", 0.0))
+        except Exception as e:
+            logger.error("Pos %s: Error parsing heat index thresholds: %s", pos_id, e)
+            return
+
+        logger.info("Pos %s: Heat Index=%.2f; Thresholds: LOW=%.2f, MEDIUM=%.2f, HIGH=%.2f",
+                    pos_id, current_heat, low, medium, high)
+
+        alert_level = None
+        # Assuming higher heat index values trigger alerts:
+        if high != 0.0 and current_heat >= high:
+            alert_level = "HIGH"
+        elif medium != 0.0 and current_heat >= medium:
+            alert_level = "MEDIUM"
+        elif low != 0.0 and current_heat >= low:
+            alert_level = "LOW"
+        else:
+            logger.info("Pos %s: Heat index %.2f does not trigger any alert.", pos_id, current_heat)
+            return
+
+        if not hi_config.get(alert_level.lower() + "_notifications", {}).get("call", False):
+            logger.info("Pos %s: Heat index call alert for level '%s' is disabled.", pos_id, alert_level)
+            return
+
+        key = f"{pos_id}-heat-{alert_level}"
+        now = time.time()
+        if now - self.last_triggered.get(key, 0) < self.cooldown:
+            logger.info("Pos %s: Heat index alert '%s' skipped (cooldown).", pos_id, alert_level)
+            return
+
+        self.last_triggered[key] = now
+        msg = (f"Heat Index ALERT: Pos {pos_id} - Heat Index={current_heat:.2f}, Level={alert_level}")
+        logger.info("Pos %s: %s", pos_id, msg)
+        self.send_call(msg, key)
+
+    def check_profit(self, pos: Dict[str, Any]):
+        pos_id = pos.get("id", "unknown")
+        try:
+            profit_val = float(pos.get("profit", 0.0))
+        except Exception as e:
+            logger.error("Pos %s: Error converting profit: %s", pos_id, e)
+            return
+
+        profit_config = self.config.get("alert_ranges", {}).get("profit_ranges", {})
+        if not profit_config.get("enabled", False):
+            logger.info("Pos %s: Profit alerts disabled.", pos_id)
+            return
+
+        try:
+            low = float(profit_config.get("low", 0.0))
+            medium = float(profit_config.get("medium", 0.0))
+            high = float(profit_config.get("high", 0.0))
+        except Exception as e:
+            logger.error("Pos %s: Error parsing profit thresholds: %s", pos_id, e)
+            return
+
+        logger.info("Pos %s: Profit=%.2f; Thresholds: LOW=%.2f, MEDIUM=%.2f, HIGH=%.2f",
+                    pos_id, profit_val, low, medium, high)
+
+        alert_level = None
+        # For profit, assume lower profit is worse.
+        if high != 0.0 and profit_val <= high:
+            alert_level = "HIGH"
+        elif medium != 0.0 and profit_val <= medium:
+            alert_level = "MEDIUM"
+        elif low != 0.0 and profit_val <= low:
+            alert_level = "LOW"
+        else:
+            logger.info("Pos %s: Profit %.2f does not trigger any alert.", pos_id, profit_val)
+            return
+
+        if not profit_config.get(alert_level.lower() + "_notifications", {}).get("call", False):
+            logger.info("Pos %s: Profit call alert for level '%s' is disabled.", pos_id, alert_level)
+            return
+
+        key = f"{pos_id}-profit-{alert_level}"
+        now = time.time()
+        if now - self.last_triggered.get(key, 0) < self.cooldown:
+            logger.info("Pos %s: Profit alert '%s' skipped (cooldown).", pos_id, alert_level)
+            return
+
+        self.last_triggered[key] = now
+        msg = (f"Profit ALERT: Pos {pos_id} - Profit={profit_val:.2f}, Level={alert_level}")
+        logger.info("Pos %s: %s", pos_id, msg)
         self.send_call(msg, key)
 
     def check_price_alerts(self):
@@ -237,7 +329,7 @@ class AlertManager:
             a for a in alerts
             if a.get("alert_type") == "PRICE_THRESHOLD" and a.get("status", "").lower() == "active"
         ]
-        logger.debug("Found %d active price alerts.", len(price_alerts))
+        logger.info("Found %d active price alerts.", len(price_alerts))
         for alert in price_alerts:
             asset_code = alert.get("asset_type", "BTC").upper()
             asset_full = self.ASSET_FULL_NAMES.get(asset_code, asset_code)
@@ -248,18 +340,22 @@ class AlertManager:
             condition = alert.get("condition", "ABOVE").upper()
             price_info = self.data_locker.get_latest_price(asset_code)
             if not price_info:
-                logger.debug("Asset %s: No latest price info; skipping price alert.", asset_code)
+                logger.info("Asset %s: No latest price info available.", asset_full)
                 continue
             current_price = float(price_info.get("current_price", 0.0))
+            logger.info("Asset %s: Price=%.2f, Trigger=%.2f, Condition=%s",
+                        asset_full, current_price, trigger_val, condition)
             if (condition == "ABOVE" and current_price >= trigger_val) or \
                (condition != "ABOVE" and current_price <= trigger_val):
                 self.handle_price_alert_trigger(alert, current_price, asset_full)
+            else:
+                logger.info("Asset %s: No price alert triggered.", asset_full)
 
     def handle_price_alert_trigger(self, alert: dict, current_price: float, asset_full: str):
         key = f"price-alert-{asset_full}"
         now = time.time()
         if now - self.last_triggered.get(key, 0) < self.cooldown:
-            logger.debug("Price alert for '%s': Cooldown active; alert skipped.", asset_full)
+            logger.info("Price alert for '%s' skipped (cooldown).", asset_full)
             return
 
         self.last_triggered[key] = now
@@ -270,40 +366,35 @@ class AlertManager:
             trig_val = 0.0
         position_type = alert.get("position_type", "").capitalize()
         wallet_name = alert.get("wallet_name", "Unknown")
-        msg = (f"Price ALERT\n"
-               f"Asset: {asset_full} {position_type}" + (f", Wallet: {wallet_name}" if wallet_name != "Unknown" else "") + "\n"
-               f"Condition: {cond}\n"
-               f"Trigger Value: {trig_val}\n"
-               f"Current Price: {current_price}\n")
-        logger.info("Price alert triggered:\n%s", msg)
+        msg = (f"Price ALERT: {asset_full} {position_type}" +
+               (f", Wallet: {wallet_name}" if wallet_name != "Unknown" else "") +
+               f" - Condition: {cond}, Trigger: {trig_val}, Current: {current_price}")
+        logger.info("Price Alert: %s", msg)
         self.send_call(msg, key)
 
     def send_call(self, body: str, key: str):
         now = time.time()
         if now - self.last_call_triggered.get(key, 0) < self.call_refractory_period:
-            logger.info("Call alert for key '%s' suppressed (refractory period active).", key)
+            logger.info("Call alert for '%s' suppressed (refractory period active).", key)
             return
         try:
             execution_sid = trigger_twilio_flow(body, self.twilio_config)
             self.last_call_triggered[key] = now
-            logger.info("Call alert sent for key '%s'; Execution SID: %s", key, execution_sid)
+            logger.info("Call alert sent for '%s'; Execution SID: %s", key, execution_sid)
             return execution_sid
         except TwilioRestException as e:
             if e.code == 20409:
-                logger.info("Call alert already active for key '%s'; new call suppressed.", key)
+                logger.info("Call alert for '%s' already active; new call suppressed.", key)
                 self.last_call_triggered[key] = now
                 return None
             else:
-                logger.error("Twilio error for key '%s': %s", key, e, exc_info=True)
+                logger.error("Twilio error for '%s': %s", key, e, exc_info=True)
                 return None
         except Exception as e:
-            logger.error("Error sending call for key '%s': %s", key, e, exc_info=True)
+            logger.error("Error sending call for '%s': %s", key, e, exc_info=True)
             return None
 
 def load_json_config(json_path: str) -> dict:
-    """
-    Load configuration from a JSON file.
-    """
     try:
         with open(json_path, 'r', encoding='utf-8') as f:
             config = json.load(f)
@@ -317,16 +408,12 @@ def load_json_config(json_path: str) -> dict:
         return {}
 
 def save_config(config: dict, json_path: str):
-    """
-    Save the given configuration dictionary to the specified JSON file.
-    """
     try:
         with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(config, f, indent=2)
         logger.debug("Configuration saved to: %s", os.path.abspath(json_path))
     except Exception as e:
         logger.error("Error saving configuration to '%s': %s", json_path, e)
-
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)

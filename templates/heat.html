@@ -1,8 +1,6 @@
-{% extends "sonic_admin.html" %}
-{% block content %}
+{% extends "base.html" %}
 
-{% set hd = heat_data|default({}) %}
-
+{% block extra_styles %}
 <style>
 /* Remove gutters so the two cards/tables meet flush in the middle */
 .row.g-0 {
@@ -56,11 +54,20 @@ tfoot tr.text-center > td {
   text-align: center !important;
 }
 </style>
+{% endblock extra_styles %}
 
-<!-- Page Title -->
-<h2 class="text-dark mb-4 icon-inline">
+{% block page_title %}
+<span class="icon-inline">
   <span>🔥</span><span>Hedge Report</span>
-</h2>
+</span>
+{% endblock page_title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Hedge Report</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+{% set hd = heat_data|default({}) %}
 
 <div class="container-fluid px-4">
   <div class="row g-0">
@@ -110,11 +117,11 @@ tfoot tr.text-center > td {
                     <td>
                       <span class="icon-inline">
                         {% if pos.asset == "BTC" %}
-                          <img src="/static/images/btc_logo.png" alt="BTC" style="width:20px;">
+                          <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="width:20px;">
                         {% elif pos.asset == "ETH" %}
-                          <img src="/static/images/eth_logo.png" alt="ETH" style="width:20px;">
+                          <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="width:20px;">
                         {% elif pos.asset == "SOL" %}
-                          <img src="/static/images/sol_logo.png" alt="SOL" style="width:20px;">
+                          <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="width:20px;">
                         {% endif %}
                         {{ pos.asset }}
                       </span>
@@ -135,11 +142,11 @@ tfoot tr.text-center > td {
                   <span class="icon-inline">
                     {% if short_totals.get('asset') %}
                       {% if short_totals.asset == "BTC" %}
-                        <img src="/static/images/btc_logo.png" alt="BTC" style="width:20px;">
+                        <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="width:20px;">
                       {% elif short_totals.asset == "ETH" %}
-                        <img src="/static/images/eth_logo.png" alt="ETH" style="width:20px;">
+                        <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="width:20px;">
                       {% elif short_totals.asset == "SOL" %}
-                        <img src="/static/images/sol_logo.png" alt="SOL" style="width:20px;">
+                        <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="width:20px;">
                       {% endif %}
                       {{ short_totals.asset }}
                     {% else %}
@@ -147,11 +154,11 @@ tfoot tr.text-center > td {
                     {% endif %}
                   </span>
                 </td>
-                <td>{{ "{:,}".format(short_totals.get('collateral',0)|float|round(2)) }}</td>
-                <td>{{ "{:,}".format(short_totals.get('value',0)|float|round(2)) }}</td>
-                <td>{{ short_totals.get('leverage',0)|float|round(2) }}</td>
-                <td>{{ short_totals.get('travel_percent',0)|float|round(2) }}%</td>
-                <td>{{ "{:,}".format(short_totals.get('size',0)|float|round(2)) }}</td>
+                <td>{{ "{:,}".format(short_totals.get('collateral', 0)|float|round(2)) }}</td>
+                <td>{{ "{:,}".format(short_totals.get('value', 0)|float|round(2)) }}</td>
+                <td>{{ short_totals.get('leverage', 0)|float|round(2) }}</td>
+                <td>{{ short_totals.get('travel_percent', 0)|float|round(2) }}%</td>
+                <td>{{ "{:,}".format(short_totals.get('size', 0)|float|round(2)) }}</td>
               </tr>
             </tfoot>
           </table>
@@ -168,7 +175,6 @@ tfoot tr.text-center > td {
           </h3>
         </div>
         <div class="card-body p-0">
-          <!-- Give the table an ID so we can style it (#long-table) -->
           <table id="long-table" class="table table-sm table-bordered mb-0">
             <thead>
               <tr class="fw-bold">
@@ -210,11 +216,11 @@ tfoot tr.text-center > td {
                     <td>
                       <span class="icon-inline">
                         {% if pos.asset == "BTC" %}
-                          <img src="/static/images/btc_logo.png" alt="BTC" style="width:20px;">
+                          <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="width:20px;">
                         {% elif pos.asset == "ETH" %}
-                          <img src="/static/images/eth_logo.png" alt="ETH" style="width:20px;">
+                          <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="width:20px;">
                         {% elif pos.asset == "SOL" %}
-                          <img src="/static/images/sol_logo.png" alt="SOL" style="width:20px;">
+                          <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="width:20px;">
                         {% endif %}
                         {{ pos.asset }}
                       </span>
@@ -226,20 +232,20 @@ tfoot tr.text-center > td {
             <tfoot>
               <tr class="fw-bold text-center">
                 {% set long_totals = hd.get('totals', {}).get('long', {}) %}
-                <td>{{ "{:,}".format(long_totals.get('size',0)|float|round(2)) }}</td>
-                <td>{{ long_totals.get('travel_percent',0)|float|round(2) }}%</td>
-                <td>{{ long_totals.get('leverage',0)|float|round(2) }}</td>
-                <td>{{ "{:,}".format(long_totals.get('value',0)|float|round(2)) }}</td>
-                <td>{{ "{:,}".format(long_totals.get('collateral',0)|float|round(2)) }}</td>
+                <td>{{ "{:,}".format(long_totals.get('size', 0)|float|round(2)) }}</td>
+                <td>{{ long_totals.get('travel_percent', 0)|float|round(2) }}%</td>
+                <td>{{ long_totals.get('leverage', 0)|float|round(2) }}</td>
+                <td>{{ "{:,}".format(long_totals.get('value', 0)|float|round(2)) }}</td>
+                <td>{{ "{:,}".format(long_totals.get('collateral', 0)|float|round(2)) }}</td>
                 <td>
                   {% if long_totals.get('asset') %}
                     <span class="icon-inline">
                       {% if long_totals.asset == "BTC" %}
-                        <img src="/static/images/btc_logo.png" alt="BTC" style="width:20px;">
+                        <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="width:20px;">
                       {% elif long_totals.asset == "ETH" %}
-                        <img src="/static/images/eth_logo.png" alt="ETH" style="width:20px;">
+                        <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="width:20px;">
                       {% elif long_totals.asset == "SOL" %}
-                        <img src="/static/images/sol_logo.png" alt="SOL" style="width:20px;">
+                        <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="width:20px;">
                       {% endif %}
                       {{ long_totals.asset }}
                     </span>
@@ -254,31 +260,29 @@ tfoot tr.text-center > td {
       </div>
     </div>
   </div>
-</div>
 
-<!-- CHARTS / EXACT SAME CODE AS BEFORE -->
-{% set shortTotals = hd.get('totals', {}).get('short', {}) %}
-{% set longTotals  = hd.get('totals', {}).get('long',  {}) %}
-{% set shortSize   = shortTotals.get('size', 0)|float|round(2) %}
-{% set longSize    = longTotals.get('size', 0)|float|round(2) %}
+  <!-- CHARTS -->
+  {% set shortTotals = hd.get('totals', {}).get('short', {}) %}
+  {% set longTotals  = hd.get('totals', {}).get('long', {}) %}
+  {% set shortSize   = shortTotals.get('size', 0)|float|round(2) %}
+  {% set longSize    = longTotals.get('size', 0)|float|round(2) %}
+  {% set btcShort = hd.get("BTC", {}).get("short", {}).get("size", 0)|float|round(2) %}
+  {% set btcLong  = hd.get("BTC", {}).get("long", {}).get("size", 0)|float|round(2) %}
+  {% set ethShort = hd.get("ETH", {}).get("short", {}).get("size", 0)|float|round(2) %}
+  {% set ethLong  = hd.get("ETH", {}).get("long", {}).get("size", 0)|float|round(2) %}
+  {% set solShort = hd.get("SOL", {}).get("short", {}).get("size", 0)|float|round(2) %}
+  {% set solLong  = hd.get("SOL", {}).get("long", {}).get("size", 0)|float|round(2) %}
+  {% set btcTotal = btcShort + btcLong %}
+  {% set ethTotal = ethShort + ethLong %}
+  {% set solTotal = solShort + solLong %}
 
-{% set btcShort = hd.get("BTC", {}).get("short", {}).get("size", 0)|float|round(2) %}
-{% set btcLong  = hd.get("BTC", {}).get("long",  {}).get("size", 0)|float|round(2) %}
-{% set ethShort = hd.get("ETH", {}).get("short", {}).get("size", 0)|float|round(2) %}
-{% set ethLong  = hd.get("ETH", {}).get("long",  {}).get("size", 0)|float|round(2) %}
-{% set solShort = hd.get("SOL", {}).get("short", {}).get("size", 0)|float|round(2) %}
-{% set solLong  = hd.get("SOL", {}).get("long",  {}).get("size", 0)|float|round(2) %}
-
-{% set btcTotal = btcShort + btcLong %}
-{% set ethTotal = ethShort + ethLong %}
-{% set solTotal = solShort + solLong %}
-
-<div class="d-flex flex-wrap justify-content-around mt-5">
-  <div style="width: 400px;">
-    <canvas id="sizeDist"></canvas>
-  </div>
-  <div style="width: 400px;">
-    <canvas id="assetDist"></canvas>
+  <div class="d-flex flex-wrap justify-content-around mt-5">
+    <div style="width: 400px;">
+      <canvas id="sizeDist"></canvas>
+    </div>
+    <div style="width: 400px;">
+      <canvas id="assetDist"></canvas>
+    </div>
   </div>
 </div>
 
@@ -313,8 +317,8 @@ tfoot tr.text-center > td {
           color: '#fff',
           font: { size:14, weight:'bold' },
           formatter: (value, ctx) => {
-            const sum = ctx.dataset.data.reduce((a,b)=>a+b,0);
-            return sum>0 ? (value/sum*100).toFixed(1)+'%' : '0%';
+            const sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
+            return sum > 0 ? (value / sum * 100).toFixed(1) + '%' : '0%';
           }
         }
       }
@@ -346,11 +350,11 @@ tfoot tr.text-center > td {
         },
         legend: { position: 'bottom' },
         datalabels: {
-          color:'#fff',
-          font:{ size:14, weight:'bold' },
+          color: '#fff',
+          font: { size:14, weight:'bold' },
           formatter: (value, ctx) => {
-            const sum = ctx.dataset.data.reduce((a,b)=>a+b,0);
-            return sum>0 ? (value/sum*100).toFixed(1)+'%' : '0%';
+            const sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
+            return sum > 0 ? (value / sum * 100).toFixed(1) + '%' : '0%';
           }
         }
       }
@@ -358,5 +362,4 @@ tfoot tr.text-center > td {
   });
 })();
 </script>
-
 {% endblock content %}

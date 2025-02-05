@@ -1,273 +1,245 @@
 {
-    "price_config": {
-        "assets": [
-            "BTC",
-            "ETH",
-            "SOL"
-        ],
-        "currency": "USD",
-        "cmc_api_key": "c51c0c22-1bf3-4674-86bf-36f39a912d1a"
+  "price_config": {
+    "assets": [
+      "BTC",
+      "ETH",
+      "SOL"
+    ],
+    "currency": "USD",
+    "cmc_api_key": "c51c0c22-1bf3-4674-86bf-36f39a912d1a"
+  },
+  "system_config": {
+    "logging_enabled": true,
+    "log_level": "DEBUG",
+    "console_output": true,
+    "log_file": "C:/space_ship/price_monitor.log",
+    "db_path": "C:/space_ship/mother_brain.db",
+    "price_monitor_enabled": true,
+    "alert_monitor_enabled": true,
+    "sonic_monitor_loop_time": 300,
+    "last_price_update_time": null
+  },
+  "api_config": {
+    "coingecko_api_enabled": "ENABLE",
+    "kucoin_api_enabled": "ENABLE",
+    "coinmarketcap_api_enabled": "ENABLE",
+    "coinpaprika_api_enabled": "ENABLE",
+    "binance_api_enabled": "ENABLE",
+    "coinmarketcap_api_key": "c51c0c22-1bf3-4674-86bf-36f39a912d1a"
+  },
+  "alert_ranges": {
+    "heat_index_ranges": {
+      "low": 233.0,
+      "medium": 111.11,
+      "high": 0.0,
+      "enabled": false,
+      "low_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "medium_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "high_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      }
     },
-    "system_config": {
-        "logging_enabled": true,
-        "log_level": "DEBUG",
-        "console_output": true,
-        "log_file": "C:/WebSonic/logs/price_monitor.log",
-        "db_path": "C:/WebSonic/data/mother_brain.db",
-        "price_monitor_enabled": true,
-        "alert_monitor_enabled": true,
-        "sonic_monitor_loop_time": 300,
-        "last_price_update_time": null
+    "collateral_ranges": {
+      "low": 0.0,
+      "medium": 0.0,
+      "high": 0.0,
+      "enabled": false,
+      "low_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "medium_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "high_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      }
     },
-    "api_config": {
-        "coingecko_api_enabled": "ENABLE",
-        "kucoin_api_enabled": "ENABLE",
-        "coinmarketcap_api_enabled": "ENABLE",
-        "coinpaprika_api_enabled": "ENABLE",
-        "binance_api_enabled": "ENABLE",
-        "coinmarketcap_api_key": "c51c0c22-1bf3-4674-86bf-36f39a912d1a"
+    "value_ranges": {
+      "low": 0.0,
+      "medium": 0.0,
+      "high": 0.0,
+      "enabled": false,
+      "low_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "medium_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "high_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      }
     },
-    "alert_ranges": {
-        "heat_index_ranges": {
-            "low": 0.0,
-            "medium": 0.0,
-            "high": 0.0,
-            "enabled": false,
-            "call_on_low": false,
-            "call_on_medium": false,
-            "call_on_high": false,
-            "low_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            },
-            "medium_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            },
-            "high_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            }
-        },
-        "collateral_ranges": {
-            "low": 0.0,
-            "medium": 0.0,
-            "high": 0.0,
-            "enabled": false,
-            "call_on_low": false,
-            "call_on_medium": false,
-            "call_on_high": false,
-            "low_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            },
-            "medium_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            },
-            "high_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            }
-        },
-        "value_ranges": {
-            "low": 0.0,
-            "medium": 0.0,
-            "high": 0.0,
-            "enabled": false,
-            "call_on_low": false,
-            "call_on_medium": false,
-            "call_on_high": false,
-            "low_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            },
-            "medium_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            },
-            "high_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            }
-        },
-        "size_ranges": {
-            "low": 0.0,
-            "medium": 0.0,
-            "high": 0.0,
-            "enabled": false,
-            "call_on_low": false,
-            "call_on_medium": false,
-            "call_on_high": false,
-            "low_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            },
-            "medium_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            },
-            "high_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            }
-        },
-        "leverage_ranges": {
-            "low": 0.0,
-            "medium": 0.0,
-            "high": 0.0,
-            "enabled": false,
-            "call_on_low": false,
-            "call_on_medium": false,
-            "call_on_high": false,
-            "low_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            },
-            "medium_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            },
-            "high_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            }
-        },
-        "liquidation_distance_ranges": {
-            "low": 0.0,
-            "medium": 0.0,
-            "high": 0.0,
-            "enabled": false,
-            "call_on_low": false,
-            "call_on_medium": false,
-            "call_on_high": false,
-            "low_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            },
-            "medium_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            },
-            "high_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            }
-        },
-        "travel_percent_liquid_ranges": {
-            "enabled": true,
-            "low": 0.0,
-            "medium": 0.0,
-            "high": 0.0,
-            "call_on_low": true,
-            "call_on_medium": true,
-            "call_on_high": true,
-            "low_notifications": {
-                "call": true,
-                "sms": false,
-                "email": false
-            },
-            "medium_notifications": {
-                "call": true,
-                "sms": false,
-                "email": false
-            },
-            "high_notifications": {
-                "call": true,
-                "sms": false,
-                "email": false
-            }
-        },
-        "travel_percent_profit_ranges": {
-            "low": 0.0,
-            "medium": 0.0,
-            "high": 0.0,
-            "enabled": false,
-            "call_on_low": false,
-            "call_on_medium": true,
-            "call_on_high": true,
-            "low_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            },
-            "medium_notifications": {
-                "call": true,
-                "sms": false,
-                "email": false
-            },
-            "high_notifications": {
-                "call": true,
-                "sms": false,
-                "email": false
-            }
-        },
-        "profit_ranges": {
-            "low": 0.0,
-            "medium": 0.0,
-            "high": 0.0,
-            "enabled": false,
-            "call_on_low": false,
-            "call_on_medium": false,
-            "call_on_high": false,
-            "low_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            },
-            "medium_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            },
-            "high_notifications": {
-                "call": false,
-                "sms": false,
-                "email": false
-            }
-        }
+    "size_ranges": {
+      "low": 0.0,
+      "medium": 0.0,
+      "high": 0.0,
+      "enabled": false,
+      "low_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "medium_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "high_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      }
     },
-    "notification_config": {
-        "email": {
-            "smtp_server": "smtp.gmail.com",
-            "smtp_port": 587,
-            "smtp_user": "bubba.diego@gmail.com",
-            "smtp_password": "pzix taan afbe igxb",
-            "recipient_email": "bubba.diego@gmail.com"
-        },
-        "sms": {
-            "carrier_gateway": "txt.att.net",
-            "recipient_number": "6199804758"
-        }
+    "leverage_ranges": {
+      "low": 0.0,
+      "medium": 0.0,
+      "high": 0.0,
+      "enabled": false,
+      "low_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "medium_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "high_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      }
     },
-    "alert_cooldown_seconds": 900,
-    "call_refractory_period": 3600,
-    "theme_profiles": {
-        "sidebar": {
-            "color_mode": "light",
-            "bg": "bg-primary-subtle"
-        },
-        "navbar": {
-            "color_mode": "light",
-            "bg": "bg-secondary-subtle"
-        }
+    "liquidation_distance_ranges": {
+      "low": 0.0,
+      "medium": 0.0,
+      "high": 0.0,
+      "enabled": false,
+      "low_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "medium_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "high_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      }
+    },
+    "travel_percent_liquid_ranges": {
+      "low": 1.0,
+      "low_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "medium": 2.0,
+      "medium_notifications": {
+        "call": true
+      },
+      "high": 3.0,
+      "high_notifications": {
+        "call": true
+      },
+      "enabled": false
+    },
+    "travel_percent_profit_ranges": {
+      "low": 0.0,
+      "medium": 0.0,
+      "medium_notifications": {
+        "call": true
+      },
+      "high": 0.0,
+      "high_notifications": {
+        "call": true
+      },
+      "enabled": false,
+      "low_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      }
+    },
+    "profit_ranges": {
+      "low": 0.0,
+      "medium": 0.0,
+      "high": 0.0,
+      "enabled": false,
+      "low_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "medium_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "high_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      }
     }
+  },
+  "notification_config": {
+    "email": {
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587,
+      "smtp_user": "bubba.diego@gmail.com",
+      "smtp_password": "pzix taan afbe igxb",
+      "recipient_email": "bubba.diego@gmail.com"
+    },
+    "sms": {
+      "carrier_gateway": "txt.att.net",
+      "recipient_number": "6199804758"
+    }
+  },
+  "alert_cooldown_seconds": 900,
+  "call_refractory_period": 4444,
+  "theme_profiles": {
+    "sidebar": {
+      "color_mode": "light",
+      "bg": "bg-primary-subtle"
+    },
+    "navbar": {
+      "color_mode": "light",
+      "bg": "bg-secondary-subtle"
+    }
+  },
+  "twilio_config": {
+    "account_sid": "ACb606788ada5dccbfeeebed0f440099b3",
+    "auth_token": "f2cee9e20e844a42157cfccbc5df5648",
+    "flow_sid": "FW5b3bf49ee04af4d23a118b613bbc0df2",
+    "to_phone": "+16199804758",
+    "from_phone": "+18336913467"
+  }
 }

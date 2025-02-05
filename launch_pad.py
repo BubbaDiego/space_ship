@@ -5,6 +5,7 @@ import json
 import smtplib
 import logging
 import sqlite3
+from config_manager import load_json_config
 from typing import Dict, Any, Optional, List
 from datetime import datetime, timedelta
 from twilio.rest import Client
@@ -693,6 +694,106 @@ def alerts_create():
     flash("New alert created successfully!", "success")
     return redirect(url_for("alerts"))
 
+
+# Utility functions for config handling
+def load_config():
+    with open(CONFIG_PATH, "r") as f:
+        return json.load(f)
+
+
+def save_config(config):
+    with open(CONFIG_PATH, "w") as f:
+        json.dump(config, f, indent=2)
+
+def load_json_config(json_path: str) -> dict:
+    """
+    Load configuration from a JSON file.
+    """
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+        logger.debug("Configuration loaded from: %s", os.path.abspath(json_path))
+        return config
+    except FileNotFoundError:
+        logger.warning("Config file '%s' not found. Returning empty dict.", json_path)
+        return {}
+    except json.JSONDecodeError as e:
+        logger.error("Error parsing JSON from '%s': %s", json_path, e)
+        return {}
+
+def save_config(config: dict, json_path: str):
+    """
+    Save the given configuration dictionary to the specified JSON file.
+    """
+    try:
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(config, f, indent=2)
+        logger.debug("Configuration saved to: %s", os.path.abspath(json_path))
+    except Exception as e:
+        logger.error("Error saving configuration to '%s': %s", json_path, e)
+
+
+# API endpoint to get current configuration
+@app.route('/api/get_config')
+def api_get_config():
+    try:
+        config = load_config()
+        return jsonify(config)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# Endpoint to update system options (e.g., alert_cooldown_seconds, call_refractory_period)
+@app.route('/update_system_options', methods=['POST'])
+def update_system_options():
+    try:
+        config = load_config()
+        if "alert_cooldown_seconds" in request.form:
+            config["alert_cooldown_seconds"] = int(request.form.get("alert_cooldown_seconds"))
+        if "call_refractory_period" in request.form:
+            config["call_refractory_period"] = int(request.form.get("call_refractory_period"))
+        save_config(config)
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# Helper function to parse nested form keys
+def parse_nested_form(form_dict):
+    nested = {}
+    for full_key, value in form_dict.items():
+        if full_key.startswith("alert_ranges["):
+            # e.g., full_key: alert_ranges[heat_index_ranges][enabled]
+            key_body = full_key[len("alert_ranges["):-1]  # remove "alert_ranges[" and trailing "]"
+            parts = key_body.split("][")
+            if len(parts) == 1:
+                # Simple key, no sub-dictionary.
+                nested[parts[0]] = value
+            elif len(parts) == 2:
+                metric, subkey = parts
+                if metric not in nested:
+                    nested[metric] = {}
+                # Convert checkbox values: if not present in form, they're false.
+                # Here, assume if the key is in form, its value is truthy (e.g., "on")
+                # Otherwise, we’ll handle missing keys later.
+                nested[metric][subkey] = value
+    return nested
+
+
+
+# Endpoint to reset refractory (example implementation)
+@app.route('/reset_refractory', methods=['POST'])
+def reset_refractory():
+    try:
+        # Your logic to reset the refractory clock goes here.
+        # For example, you might update a timestamp in your config.
+        config = load_config()
+        config["last_refractory_reset"] = "now"  # or use a real timestamp
+        save_config(config)
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route("/manual_check_alerts", methods=["POST"])
 def manual_check_alerts():
     manager.check_alerts()
@@ -1298,56 +1399,40 @@ def price_charts():
     conn.close()
     return render_template("price_charts.html", chart_data=chart_data, timeframe=hours)
 
-@app.route("/update_alert_config", methods=["POST"])
+
+@app.route('/update_alert_config', methods=['POST'])
 def update_alert_config():
     try:
-        if not os.path.exists(CONFIG_PATH):
-            return jsonify({"error": "sonic_config.json not found"}), 404
-        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        config_data = AppConfig(**data)
+        # Assuming you have a function to load your JSON config
+        config = load_json_config("sonic_config.json")  # make sure this is imported properly
 
-        def parse_float_or_none(val, default=0.0):
-            if val is None or val.strip() == "":
-                return default
-            try:
-                return float(val)
-            except ValueError:
-                return default
-        config_data.alert_ranges["heat_index_ranges"]["low"] = parse_float_or_none(request.form.get("heat_index_ranges_low"))
-        config_data.alert_ranges["heat_index_ranges"]["medium"] = parse_float_or_none(request.form.get("heat_index_ranges_medium"))
-        config_data.alert_ranges["heat_index_ranges"]["high"] = parse_float_or_none(request.form.get("heat_index_ranges_high"))
-        config_data.alert_ranges["collateral_ranges"]["low"] = parse_float_or_none(request.form.get("collateral_ranges_low"))
-        config_data.alert_ranges["collateral_ranges"]["medium"] = parse_float_or_none(request.form.get("collateral_ranges_medium"))
-        config_data.alert_ranges["collateral_ranges"]["high"] = parse_float_or_none(request.form.get("collateral_ranges_high"))
-        config_data.alert_ranges["value_ranges"]["low"] = parse_float_or_none(request.form.get("value_ranges_low"))
-        config_data.alert_ranges["value_ranges"]["medium"] = parse_float_or_none(request.form.get("value_ranges_medium"))
-        config_data.alert_ranges["value_ranges"]["high"] = parse_float_or_none(request.form.get("value_ranges_high"))
-        config_data.alert_ranges["size_ranges"]["low"] = parse_float_or_none(request.form.get("size_ranges_low"))
-        config_data.alert_ranges["size_ranges"]["medium"] = parse_float_or_none(request.form.get("size_ranges_medium"))
-        config_data.alert_ranges["size_ranges"]["high"] = parse_float_or_none(request.form.get("size_ranges_high"))
-        config_data.alert_ranges["leverage_ranges"]["low"] = parse_float_or_none(request.form.get("leverage_ranges_low"))
-        config_data.alert_ranges["leverage_ranges"]["medium"] = parse_float_or_none(request.form.get("leverage_ranges_medium"))
-        config_data.alert_ranges["leverage_ranges"]["high"] = parse_float_or_none(request.form.get("leverage_ranges_high"))
-        config_data.alert_ranges["liquidation_distance_ranges"]["low"] = parse_float_or_none(request.form.get("liquidation_distance_ranges_low"))
-        config_data.alert_ranges["liquidation_distance_ranges"]["medium"] = parse_float_or_none(request.form.get("liquidation_distance_ranges_medium"))
-        config_data.alert_ranges["liquidation_distance_ranges"]["high"] = parse_float_or_none(request.form.get("liquidation_distance_ranges_high"))
-        config_data.alert_ranges["travel_percent_liquid_ranges"]["low"] = parse_float_or_none(request.form.get("travel_percent_liquid_ranges_low"))
-        config_data.alert_ranges["travel_percent_liquid_ranges"]["medium"] = parse_float_or_none(request.form.get("travel_percent_liquid_ranges_medium"))
-        config_data.alert_ranges["travel_percent_liquid_ranges"]["high"] = parse_float_or_none(request.form.get("travel_percent_liquid_ranges_high"))
-        config_data.alert_ranges["travel_percent_profit_ranges"]["low"] = parse_float_or_none(request.form.get("travel_percent_profit_ranges_low"))
-        config_data.alert_ranges["travel_percent_profit_ranges"]["medium"] = parse_float_or_none(request.form.get("travel_percent_profit_ranges_medium"))
-        config_data.alert_ranges["travel_percent_profit_ranges"]["high"] = parse_float_or_none(request.form.get("travel_percent_profit_ranges_high"))
-        config_data.alert_ranges["profit_ranges"]["low"] = parse_float_or_none(request.form.get("profit_ranges_low"))
-        config_data.alert_ranges["profit_ranges"]["medium"] = parse_float_or_none(request.form.get("profit_ranges_medium"))
-        config_data.alert_ranges["profit_ranges"]["high"] = parse_float_or_none(request.form.get("profit_ranges_high"))
-        save_app_config(config_data)
-        flash("Alert ranges updated successfully!", "success")
-        return redirect(url_for("alerts"))
-    except Exception as ex:
-        logger.exception(f"Error in update_alert_config: {ex}")
-        flash(f"Error updating alert ranges: {ex}", "danger")
-        return redirect(url_for("alerts"))
+        form_data = request.form.to_dict(flat=True)
+        updated_alerts = parse_alert_config_form(form_data)
+
+        # Set defaults for unchecked checkboxes or missing keys:
+        expected_metrics = [
+            "heat_index_ranges", "collateral_ranges", "value_ranges", "size_ranges",
+            "leverage_ranges", "liquidation_distance_ranges", "travel_percent_liquid_ranges",
+            "travel_percent_profit_ranges", "profit_ranges"
+        ]
+        for metric in expected_metrics:
+            if metric not in updated_alerts:
+                updated_alerts[metric] = {}
+            updated_alerts[metric].setdefault("enabled", False)
+            for thresh in ["low", "medium", "high"]:
+                updated_alerts[metric].setdefault(thresh, 0.0)
+            for notif in ["low_notifications", "medium_notifications", "high_notifications"]:
+                updated_alerts[metric].setdefault(notif, {"call": False, "sms": False, "email": False})
+
+        config["alert_ranges"] = updated_alerts
+
+        save_config(config, "sonic_config.json")  # Ensure this function is defined and imported
+        return jsonify({"success": True})
+    except Exception as e:
+        logger.error("Error updating alert config: %s", e, exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
 
 @app.route("/hedge-report")
 def hedge_report():
@@ -1381,37 +1466,6 @@ def hedge_report():
 @app.route("/alert-config", methods=["GET"])
 def alert_config_page():
     return render_template("alert_manager_config.html")
-
-@app.route("/api/get_config", methods=["GET"])
-def api_get_config():
-    try:
-        if not os.path.exists(CONFIG_PATH):
-            return jsonify({"error": "Config file not found"}), 404
-        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-            config = json.load(f)
-        return jsonify(config), 200
-    except Exception as e:
-        logger.exception("Error reading config file")
-
-@app.route("/api/update_system_options", methods=["POST"])
-def update_system_options():
-    try:
-        new_opts = request.get_json()
-        if not new_opts:
-            return jsonify({"error": "No system options provided"}), 400
-        if os.path.exists(CONFIG_PATH):
-            with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-                config = json.load(f)
-        else:
-            config = {}
-        config["alert_cooldown_seconds"] = new_opts.get("alert_cooldown_seconds", config.get("alert_cooldown_seconds", 900))
-        config["call_refractory_period"] = new_opts.get("call_refractory_period", config.get("call_refractory_period", 3600))
-        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
-            json.dump(config, f, indent=2)
-        return jsonify({"message": "System options updated successfully"}), 200
-    except Exception as e:
-        logger.exception("Error updating system options")
-        return jsonify({"error": str(e)}), 500
 
 @app.route("/positions_mobile")
 def positions_mobile():
@@ -1540,15 +1594,42 @@ def positions_mobile():
                            last_update_positions=pos_time_formatted,
                            last_update_positions_source=times_dict.get("last_update_positions_source", "N/A"))
 
-@app.route("/api/reset_refractory", methods=["POST"])
-def reset_refractory():
-    try:
-        from alert_manager import manager
-        manager.last_call_triggered.clear()
-        return jsonify({"message": "Refractory clock reset successfully"}), 200
-    except Exception as e:
-        logger.exception("Error resetting refractory clock")
-        return jsonify({"error": str(e)}), 500
+def parse_alert_config_form(form_data: dict) -> dict:
+    """
+    Parses the flat form_data dict (with keys like
+    'alert_ranges[heat_index_ranges][enabled]') into a nested dict.
+    Unchecked checkboxes won’t be present, so defaults may need to be set later.
+    """
+    parsed = {}
+    for full_key, value in form_data.items():
+        if full_key.startswith("alert_ranges[") and full_key.endswith("]"):
+            inner = full_key[len("alert_ranges["):-1]  # Remove prefix and trailing ']'
+            parts = inner.split("][")  # e.g., ['heat_index_ranges', 'enabled']
+            if len(parts) == 2:
+                metric, field = parts
+                if metric not in parsed:
+                    parsed[metric] = {}
+                # For checkboxes, if present, we assume a value like "on" means True.
+                # Otherwise, try to convert to float.
+                if field in ["enabled"]:
+                    parsed[metric][field] = True
+                else:
+                    try:
+                        parsed[metric][field] = float(value)
+                    except ValueError:
+                        parsed[metric][field] = value
+            elif len(parts) == 3:
+                # For nested notifications keys like:
+                # alert_ranges[heat_index_ranges][low_notifications][call]
+                metric, subgroup, field = parts
+                if metric not in parsed:
+                    parsed[metric] = {}
+                if subgroup not in parsed[metric]:
+                    parsed[metric][subgroup] = {}
+                # Checkboxes: if the key is present, we set it to True.
+                parsed[metric][subgroup][field] = True
+    return parsed
+
 
 @app.route("/api/update_config", methods=["POST"])
 def api_update_config():
@@ -1578,3 +1659,34 @@ def theme_options():
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5001)
+
+def parse_alert_config_form(form_data: dict) -> dict:
+    updated = {}
+    for full_key, value in form_data.items():
+        # Expect keys like: alert_ranges[heat_index_ranges][enabled]
+        if full_key.startswith("alert_ranges[") and full_key.endswith("]"):
+            inner = full_key[len("alert_ranges["):-1]  # removes the prefix and trailing ']'
+            parts = inner.split("][")  # e.g., ['heat_index_ranges', 'enabled']
+            if len(parts) == 2:
+                metric, field = parts
+                if metric not in updated:
+                    updated[metric] = {}
+                # Convert checkbox values: if value is "on", set True; otherwise, use the value.
+                if field in ["enabled"]:
+                    updated[metric][field] = True
+                else:
+                    try:
+                        # Convert to a number if possible
+                        updated[metric][field] = float(value)
+                    except ValueError:
+                        updated[metric][field] = value
+            elif len(parts) == 3:
+                # For nested keys like: alert_ranges[heat_index_ranges][low_notifications][call]
+                metric, subfield, field = parts
+                if metric not in updated:
+                    updated[metric] = {}
+                if subfield not in updated[metric]:
+                    updated[metric][subfield] = {}
+                # For checkboxes, set to True if present
+                updated[metric][subfield][field] = True
+    return updated

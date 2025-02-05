@@ -526,7 +526,12 @@ def export_config():
         mimetype="application/json"
     )
 
-@app.route("/heat", methods=["GET"])
+@app.route('/console_view')
+def console_view():
+    # URL to your PythonAnywhere error log
+    log_url = "https://www.pythonanywhere.com/user/BubbaDiego/files/var/log/www.deadlypanda.com.error.log"
+    return render_template("console_view.html", log_url=log_url)
+
 @app.route("/heat", methods=["GET"])
 def heat():
     data_locker = DataLocker(DB_PATH)

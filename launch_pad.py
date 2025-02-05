@@ -1655,6 +1655,35 @@ def api_update_config():
         logger.exception("Error updating alert configuration")
         return jsonify({"error": str(e)}), 500
 
+
+
+@app.route('/save_theme', methods=['POST'])
+def save_theme():
+    CONFIG_FILE = 'sonic_config.json'
+
+    data = request.get_json()
+    try:
+        # Load existing config
+        if os.path.exists(CONFIG_FILE):
+            with open(CONFIG_FILE, 'r') as f:
+                config = json.load(f)
+        else:
+            config = {}
+
+        # Update only the theme_profiles section
+        config['theme_profiles'] = {
+            'sidebar': data.get('sidebar', config.get('theme_profiles', {}).get('sidebar', {})),
+            'navbar': data.get('navbar', config.get('theme_profiles', {}).get('navbar', {}))
+        }
+
+        # Write the updated config back to the file
+        with open(CONFIG_FILE, 'w') as f:
+            json.dump(config, f, indent=2)
+
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/theme', methods=['GET', 'POST'])
 def theme_options():
     if request.method == 'POST':

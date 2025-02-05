@@ -4,16 +4,25 @@
 <div class="container-fluid">
   <h1 class="mb-4">Price Charts (Last {{ timeframe }} Hours)</h1>
 
-  <!-- Timeframe Selection Form -->
+  <!-- Timeframe Selection Form using radio buttons -->
   <form id="timeframeForm" method="GET" class="mb-4">
-    <label for="timeframeSelect">Select Timeframe (Hours):</label>
-    <select id="timeframeSelect" name="hours" onchange="document.getElementById('timeframeForm').submit();">
-      <option value="1" {% if timeframe == 1 %}selected{% endif %}>1</option>
-      <option value="3" {% if timeframe == 3 %}selected{% endif %}>3</option>
-      <option value="6" {% if timeframe == 6 %}selected{% endif %}>6</option>
-      <option value="12" {% if timeframe == 12 %}selected{% endif %}>12</option>
-      <option value="24" {% if timeframe == 24 %}selected{% endif %}>24</option>
-    </select>
+    <label class="mb-2 d-block">Select Timeframe (Hours):</label>
+    <div class="btn-group" role="group" aria-label="Timeframe selection">
+      <input type="radio" class="btn-check" name="hours" id="hours1" value="1" autocomplete="off" {% if timeframe == 1 %}checked{% endif %} onchange="document.getElementById('timeframeForm').submit();">
+      <label class="btn btn-outline-primary" for="hours1">1</label>
+
+      <input type="radio" class="btn-check" name="hours" id="hours3" value="3" autocomplete="off" {% if timeframe == 3 %}checked{% endif %} onchange="document.getElementById('timeframeForm').submit();">
+      <label class="btn btn-outline-primary" for="hours3">3</label>
+
+      <input type="radio" class="btn-check" name="hours" id="hours6" value="6" autocomplete="off" {% if timeframe == 6 %}checked{% endif %} onchange="document.getElementById('timeframeForm').submit();">
+      <label class="btn btn-outline-primary" for="hours6">6</label>
+
+      <input type="radio" class="btn-check" name="hours" id="hours12" value="12" autocomplete="off" {% if timeframe == 12 %}checked{% endif %} onchange="document.getElementById('timeframeForm').submit();">
+      <label class="btn btn-outline-primary" for="hours12">12</label>
+
+      <input type="radio" class="btn-check" name="hours" id="hours24" value="24" autocomplete="off" {% if timeframe == 24 %}checked{% endif %} onchange="document.getElementById('timeframeForm').submit();">
+      <label class="btn btn-outline-primary" for="hours24">24</label>
+    </div>
   </form>
 
   <!-- Charts Row -->

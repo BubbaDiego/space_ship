@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block extra_styles %}
+<style>
+  .console-container {
+    margin: 2rem auto;
+    max-width: 90%;
+  }
+  .console-header {
+    margin-bottom: 1rem;
+  }
+  .console-iframe {
+    width: 100%;
+    height: 600px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+</style>
+{% endblock extra_styles %}
+
+{% block content %}
+<div class="console-container">
+  <h1 class="console-header">Error Log Console</h1>
+  <p>
+    Click <a href="https://www.pythonanywhere.com/user/BubbaDiego/files/var/log/www.deadlypanda.com.error.log" target="_blank">here</a>
+    to open the error log in a new tab.
+  </p>
+  <p>
+    Or view it embedded below (note that you may be prompted to log in if you're not already authenticated):
+  </p>
+  <iframe class="console-iframe" src="https://www.pythonanywhere.com/user/BubbaDiego/files/var/log/www.deadlypanda.com.error.log"></iframe>
+</div>
+{% endblock content %}

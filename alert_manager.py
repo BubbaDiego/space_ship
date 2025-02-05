@@ -105,6 +105,7 @@ class AlertManager:
         self.db_path = db_path
         self.poll_interval = poll_interval
         self.config_path = config_path
+        self.last_profit: Dict[str, float] = {}
 
         logger.info("Initializing AlertManager...")
         logger.info("  DB Path       : %s", db_path)
@@ -277,11 +278,28 @@ class AlertManager:
         self.send_call(msg, key)
 
     def check_profit(self, pos: Dict[str, Any]):
+        # Log the raw profit value
+        raw_profit = pos.get("profit")
+        logger.debug("Raw profit from pos: %s", raw_profit)
+
         try:
-            profit_val = float(pos.get("profit", 0.0))
+            profit_val = float(raw_profit) if raw_profit is not None else 0.0
         except Exception as e:
             logger.error("Error converting profit: %s", e)
             return
+
+        logger.debug("Converted profit value: %.2f", profit_val)
+
+        # Fallback: If profit is 0, compute profit as (value - collateral)
+        if profit_val == 0.0:
+            try:
+                computed_profit = float(pos.get("value", 0)) - float(pos.get("collateral", 0))
+                logger.debug("Computed profit as value - collateral: %.2f", computed_profit)
+                profit_val = computed_profit
+            except Exception as e:
+                logger.error("Error computing fallback profit: %s", e)
+
+        logger.debug("Final profit value used for alert: %.2f", profit_val)
 
         profit_config = self.config.get("alert_ranges", {}).get("profit_ranges", {})
         if not profit_config.get("enabled", False):
@@ -296,8 +314,7 @@ class AlertManager:
             logger.error("Error parsing profit thresholds: %s", e)
             return
 
-        logger.info("Profit: %.2f; Thresholds: LOW=%.2f, MEDIUM=%.2f, HIGH=%.2f",
-                    profit_val, low, medium, high)
+        logger.info("Profit: %.2f; Thresholds: LOW=%.2f, MEDIUM=%.2f, HIGH=%.2f", profit_val, low, medium, high)
 
         alert_level = None
         threshold_val = None
@@ -305,12 +322,16 @@ class AlertManager:
         if high != 0.0 and profit_val <= high:
             alert_level = "HIGH"
             threshold_val = high
+            logger.debug("Profit value (%.2f) is <= HIGH threshold (%.2f); alert_level set to HIGH", profit_val, high)
         elif medium != 0.0 and profit_val <= medium:
             alert_level = "MEDIUM"
             threshold_val = medium
+            logger.debug("Profit value (%.2f) is <= MEDIUM threshold (%.2f); alert_level set to MEDIUM", profit_val,
+                         medium)
         elif low != 0.0 and profit_val <= low:
             alert_level = "LOW"
             threshold_val = low
+            logger.debug("Profit value (%.2f) is <= LOW threshold (%.2f); alert_level set to LOW", profit_val, low)
         else:
             logger.info("Profit %.2f does not trigger any alert.", profit_val)
             return
@@ -327,14 +348,14 @@ class AlertManager:
 
         self.last_triggered[key] = now
 
-        # Compose a friendly profit alert message without using any position ID.
+        # Compose a friendly profit alert message without including any position ID.
         asset_code = pos.get("asset_type", "???").upper()
         asset_full = self.ASSET_FULL_NAMES.get(asset_code, asset_code)
         position_type = pos.get("position_type", "").capitalize()
         msg = (f"Congratulations sugar ass. You have a profit of {profit_val:.2f} for "
                f"{asset_full} {position_type}. This is a {alert_level} alert as it falls below "
                f"the threshold of {threshold_val:.2f}.")
-        logger.info("Profit Alert: %s", msg)
+        logger.info("Profit Alert Message: %s", msg)
         self.send_call(msg, key)
 
     def check_price_alerts(self):

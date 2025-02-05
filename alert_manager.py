@@ -91,7 +91,7 @@ def get_alert_class(value: float, low_thresh: float, med_thresh: float, high_thr
         return "alert-low"
 
 # ================================
-# AlertManager Class with Added Support for Heat Index and Profit
+# AlertManager Class with Added Support for Heat Index and Profit, and State Latching
 # ================================
 class AlertManager:
     ASSET_FULL_NAMES = {
@@ -135,9 +135,10 @@ class AlertManager:
         logger.info("Alert settings: Cooldown=%d sec, Refractory Period=%d sec",
                     self.cooldown, self.call_refractory_period)
 
+        # In-memory state for alert latching
         self.last_call_triggered: Dict[str, float] = {}
-        self.monitor_enabled = self.config.get("system_config", {}).get("alert_monitor_enabled", True)
         self.last_triggered: Dict[str, float] = {}
+        self.monitor_enabled = self.config.get("system_config", {}).get("alert_monitor_enabled", True)
 
         logger.info("AlertManager is ready.")
 
@@ -204,7 +205,6 @@ class AlertManager:
             logger.info("Pos %s: No travel percent threshold breached.", pos_id)
             return
 
-        # Use the notifications mapping from the JSON
         if not tpli_config.get(alert_level.lower() + "_notifications", {}).get("call", False):
             logger.info("Pos %s: Travel percent call alert for level '%s' is disabled.", pos_id, alert_level)
             return
@@ -242,11 +242,15 @@ class AlertManager:
             logger.error("Pos %s: Error parsing heat index thresholds: %s", pos_id, e)
             return
 
+        # Retrieve asset information for a cleaner message
+        asset_code = pos.get("asset_type", "???").upper()
+        asset_full = self.ASSET_FULL_NAMES.get(asset_code, asset_code)
+        position_type = pos.get("position_type", "").capitalize()
+
         logger.info("Pos %s: Heat Index=%.2f; Thresholds: LOW=%.2f, MEDIUM=%.2f, HIGH=%.2f",
                     pos_id, current_heat, low, medium, high)
 
         alert_level = None
-        # Assuming higher heat index values trigger alerts:
         if high != 0.0 and current_heat >= high:
             alert_level = "HIGH"
         elif medium != 0.0 and current_heat >= medium:
@@ -268,21 +272,20 @@ class AlertManager:
             return
 
         self.last_triggered[key] = now
-        msg = (f"Heat Index ALERT: Pos {pos_id} - Heat Index={current_heat:.2f}, Level={alert_level}")
+        msg = (f"Heat Index ALERT: {asset_full} {position_type} - Heat Index = {current_heat:.2f}, Level = {alert_level}")
         logger.info("Pos %s: %s", pos_id, msg)
         self.send_call(msg, key)
 
     def check_profit(self, pos: Dict[str, Any]):
-        pos_id = pos.get("id", "unknown")
         try:
             profit_val = float(pos.get("profit", 0.0))
         except Exception as e:
-            logger.error("Pos %s: Error converting profit: %s", pos_id, e)
+            logger.error("Error converting profit: %s", e)
             return
 
         profit_config = self.config.get("alert_ranges", {}).get("profit_ranges", {})
         if not profit_config.get("enabled", False):
-            logger.info("Pos %s: Profit alerts disabled.", pos_id)
+            logger.info("Profit alerts disabled.")
             return
 
         try:
@@ -290,37 +293,48 @@ class AlertManager:
             medium = float(profit_config.get("medium", 0.0))
             high = float(profit_config.get("high", 0.0))
         except Exception as e:
-            logger.error("Pos %s: Error parsing profit thresholds: %s", pos_id, e)
+            logger.error("Error parsing profit thresholds: %s", e)
             return
 
-        logger.info("Pos %s: Profit=%.2f; Thresholds: LOW=%.2f, MEDIUM=%.2f, HIGH=%.2f",
-                    pos_id, profit_val, low, medium, high)
+        logger.info("Profit: %.2f; Thresholds: LOW=%.2f, MEDIUM=%.2f, HIGH=%.2f",
+                    profit_val, low, medium, high)
 
         alert_level = None
-        # For profit, assume lower profit is worse.
+        threshold_val = None
+        # For profit, lower profit is worse.
         if high != 0.0 and profit_val <= high:
             alert_level = "HIGH"
+            threshold_val = high
         elif medium != 0.0 and profit_val <= medium:
             alert_level = "MEDIUM"
+            threshold_val = medium
         elif low != 0.0 and profit_val <= low:
             alert_level = "LOW"
+            threshold_val = low
         else:
-            logger.info("Pos %s: Profit %.2f does not trigger any alert.", pos_id, profit_val)
+            logger.info("Profit %.2f does not trigger any alert.", profit_val)
             return
 
         if not profit_config.get(alert_level.lower() + "_notifications", {}).get("call", False):
-            logger.info("Pos %s: Profit call alert for level '%s' is disabled.", pos_id, alert_level)
+            logger.info("Profit call alert for level '%s' is disabled.", alert_level)
             return
 
-        key = f"{pos_id}-profit-{alert_level}"
+        key = f"profit-{alert_level}"
         now = time.time()
         if now - self.last_triggered.get(key, 0) < self.cooldown:
-            logger.info("Pos %s: Profit alert '%s' skipped (cooldown).", pos_id, alert_level)
+            logger.info("Profit alert '%s' skipped (cooldown).", alert_level)
             return
 
         self.last_triggered[key] = now
-        msg = (f"Profit ALERT: Pos {pos_id} - Profit={profit_val:.2f}, Level={alert_level}")
-        logger.info("Pos %s: %s", pos_id, msg)
+
+        # Compose a friendly profit alert message without using any position ID.
+        asset_code = pos.get("asset_type", "???").upper()
+        asset_full = self.ASSET_FULL_NAMES.get(asset_code, asset_code)
+        position_type = pos.get("position_type", "").capitalize()
+        msg = (f"Congratulations sugar ass. You have a profit of {profit_val:.2f} for "
+               f"{asset_full} {position_type}. This is a {alert_level} alert as it falls below "
+               f"the threshold of {threshold_val:.2f}.")
+        logger.info("Profit Alert: %s", msg)
         self.send_call(msg, key)
 
     def check_price_alerts(self):

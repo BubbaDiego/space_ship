@@ -8,6 +8,8 @@ import sqlite3
 from config_manager import load_json_config
 from typing import Dict, Any, Optional, List
 from datetime import datetime, timedelta
+from flask_socketio import SocketIO, emit
+from flask import current_app
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
 import asyncio
@@ -72,15 +74,29 @@ manager = AlertManager(
     config_path=CONFIG_PATH
 )
 
-# ================================
-# Routes
-# ================================
+# Initialize SocketIO with your app
+socketio = SocketIO(app)
+
 @app.route('/')
 def index():
-    return render_template('base.html')
+    # Load the config file from disk (adjust the path as needed)
+    try:
+        with open('C:/space_ship/sonic_config.json', 'r') as f:
+            config = json.load(f)
+    except Exception as e:
+        # Fallback to defaults if file loading fails
+        config = {}
+
+    # Extract theme_profiles from the config file, or set defaults
+    theme = config.get("theme_profiles", {
+        "sidebar": {"color_mode": "dark", "bg": "bg-success"},
+        "navbar": {"color_mode": "dark", "bg": ""}
+    })
+
+    return render_template('base.html', theme=theme)
 
 @app.route('/theme')
-def theme():
+def theme_options():
     return render_template('theme.html')
 
 def get_alert_class(value, low_thresh, med_thresh, high_thresh):
@@ -980,6 +996,14 @@ def update_jupiter():
         prices_dt=now,
         prices_source=source
     )
+
+    # Emit an event to all connected clients
+    socketio.emit('data_updated', {
+        'message': f"Jupiter positions + Prices updated successfully by {source}!",
+        'last_update_time_positions': now.isoformat(),
+        'last_update_time_prices': now.isoformat()
+    })
+
     return jsonify({
         "message": f"Jupiter positions + Prices updated successfully by {source}!",
         "source": source,
@@ -987,9 +1011,15 @@ def update_jupiter():
         "last_update_time_prices": now.isoformat()
     }), 200
 
-@app.route("/audio-tester")
-def audio_tester():
-    return render_template("audio_tester.html")
+@app.route("/latest_update_info")
+def latest_update_info():
+    data_locker = DataLocker.get_instance(DB_PATH)  # Make sure DB_PATH is defined
+    times = data_locker.get_last_update_times()
+    return jsonify({
+        "last_update_time_positions": times["last_update_time_positions"] or "No Data",
+        "last_update_time_prices": times["last_update_time_prices"] or "No Data",
+        "last_update_time_jupiter": times["last_update_time_jupiter"] or "No Data"
+    })
 
 @app.route("/api/positions_data", methods=["GET"])
 def positions_data_api():
@@ -1659,37 +1689,53 @@ def api_update_config():
 
 @app.route('/save_theme', methods=['POST'])
 def save_theme():
-    CONFIG_FILE = 'sonic_config.json'
-
-    data = request.get_json()
     try:
-        # Load existing config
-        if os.path.exists(CONFIG_FILE):
-            with open(CONFIG_FILE, 'r') as f:
-                config = json.load(f)
-        else:
-            config = {}
+        # Get the incoming theme data from the request.
+        new_theme_data = request.get_json()
+        if not new_theme_data:
+            return jsonify({"success": False, "error": "No data received"}), 400
 
-        # Update only the theme_profiles section
-        config['theme_profiles'] = {
-            'sidebar': data.get('sidebar', config.get('theme_profiles', {}).get('sidebar', {})),
-            'navbar': data.get('navbar', config.get('theme_profiles', {}).get('navbar', {}))
-        }
+        # Path to your configuration JSON file.
+        config_path = current_app.config.get("CONFIG_PATH", "C:/space_ship/sonic_config.json")
 
-        # Write the updated config back to the file
-        with open(CONFIG_FILE, 'w') as f:
+        # Load existing configuration.
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+
+        # Update the theme_profiles section. Adjust this as needed.
+        # Expecting new_theme_data to have keys 'sidebar' and 'navbar'.
+        config.setdefault("theme_profiles", {})
+        config["theme_profiles"]["sidebar"] = new_theme_data.get("sidebar", config["theme_profiles"].get("sidebar", {}))
+        config["theme_profiles"]["navbar"] = new_theme_data.get("navbar", config["theme_profiles"].get("navbar", {}))
+
+        # Write the updated configuration back to the file.
+        with open(config_path, 'w') as f:
             json.dump(config, f, indent=2)
 
-        return jsonify({'success': True})
+        return jsonify({"success": True})
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        current_app.logger.error(f"Error saving theme: {e}", exc_info=True)
+        return jsonify({"success": False, "error": str(e)}), 500
 
-@app.route('/theme', methods=['GET', 'POST'])
-def theme_options():
-    if request.method == 'POST':
-        data = request.form
-        return jsonify({"status": "success"})
-    return render_template("theme.html")
+@app.context_processor
+def update_theme():
+    try:
+        with open('C:/space_ship/sonic_config.json', 'r') as f:
+            config = json.load(f)
+    except Exception as e:
+        config = {}
+    # Set default values if keys are missing
+    theme = {
+        'sidebar': {
+            'bg': config.get('sidebar_bg', 'bg-primary'),
+            'color_mode': config.get('sidebar_mode', 'dark')
+        },
+        'navbar': {
+            'bg': config.get('navbar_bg', 'bg-secondary'),
+            'color_mode': config.get('navbar_mode', 'dark')
+        }
+    }
+    return dict(theme=theme)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5001)

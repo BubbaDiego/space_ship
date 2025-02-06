@@ -224,11 +224,11 @@
   "theme_profiles": {
     "sidebar": {
       "color_mode": "dark",
-      "bg": "bg-light"
+      "bg": "bg-primary-subtle"
     },
     "navbar": {
-      "color_mode": "",
-      "bg": "bg-info"
+      "color_mode": "dark",
+      "bg": "bg-danger"
     }
   },
   "twilio_config": {

@@ -37,7 +37,7 @@
 <div class="container my-3">
   <!-- Reusable Update Info Boxes Component -->
   <div class="update-info-boxes">
-    <!-- Crypto Update Info Box -->
+    <!-- Crypto (Positions) Update Info Box -->
     <div class="info-box" id="update-crypto-all-btn">
       <span class="info-box-icon bg-info">
         <img src="{{ url_for('static', filename='images/crypto_icon.jpg') }}" alt="Crypto" id="crypto-icon" />
@@ -45,8 +45,8 @@
       <div class="info-box-content" id="crypto-update-text">
         <span class="info-box-text">Crypto Update</span>
         <span class="info-box-number">
-          Last Update: {{ last_update_positions }}<br>
-          Source: {{ last_update_positions_source }}
+          Last Update: {{ last_update_time_positions or "No Data" }}<br>
+          Source: {{ last_update_positions_source or "N/A" }}
         </span>
       </div>
     </div>
@@ -59,8 +59,8 @@
       <div class="info-box-content" id="jupiter-update-text">
         <span class="info-box-text">Jupiter Update</span>
         <span class="info-box-number">
-          Jupiter Last Update: {{ last_update_jupiter }}<br>
-          Source: {{ last_update_jupiter_source }}
+          Jupiter Last Update: {{ last_update_time_jupiter or "No Data" }}<br>
+          Source: {{ last_update_jupiter_source or "N/A" }}
         </span>
       </div>
     </div>
@@ -166,7 +166,7 @@
           {% endfor %}
         </tbody>
         <tfoot>
-          <tr>
+          <tr style="font-weight: bold; background-color: #f3e5f5; text-align: center !important;">
             <td>TOTALS</td>
             <td></td>
             <td id="footProfit">{{ "{:,.2f}".format(totals.get("total_profit", 0)) }}</td>
@@ -190,7 +190,7 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   console.log("Positions extra_scripts loaded");
-  // Crypto Update Info Box refresh logic
+  // Crypto (Positions) Update Info Box refresh logic
   const cryptoInfoBox = document.getElementById("update-crypto-all-btn");
   const cryptoIcon = document.getElementById("crypto-icon");
   if (cryptoInfoBox) {

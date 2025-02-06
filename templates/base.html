@@ -2,26 +2,30 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>AdminLTE 4 | Dashboard</title>
+    <title>{{ title if title else "AdminLTE 4 | Dashboard" }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="title" content="AdminLTE 4 | Dashboard" />
-    <meta name="author" content="ColorlibHQ" />
     <meta name="description" content="AdminLTE is a Free Bootstrap 5 Admin Dashboard, 30 example pages using Vanilla JS." />
-    <meta name="keywords" content="bootstrap 5, admin dashboard, bootstrap 5 charts, colorlibhq, adminlte" />
+    <meta name="keywords" content="bootstrap 5, admin dashboard, charts, adminlte" />
+    <meta name="author" content="ColorlibHQ" />
+
     <!-- Fonts -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css" integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q=" crossorigin="anonymous" />
+
     <!-- OverlayScrollbars CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/styles/overlayscrollbars.min.css" integrity="sha256-tZHrRjVqNSRyWg2wbppGnT833E/Ys0DHWGwT04GiqQg=" crossorigin="anonymous" />
+
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha256-9kPW/n5nn53j4WMRYAxe9c1rCY96Oogo/MKSVdKzPmI=" crossorigin="anonymous" />
+
     <!-- AdminLTE CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='AdminLTE/dist/css/adminlte.css') }}" />
+
     {% block extra_styles %}{% endblock %}
   </head>
   <body class="layout-fixed sidebar-expand-lg sidebar-mini sidebar-collapse bg-body-tertiary">
     <div class="app-wrapper">
       <!-- Header -->
-      <nav class="app-header navbar navbar-expand bg-body">
+      <nav class="app-header navbar navbar-expand {% if theme.navbar.bg %}{{ theme.navbar.bg }}{% else %}bg-body{% endif %}" data-bs-theme="{{ theme.navbar.color_mode }}">
         <div class="container-fluid">
           <ul class="navbar-nav">
             <li class="nav-item">
@@ -36,7 +40,7 @@
           <ul class="navbar-nav ms-auto">
             <!-- Color Mode Toggler -->
             <li class="nav-item dropdown">
-              <button class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static">
+              <button class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
                 <span class="theme-icon-active"><i class="my-1"></i></span>
                 <span class="d-lg-none ms-2" id="bd-theme-text">Toggle theme</span>
               </button>
@@ -71,7 +75,7 @@
       <!-- End Header -->
 
       <!-- Sidebar -->
-      <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+      <aside class="app-sidebar shadow {% if theme.sidebar.bg %}{{ theme.sidebar.bg }}{% else %}bg-body-secondary{% endif %}" data-bs-theme="{{ theme.sidebar.color_mode }}">
         <div class="sidebar-brand">
           <a href="{{ url_for('index') }}" class="brand-link">
             <img src="{{ url_for('static', filename='images/corner_logo_owl.jpg') }}" alt="Sonic Logo" class="brand-image rounded-circle shadow" />
@@ -81,56 +85,48 @@
         <div class="sidebar-wrapper">
           <nav class="mt-2">
             <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
-              <!-- Dashboard Menu Item -->
               <li class="nav-item">
                 <a href="{{ url_for('index') }}" class="nav-link">
                   <i class="nav-icon bi bi-speedometer"></i>
                   <p>Dashboard</p>
                 </a>
               </li>
-              <!-- Positions Menu Item -->
               <li class="nav-item">
                 <a href="{{ url_for('positions') }}" class="nav-link">
                   <i class="nav-icon bi bi-briefcase"></i>
                   <p>Positions</p>
                 </a>
               </li>
-              <!-- Prices Menu Item -->
               <li class="nav-item">
                 <a href="{{ url_for('price_charts') }}" class="nav-link">
                   <i class="nav-icon bi bi-currency-dollar"></i>
                   <p>Prices</p>
                 </a>
               </li>
-              <!-- Hedge Report Menu Item -->
               <li class="nav-item">
                 <a href="{{ url_for('heat') }}" class="nav-link">
                   <i class="nav-icon bi bi-shield-check"></i>
                   <p>Hedge Report</p>
                 </a>
               </li>
-              <!-- Alerts Menu Item -->
               <li class="nav-item">
                 <a href="{{ url_for('alert_config_page') }}" class="nav-link">
                   <i class="nav-icon bi bi-exclamation-triangle-fill"></i>
                   <p>Alerts</p>
                 </a>
               </li>
-              <!-- Database Menu Item -->
               <li class="nav-item">
                 <a href="{{ url_for('database_viewer') }}" class="nav-link">
                   <i class="nav-icon bi bi-database"></i>
                   <p>Database</p>
                 </a>
               </li>
-              <!-- Theme Menu Item -->
               <li class="nav-item">
                 <a href="{{ url_for('theme_options') }}" class="nav-link">
                   <i class="nav-icon bi bi-palette-fill"></i>
                   <p>Theme</p>
                 </a>
               </li>
-              <!-- Console View Menu Item (New) -->
               <li class="nav-item">
                 <a href="{{ url_for('console_view') }}" class="nav-link">
                   <i class="nav-icon bi bi-terminal"></i>
@@ -167,6 +163,11 @@
         <div class="app-content">
           <div class="container-fluid">
             {% block content %}{% endblock %}
+            <!-- Auto-update info panel -->
+            <div id="updateInfo" class="alert alert-info mt-3" role="alert">
+              <p class="mb-1">Positions last updated: <span id="last_update_time_positions">--</span></p>
+              <p class="mb-0">Prices last updated: <span id="last_update_time_prices">--</span></p>
+            </div>
           </div>
         </div>
         <!-- End App Content -->
@@ -244,6 +245,31 @@
         }
       });
     </script>
+
+    <!-- AJAX Polling Script for Auto-Updating Data -->
+    <script>
+      async function fetchLatestUpdate() {
+        try {
+          const response = await fetch('/latest_update_info');
+          if (!response.ok) {
+            console.error("Error fetching update info:", response.status);
+            return;
+          }
+          const data = await response.json();
+          document.getElementById('last_update_time_positions').textContent = data.last_update_time_positions;
+          document.getElementById('last_update_time_prices').textContent = data.last_update_time_prices;
+        } catch (error) {
+          console.error("Error fetching update info:", error);
+        }
+      }
+
+      // Poll every 5 seconds
+      setInterval(fetchLatestUpdate, 5000);
+
+      // Initial fetch on page load
+      fetchLatestUpdate();
+    </script>
+
     {% block extra_scripts %}{% endblock %}
   </body>
 </html>

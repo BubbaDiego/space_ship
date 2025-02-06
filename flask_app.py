@@ -72,15 +72,26 @@ manager = AlertManager(
     config_path=CONFIG_PATH
 )
 
-# ================================
-# Routes
-# ================================
 @app.route('/')
 def index():
-    return render_template('base.html')
+    # Load the config file from disk (adjust the path as needed)
+    try:
+        with open('C:/space_ship/sonic_config.json', 'r') as f:
+            config = json.load(f)
+    except Exception as e:
+        # Fallback to defaults if file loading fails
+        config = {}
+
+    # Extract theme_profiles from the config file, or set defaults
+    theme = config.get("theme_profiles", {
+        "sidebar": {"color_mode": "dark", "bg": "bg-success"},
+        "navbar": {"color_mode": "dark", "bg": ""}
+    })
+
+    return render_template('base.html', theme=theme)
 
 @app.route('/theme')
-def theme():
+def theme_options():
     return render_template('theme.html')
 
 def get_alert_class(value, low_thresh, med_thresh, high_thresh):
@@ -1655,12 +1666,54 @@ def api_update_config():
         logger.exception("Error updating alert configuration")
         return jsonify({"error": str(e)}), 500
 
-@app.route('/theme', methods=['GET', 'POST'])
-def theme_options():
-    if request.method == 'POST':
-        data = request.form
-        return jsonify({"status": "success"})
-    return render_template("theme.html")
+
+
+@app.route('/save_theme', methods=['POST'])
+def save_theme():
+    CONFIG_FILE = 'sonic_config.json'
+
+    data = request.get_json()
+    try:
+        # Load existing config
+        if os.path.exists(CONFIG_FILE):
+            with open(CONFIG_FILE, 'r') as f:
+                config = json.load(f)
+        else:
+            config = {}
+
+        # Update only the theme_profiles section
+        config['theme_profiles'] = {
+            'sidebar': data.get('sidebar', config.get('theme_profiles', {}).get('sidebar', {})),
+            'navbar': data.get('navbar', config.get('theme_profiles', {}).get('navbar', {}))
+        }
+
+        # Write the updated config back to the file
+        with open(CONFIG_FILE, 'w') as f:
+            json.dump(config, f, indent=2)
+
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.context_processor
+def update_theme():
+    try:
+        with open('C:/space_ship/sonic_config.json', 'r') as f:
+            config = json.load(f)
+    except Exception as e:
+        config = {}
+    # Set default values if keys are missing
+    theme = {
+        'sidebar': {
+            'bg': config.get('sidebar_bg', 'bg-primary'),
+            'color_mode': config.get('sidebar_mode', 'dark')
+        },
+        'navbar': {
+            'bg': config.get('navbar_bg', 'bg-secondary'),
+            'color_mode': config.get('navbar_mode', 'dark')
+        }
+    }
+    return dict(theme=theme)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5001)

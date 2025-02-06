@@ -27,9 +27,8 @@ class DataLocker:
         try:
             self._init_sqlite_if_needed()
 
-            # ... (existing CREATE TABLE statements) ...
-
-            # SYSTEM_VARS table
+            # ... (other CREATE TABLE statements for tables like prices, positions, alerts, etc.)
+            # SYSTEM_VARS table - create only once
             self.cursor.execute("""
                 CREATE TABLE IF NOT EXISTS system_vars (
                     id INTEGER PRIMARY KEY,
@@ -39,68 +38,44 @@ class DataLocker:
                     last_update_prices_source TEXT
                 )
             """)
-            # SYSTEM_VARS table
             self.cursor.execute("""
-                       CREATE TABLE IF NOT EXISTS system_vars (
-                           id INTEGER PRIMARY KEY,
-                           last_update_time_positions DATETIME,
-                           last_update_positions_source TEXT,
-                           last_update_time_prices DATETIME,
-                           last_update_prices_source TEXT
-                       )
-                   """)
-            self.cursor.execute("""
-                       INSERT OR IGNORE INTO system_vars (
-                           id,
-                           last_update_time_positions,
-                           last_update_positions_source,
-                           last_update_time_prices,
-                           last_update_prices_source
-                       )
-                       VALUES (1, NULL, NULL, NULL, NULL)
-                   """)
+                INSERT OR IGNORE INTO system_vars (
+                    id,
+                    last_update_time_positions,
+                    last_update_positions_source,
+                    last_update_time_prices,
+                    last_update_prices_source
+                )
+                VALUES (1, NULL, NULL, NULL, NULL)
+            """)
 
             # Check and add new columns for Jupiter updates if missing
             self.cursor.execute("PRAGMA table_info(system_vars)")
             existing_cols = [row["name"] for row in self.cursor.fetchall()]
             if "last_update_time_jupiter" not in existing_cols:
                 self.cursor.execute("""
-                           ALTER TABLE system_vars
-                           ADD COLUMN last_update_time_jupiter DATETIME
-                       """)
+                    ALTER TABLE system_vars
+                    ADD COLUMN last_update_time_jupiter DATETIME
+                """)
                 self.logger.info("Added 'last_update_time_jupiter' column to 'system_vars' table.")
             if "last_update_jupiter_source" not in existing_cols:
                 self.cursor.execute("""
-                           ALTER TABLE system_vars
-                           ADD COLUMN last_update_jupiter_source TEXT
-                       """)
+                    ALTER TABLE system_vars
+                    ADD COLUMN last_update_jupiter_source TEXT
+                """)
                 self.logger.info("Added 'last_update_jupiter_source' column to 'system_vars' table.")
 
-            # -- NEW: Check if total_brokerage_balance, total_wallet_balance, total_balance exist
+            # Check and add additional balance columns if missing
             self.cursor.execute("PRAGMA table_info(system_vars)")
-            existing_cols = [row[1] for row in self.cursor.fetchall()]
-
-            # If missing, add them:
-            if "total_brokerage_balance" not in existing_cols:
-                self.cursor.execute("""
-                    ALTER TABLE system_vars
-                    ADD COLUMN total_brokerage_balance REAL DEFAULT 0.0
-                """)
-                self.logger.info("Added 'total_brokerage_balance' column to 'system_vars' table.")
-
-            if "total_wallet_balance" not in existing_cols:
-                self.cursor.execute("""
-                    ALTER TABLE system_vars
-                    ADD COLUMN total_wallet_balance REAL DEFAULT 0.0
-                """)
-                self.logger.info("Added 'total_wallet_balance' column to 'system_vars' table.")
-
-            if "total_balance" not in existing_cols:
-                self.cursor.execute("""
-                    ALTER TABLE system_vars
-                    ADD COLUMN total_balance REAL DEFAULT 0.0
-                """)
-                self.logger.info("Added 'total_balance' column to 'system_vars' table.")
+            existing_cols = [row["name"] for row in self.cursor.fetchall()]
+            for col, sql in [
+                ("total_brokerage_balance", "ALTER TABLE system_vars ADD COLUMN total_brokerage_balance REAL DEFAULT 0.0"),
+                ("total_wallet_balance", "ALTER TABLE system_vars ADD COLUMN total_wallet_balance REAL DEFAULT 0.0"),
+                ("total_balance", "ALTER TABLE system_vars ADD COLUMN total_balance REAL DEFAULT 0.0")
+            ]:
+                if col not in existing_cols:
+                    self.cursor.execute(sql)
+                    self.logger.info(f"Added '{col}' column to 'system_vars' table.")
 
             self.conn.commit()
             self.logger.debug("Database initialization complete.")
@@ -190,7 +165,6 @@ class DataLocker:
                        last_updated = ?
                  WHERE api_name = ?
             """, (now_str, api_name))
-
         self.conn.commit()
         self.logger.debug(
             f"Incremented API report counter for {api_name}, last_updated={now_str}."
@@ -205,8 +179,6 @@ class DataLocker:
         from system_vars where id=1
         """
         self._init_sqlite_if_needed()
-
-        # Attempt to fetch the single system_vars row with id=1
         row = self.cursor.execute("""
             SELECT
               total_brokerage_balance,
@@ -215,16 +187,12 @@ class DataLocker:
             FROM system_vars
             WHERE id=1
         """).fetchone()
-
-        # If row not found, return default zeros
         if not row:
             return {
                 "total_brokerage_balance": 0.0,
                 "total_wallet_balance": 0.0,
                 "total_balance": 0.0
             }
-
-        # Return them as floats (in case they're None, fallback to 0.0)
         return {
             "total_brokerage_balance": row["total_brokerage_balance"] or 0.0,
             "total_wallet_balance": row["total_wallet_balance"] or 0.0,
@@ -242,14 +210,10 @@ class DataLocker:
         Pass None if you don't want to change that field.
         """
         self._init_sqlite_if_needed()
-
-        # Get existing values so we can preserve anything not being updated
         current = self.get_balance_vars()
-
         new_brokerage = brokerage_balance if brokerage_balance is not None else current["total_brokerage_balance"]
         new_wallet = wallet_balance if wallet_balance is not None else current["total_wallet_balance"]
         new_total = total_balance if total_balance is not None else current["total_balance"]
-
         self.cursor.execute("""
             UPDATE system_vars
                SET total_brokerage_balance=?,
@@ -258,7 +222,6 @@ class DataLocker:
              WHERE id=1
         """, (new_brokerage, new_wallet, new_total))
         self.conn.commit()
-
         self.logger.debug(
             f"Updated system_vars => total_brokerage_balance={new_brokerage}, "
             f"total_wallet_balance={new_wallet}, total_balance={new_total}"
@@ -269,6 +232,7 @@ class DataLocker:
         Inserts a new price row.
         """
         try:
+            self._init_sqlite_if_needed()
             if "id" not in price_dict:
                 price_dict["id"] = str(uuid4())
             if "asset_type" not in price_dict:
@@ -283,10 +247,7 @@ class DataLocker:
                 price_dict["previous_update_time"] = None
             if "source" not in price_dict:
                 price_dict["source"] = "Manual"
-
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            cursor.execute("""
+            self.cursor.execute("""
                 INSERT INTO prices (
                     id,
                     asset_type,
@@ -301,8 +262,7 @@ class DataLocker:
                     :last_update_time, :previous_update_time, :source
                 )
             """, price_dict)
-            conn.commit()
-            conn.close()
+            self.conn.commit()
             self.logger.debug(f"Inserted price row with ID={price_dict['id']}")
         except Exception as e:
             self.logger.exception(f"Unexpected error in insert_price: {e}")
@@ -313,25 +273,21 @@ class DataLocker:
         Returns rows from 'prices' as a list of dicts. Can filter by asset_type.
         """
         try:
-            conn = sqlite3.connect(self.db_path)
-            conn.row_factory = sqlite3.Row
-            cursor = conn.cursor()
+            self._init_sqlite_if_needed()
             if asset_type:
-                cursor.execute("""
+                self.cursor.execute("""
                     SELECT *
                       FROM prices
                      WHERE asset_type=?
                      ORDER BY last_update_time DESC
                 """, (asset_type,))
             else:
-                cursor.execute("""
+                self.cursor.execute("""
                     SELECT *
                       FROM prices
                      ORDER BY last_update_time DESC
                 """)
-            rows = cursor.fetchall()
-            conn.close()
-
+            rows = self.cursor.fetchall()
             price_list = [dict(row) for row in rows]
             self.logger.debug(f"Retrieved {len(price_list)} price rows.")
             return price_list
@@ -343,24 +299,18 @@ class DataLocker:
             return []
 
     def read_positions(self) -> List[dict]:
-        conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM positions")
-        rows = cur.fetchall()
-        conn.close()
+        self._init_sqlite_if_needed()
+        self.cursor.execute("SELECT * FROM positions")
+        rows = self.cursor.fetchall()
         return [dict(r) for r in rows]
 
     def read_prices(self) -> List[dict]:
         """
         Returns all rows from 'prices' as plain dicts.
         """
-        conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM prices ORDER BY last_update_time DESC")
-        rows = cur.fetchall()
-        conn.close()
+        self._init_sqlite_if_needed()
+        self.cursor.execute("SELECT * FROM prices ORDER BY last_update_time DESC")
+        rows = self.cursor.fetchall()
         return [dict(r) for r in rows]
 
     def get_latest_price(self, asset_type: str) -> Optional[dict]:
@@ -368,18 +318,15 @@ class DataLocker:
         Returns the newest price row for this asset_type or None.
         """
         try:
-            conn = sqlite3.connect(self.db_path)
-            conn.row_factory = sqlite3.Row
-            cur = conn.cursor()
-            cur.execute("""
+            self._init_sqlite_if_needed()
+            self.cursor.execute("""
                 SELECT *
                   FROM prices
                  WHERE asset_type=?
                  ORDER BY last_update_time DESC
                  LIMIT 1
             """, (asset_type,))
-            row = cur.fetchone()
-            conn.close()
+            row = self.cursor.fetchone()
             return dict(row) if row else None
         except sqlite3.Error as e:
             self.logger.error(f"Database error in get_latest_price: {e}", exc_info=True)
@@ -393,11 +340,9 @@ class DataLocker:
         Delete a price row by ID.
         """
         try:
-            conn = sqlite3.connect(self.db_path)
-            cur = conn.cursor()
-            cur.execute("DELETE FROM prices WHERE id=?", (price_id,))
-            conn.commit()
-            conn.close()
+            self._init_sqlite_if_needed()
+            self.cursor.execute("DELETE FROM prices WHERE id=?", (price_id,))
+            self.conn.commit()
             self.logger.debug(f"Deleted price row ID={price_id}")
         except sqlite3.Error as e:
             self.logger.error(f"Database error in delete_price: {e}", exc_info=True)
@@ -417,9 +362,8 @@ class DataLocker:
         try:
             if not alert_dict.get("id"):
                 alert_dict["id"] = str(uuid4())
-            conn = sqlite3.connect(self.db_path)
-            cur = conn.cursor()
-            cur.execute("""
+            self._init_sqlite_if_needed()
+            self.cursor.execute("""
                 INSERT INTO alerts (
                     id,
                     alert_type,
@@ -444,8 +388,7 @@ class DataLocker:
                     :liquidation_price, :notes, :position_reference_id
                 )
             """, alert_dict)
-            conn.commit()
-            conn.close()
+            self.conn.commit()
             self.logger.debug(f"Created alert ID={alert_dict['id']}")
         except sqlite3.IntegrityError as ie:
             self.logger.error(f"IntegrityError creating alert: {ie}", exc_info=True)
@@ -461,12 +404,9 @@ class DataLocker:
         Return all alerts as a list of dictionaries.
         """
         try:
-            conn = sqlite3.connect(self.db_path)
-            conn.row_factory = sqlite3.Row
-            cur = conn.cursor()
-            cur.execute("SELECT * FROM alerts")
-            rows = cur.fetchall()
-            conn.close()
+            self._init_sqlite_if_needed()
+            self.cursor.execute("SELECT * FROM alerts")
+            rows = self.cursor.fetchall()
             alert_list = [dict(r) for r in rows]
             self.logger.debug(f"Fetched {len(alert_list)} alerts.")
             return alert_list
@@ -482,15 +422,13 @@ class DataLocker:
         Update 'status' field of an alert by ID.
         """
         try:
-            conn = sqlite3.connect(self.db_path)
-            cur = conn.cursor()
-            cur.execute("""
+            self._init_sqlite_if_needed()
+            self.cursor.execute("""
                 UPDATE alerts
                    SET status=?
                  WHERE id=?
             """, (new_status, alert_id))
-            conn.commit()
-            conn.close()
+            self.conn.commit()
             self.logger.debug(f"Alert {alert_id} => status={new_status}")
         except sqlite3.Error as e:
             self.logger.error(f"DB error update_alert_status: {e}", exc_info=True)
@@ -504,11 +442,9 @@ class DataLocker:
         Delete alert by ID
         """
         try:
-            conn = sqlite3.connect(self.db_path)
-            cur = conn.cursor()
-            cur.execute("DELETE FROM alerts WHERE id=?", (alert_id,))
-            conn.commit()
-            conn.close()
+            self._init_sqlite_if_needed()
+            self.cursor.execute("DELETE FROM alerts WHERE id=?", (alert_id,))
+            self.conn.commit()
             self.logger.debug(f"Deleted alert ID={alert_id}")
         except sqlite3.Error as e:
             self.logger.error(f"DB error in delete_alert: {e}", exc_info=True)
@@ -531,7 +467,6 @@ class DataLocker:
         self._init_sqlite_if_needed()
         if timestamp is None:
             timestamp = datetime.now()
-
         price_dict = {
             "id": str(uuid4()),
             "asset_type": asset_type,
@@ -541,8 +476,7 @@ class DataLocker:
             "previous_update_time": None,
             "source": source
         }
-
-        self.insert_price(price_dict)  # We do a brand-new row every time now!
+        self.insert_price(price_dict)
 
     # ----------------------------------------------------------------
     # POSITIONS
@@ -571,30 +505,27 @@ class DataLocker:
         pos_dict.setdefault("liquidation_distance", None)
         pos_dict.setdefault("heat_index", 0.0)
         pos_dict.setdefault("current_heat_index", 0.0)
-        # NEW: Set default value for pnl_after_fees_usd
         pos_dict.setdefault("pnl_after_fees_usd", 0.0)
-
         try:
-            with sqlite3.connect(self.db_path) as conn:
-                cur = conn.cursor()
-                cur.execute("""
-                    INSERT INTO positions (
-                        id, asset_type, position_type,
-                        entry_price, liquidation_price, current_travel_percent,
-                        value, collateral, size, wallet_name, leverage, last_updated,
-                        alert_reference_id, hedge_buddy_id, current_price,
-                        liquidation_distance, heat_index, current_heat_index,
-                        pnl_after_fees_usd
-                    ) VALUES (
-                        :id, :asset_type, :position_type,
-                        :entry_price, :liquidation_price, :current_travel_percent,
-                        :value, :collateral, :size, :wallet_name, :leverage, :last_updated,
-                        :alert_reference_id, :hedge_buddy_id, :current_price,
-                        :liquidation_distance, :heat_index, :current_heat_index,
-                        :pnl_after_fees_usd
-                    )
-                """, pos_dict)
-                conn.commit()
+            self._init_sqlite_if_needed()
+            self.cursor.execute("""
+                INSERT INTO positions (
+                    id, asset_type, position_type,
+                    entry_price, liquidation_price, current_travel_percent,
+                    value, collateral, size, wallet_name, leverage, last_updated,
+                    alert_reference_id, hedge_buddy_id, current_price,
+                    liquidation_distance, heat_index, current_heat_index,
+                    pnl_after_fees_usd
+                ) VALUES (
+                    :id, :asset_type, :position_type,
+                    :entry_price, :liquidation_price, :current_travel_percent,
+                    :value, :collateral, :size, :wallet_name, :leverage, :last_updated,
+                    :alert_reference_id, :hedge_buddy_id, :current_price,
+                    :liquidation_distance, :heat_index, :current_heat_index,
+                    :pnl_after_fees_usd
+                )
+            """, pos_dict)
+            self.conn.commit()
             self.logger.debug(f"Created position ID={pos_dict['id']}")
         except Exception as ex:
             self.logger.exception(f"Error creating position: {ex}")
@@ -605,12 +536,9 @@ class DataLocker:
         Return all positions as dict.
         """
         try:
-            conn = sqlite3.connect(self.db_path)
-            conn.row_factory = sqlite3.Row
-            cur = conn.cursor()
-            cur.execute("SELECT * FROM positions")
-            rows = cur.fetchall()
-            conn.close()
+            self._init_sqlite_if_needed()
+            self.cursor.execute("SELECT * FROM positions")
+            rows = self.cursor.fetchall()
             results = [dict(r) for r in rows]
             self.logger.debug(f"Fetched {len(results)} positions.")
             return results
@@ -626,11 +554,9 @@ class DataLocker:
         Delete a single position by ID.
         """
         try:
-            conn = sqlite3.connect(self.db_path)
-            cur = conn.cursor()
-            cur.execute("DELETE FROM positions WHERE id=?", (position_id,))
-            conn.commit()
-            conn.close()
+            self._init_sqlite_if_needed()
+            self.cursor.execute("DELETE FROM positions WHERE id=?", (position_id,))
+            self.conn.commit()
             self.logger.debug(f"Deleted position ID={position_id}")
         except sqlite3.Error as e:
             self.logger.error(f"DB error delete_position: {e}", exc_info=True)
@@ -644,10 +570,9 @@ class DataLocker:
         Delete all rows from 'positions'
         """
         try:
-            with sqlite3.connect(self.db_path) as conn:
-                cur = conn.cursor()
-                cur.execute("DELETE FROM positions")
-                conn.commit()
+            self._init_sqlite_if_needed()
+            self.cursor.execute("DELETE FROM positions")
+            self.conn.commit()
             self.logger.debug("Deleted all positions.")
         except Exception as ex:
             self.logger.exception(f"Error in delete_all_positions: {ex}")
@@ -655,7 +580,6 @@ class DataLocker:
 
     # ----------------------------------------------------------------
     # GET / SET last update times (system_vars table)
-    # with sources included
     # ----------------------------------------------------------------
 
     def set_last_update_times(
@@ -672,18 +596,13 @@ class DataLocker:
         Pass None if you don't want to update a given field.
         """
         self._init_sqlite_if_needed()
-
-        # Get existing row
         current = self.get_last_update_times()
-
-        # Use new values if provided; otherwise, keep existing values.
         new_positions_dt = positions_dt.isoformat() if positions_dt else current.get("last_update_time_positions")
         new_positions_src = positions_source if positions_source else current.get("last_update_positions_source")
         new_prices_dt = prices_dt.isoformat() if prices_dt else current.get("last_update_time_prices")
         new_prices_src = prices_source if prices_source else current.get("last_update_prices_source")
         new_jupiter_dt = jupiter_dt.isoformat() if jupiter_dt else current.get("last_update_time_jupiter")
         new_jupiter_src = jupiter_source if jupiter_source else current.get("last_update_jupiter_source")
-
         self.cursor.execute("""
             UPDATE system_vars
                SET last_update_time_positions = ?,
@@ -695,7 +614,6 @@ class DataLocker:
              WHERE id = 1
         """, (new_positions_dt, new_positions_src, new_prices_dt, new_prices_src, new_jupiter_dt, new_jupiter_src))
         self.conn.commit()
-
         self.logger.debug(
             "Updated system_vars =>"
             f" last_update_time_positions={new_positions_dt},"
@@ -719,7 +637,6 @@ class DataLocker:
             FROM system_vars
             WHERE id=1
         """).fetchone()
-
         if not row:
             return {
                 "last_update_time_positions": None,
@@ -729,7 +646,6 @@ class DataLocker:
                 "last_update_time_jupiter": None,
                 "last_update_jupiter_source": None
             }
-
         return {
             "last_update_time_positions": row["last_update_time_positions"],
             "last_update_positions_source": row["last_update_positions_source"],
@@ -738,26 +654,31 @@ class DataLocker:
             "last_update_time_jupiter": row["last_update_time_jupiter"],
             "last_update_jupiter_source": row["last_update_jupiter_source"]
         }
+
     # ----------------------------------------------------------------
-    # Wallet & Broker
+    # WALLET & BROKER
     # ----------------------------------------------------------------
 
     def read_wallets(self) -> List[dict]:
+        """
+        Returns wallets as a list of dicts with balance as float.
+        """
         self._init_sqlite_if_needed()
         self.cursor.execute("SELECT * FROM wallets")
         rows = self.cursor.fetchall()
         results = []
-        for row in rows:
+        for r in rows:
             results.append({
-                "name": row["name"],
-                "public_address": row["public_address"],
-                "private_address": row["private_address"],
-                "image_path": row["image_path"],
-                "balance": row["balance"]
+                "name": r["name"],
+                "public_address": r["public_address"],
+                "private_address": r["private_address"],
+                "image_path": r["image_path"],
+                "balance": float(r["balance"])
             })
         return results
 
     def update_wallet(self, wallet_name, wallet_dict):
+        self._init_sqlite_if_needed()
         query = """
             UPDATE wallets 
                SET name = ?,
@@ -788,17 +709,17 @@ class DataLocker:
         Updates the size & collateral of a position by ID
         """
         try:
+            self._init_sqlite_if_needed()
             query = """
             UPDATE positions
                SET size=?,
                    collateral=?
              WHERE id=?
             """
-            self._init_sqlite_if_needed()
             self.cursor.execute(query, (size, collateral, position_id))
             self.conn.commit()
         except Exception as ex:
-            print(f"Error updating position {position_id}: {ex}")
+            self.logger.exception(f"Error updating position {position_id}: {ex}")
             raise
 
     def create_wallet(self, wallet_dict: dict):
@@ -806,9 +727,8 @@ class DataLocker:
         Insert new wallet row from dict.
         """
         try:
-            conn = sqlite3.connect(self.db_path)
-            cur = conn.cursor()
-            cur.execute("""
+            self._init_sqlite_if_needed()
+            self.cursor.execute("""
                 INSERT INTO wallets (name, public_address, private_address, image_path, balance)
                 VALUES (?,?,?,?,?)
             """, (
@@ -818,8 +738,7 @@ class DataLocker:
                 wallet_dict.get("image_path"),
                 wallet_dict.get("balance", 0.0)
             ))
-            conn.commit()
-            conn.close()
+            self.conn.commit()
         except Exception as ex:
             self.logger.exception(f"Error creating wallet: {ex}")
             raise
@@ -846,18 +765,18 @@ class DataLocker:
 
     def read_brokers(self) -> List[dict]:
         """
-        Returns brokers as a list of dicts
+        Returns brokers as a list of dicts with total_holding as float.
         """
         self._init_sqlite_if_needed()
         self.cursor.execute("SELECT * FROM brokers")
         rows = self.cursor.fetchall()
         results = []
-        for row in rows:
+        for r in rows:
             results.append({
-                "name": row["name"],
-                "image_path": row["image_path"],
-                "web_address": row["web_address"],
-                "total_holding": row["total_holding"]
+                "name": r["name"],
+                "image_path": r["image_path"],
+                "web_address": r["web_address"],
+                "total_holding": float(r["total_holding"])
             })
         return results
 
@@ -884,15 +803,13 @@ class DataLocker:
         Update only the 'size' field of a position
         """
         try:
-            conn = sqlite3.connect(self.db_path)
-            cur = conn.cursor()
-            cur.execute("""
+            self._init_sqlite_if_needed()
+            self.cursor.execute("""
                 UPDATE positions
                    SET size=?
                  WHERE id=?
             """, (new_size, position_id))
-            conn.commit()
-            conn.close()
+            self.conn.commit()
             self.logger.debug(f"Updated position {position_id} => size={new_size}")
         except sqlite3.Error as ex:
             self.logger.error(f"DB error in update_position_size: {ex}", exc_info=True)
@@ -901,106 +818,12 @@ class DataLocker:
             self.logger.exception(f"Error update_position_size: {ex}")
             raise
 
-    def read_wallets(self) -> List[dict]:
-        self._init_sqlite_if_needed()
-        self.cursor.execute("SELECT * FROM wallets")
-        rows = self.cursor.fetchall()
-        results = []
-        for r in rows:
-            results.append({
-                "name": r["name"],
-                "public_address": r["public_address"],
-                "private_address": r["private_address"],
-                "image_path": r["image_path"],
-                "balance": float(r["balance"])
-            })
-        return results
-
-    def read_brokers(self) -> List[dict]:
-        self._init_sqlite_if_needed()
-        self.cursor.execute("SELECT * FROM brokers")
-        rows = self.cursor.fetchall()
-        results = []
-        for r in rows:
-            results.append({
-                "name": r["name"],
-                "image_path": r["image_path"],
-                "web_address": r["web_address"],
-                "total_holding": float(r["total_holding"])
-            })
-        return results
-
-    def get_balance_vars(self) -> dict:
-        """
-        Return a dict with the 3 columns:
-          "total_brokerage_balance",
-          "total_wallet_balance",
-          "total_balance"
-        from system_vars where id=1
-        """
-        self._init_sqlite_if_needed()
-
-        row = self.cursor.execute("""
-            SELECT
-              total_brokerage_balance,
-              total_wallet_balance,
-              total_balance
-            FROM system_vars
-            WHERE id=1
-        """).fetchone()
-
-        if not row:
-            return {
-                "total_brokerage_balance": 0.0,
-                "total_wallet_balance": 0.0,
-                "total_balance": 0.0
-            }
-        return {
-            "total_brokerage_balance": row["total_brokerage_balance"] or 0.0,
-            "total_wallet_balance": row["total_wallet_balance"] or 0.0,
-            "total_balance": row["total_balance"] or 0.0
-        }
-
-    def set_balance_vars(
-            self,
-            brokerage_balance: float = None,
-            wallet_balance: float = None,
-            total_balance: float = None
-    ):
-        """
-        Update any of the 3 columns in system_vars. Pass None if you don't want to change that value.
-        """
-        self._init_sqlite_if_needed()
-
-        # Read old values
-        current = self.get_balance_vars()
-        new_brokerage = brokerage_balance if brokerage_balance is not None else current["total_brokerage_balance"]
-        new_wallet = wallet_balance if wallet_balance is not None else current["total_wallet_balance"]
-        new_total = total_balance if total_balance is not None else current["total_balance"]
-
-        self.cursor.execute("""
-            UPDATE system_vars
-               SET total_brokerage_balance=?,
-                   total_wallet_balance=?,
-                   total_balance=?
-             WHERE id=1
-        """, (new_brokerage, new_wallet, new_total))
-        self.conn.commit()
-
-        self.logger.debug(
-            f"Updated system_vars => total_brokerage_balance={new_brokerage}, "
-            f"total_wallet_balance={new_wallet}, total_balance={new_total}"
-        )
-
-
     def get_wallet_by_name(self, wallet_name: str) -> Optional[dict]:
         """
         Returns a single wallet row (dict) by name or None.
         """
-        conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        row = cur.execute("""
+        self._init_sqlite_if_needed()
+        self.cursor.execute("""
             SELECT name,
                    public_address,
                    private_address,
@@ -1009,8 +832,8 @@ class DataLocker:
               FROM wallets
              WHERE name=?
              LIMIT 1
-        """, (wallet_name,)).fetchone()
-        conn.close()
+        """, (wallet_name,))
+        row = self.cursor.fetchone()
         if not row:
             return None
         return {

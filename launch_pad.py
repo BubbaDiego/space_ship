@@ -79,21 +79,10 @@ socketio = SocketIO(app)
 
 @app.route('/')
 def index():
-    # Load the config file from disk (adjust the path as needed)
-    try:
-        with open('C:/space_ship/sonic_config.json', 'r') as f:
-            config = json.load(f)
-    except Exception as e:
-        # Fallback to defaults if file loading fails
-        config = {}
-
-    # Extract theme_profiles from the config file, or set defaults
-    theme = config.get("theme_profiles", {
-        "sidebar": {"color_mode": "dark", "bg": "bg-success"},
-        "navbar": {"color_mode": "dark", "bg": ""}
-    })
-
-    return render_template('base.html', theme=theme)
+    with open(CONFIG_PATH, "r") as f:
+        config = json.load(f)
+    theme = config.get("theme_profiles", {})
+    return render_template("base.html", theme=theme, title="Sonic Dashboard")
 
 @app.route('/theme')
 def theme_options():
@@ -243,7 +232,7 @@ def positions():
         pos["profit_alert_class"] = get_alert_class_local(profit_val, profit_low, profit_med, profit_high)
 
     totals_dict = calc_services.calculate_totals(updated_positions)
-    times_dict = data_locker.get_last_update_times()
+    times_dict = data_locker.get_last_update_times() or {}
     pos_time_iso = times_dict.get("last_update_time_positions", "N/A")
 
     # Helper: Convert ISO timestamp to PST string.
@@ -1013,12 +1002,17 @@ def update_jupiter():
 
 @app.route("/latest_update_info")
 def latest_update_info():
-    data_locker = DataLocker.get_instance(DB_PATH)  # Make sure DB_PATH is defined
+    data_locker = DataLocker.get_instance(DB_PATH)  # Adjust this if needed.
     times = data_locker.get_last_update_times()
+    # Convert sqlite3.Row to a dict if it's not None
+    if times is not None:
+        times = dict(times)
+    else:
+        times = {}
     return jsonify({
-        "last_update_time_positions": times["last_update_time_positions"] or "No Data",
-        "last_update_time_prices": times["last_update_time_prices"] or "No Data",
-        "last_update_time_jupiter": times["last_update_time_jupiter"] or "No Data"
+        "last_update_time_positions": times.get("last_update_time_positions", "No Data"),
+        "last_update_time_prices": times.get("last_update_time_prices", "No Data"),
+        "last_update_time_jupiter": times.get("last_update_time_jupiter", "No Data")
     })
 
 @app.route("/api/positions_data", methods=["GET"])
@@ -1609,9 +1603,18 @@ def positions_mobile():
         profit_val = float(pos.get("pnl_after_fees_usd", 0.0))
         pos["profit_alert_class"] = get_alert_class_local(profit_val, profit_low, profit_med, profit_high)
 
-    totals_dict = calc_services.calculate_totals(updated_positions)
-    times_dict = data_locker.get_last_update_times()
+        # Fix: Convert sqlite3.Row to dict explicitly.
+        times_dict = data_locker.get_last_update_times()
+        if times_dict is not None:
+            # Convert to dict to enable .get()
+            times_dict = dict(times_dict)
+        else:
+            times_dict = {}
+
+        pos_time_iso = times_dict.get("last_update_time_positions", "N/A")
+
     pos_time_iso = times_dict.get("last_update_time_positions", "N/A")
+
     def _convert_iso_to_pst(iso_str):
         if not iso_str or iso_str == "N/A":
             return "N/A"
@@ -1690,23 +1693,25 @@ def api_update_config():
 @app.route('/save_theme', methods=['POST'])
 def save_theme():
     try:
-        # Get the incoming theme data from the request.
         new_theme_data = request.get_json()
         if not new_theme_data:
             return jsonify({"success": False, "error": "No data received"}), 400
 
-        # Path to your configuration JSON file.
-        config_path = current_app.config.get("CONFIG_PATH", "C:/space_ship/sonic_config.json")
+        # Use the relative path from the app config, with CONFIG_PATH as the default.
+        config_path = current_app.config.get("CONFIG_PATH", CONFIG_PATH)
 
         # Load existing configuration.
         with open(config_path, 'r') as f:
             config = json.load(f)
 
-        # Update the theme_profiles section. Adjust this as needed.
-        # Expecting new_theme_data to have keys 'sidebar' and 'navbar'.
+        # Update the theme_profiles section.
         config.setdefault("theme_profiles", {})
-        config["theme_profiles"]["sidebar"] = new_theme_data.get("sidebar", config["theme_profiles"].get("sidebar", {}))
-        config["theme_profiles"]["navbar"] = new_theme_data.get("navbar", config["theme_profiles"].get("navbar", {}))
+        config["theme_profiles"]["sidebar"] = new_theme_data.get(
+            "sidebar", config["theme_profiles"].get("sidebar", {})
+        )
+        config["theme_profiles"]["navbar"] = new_theme_data.get(
+            "navbar", config["theme_profiles"].get("navbar", {})
+        )
 
         # Write the updated configuration back to the file.
         with open(config_path, 'w') as f:
@@ -1714,13 +1719,15 @@ def save_theme():
 
         return jsonify({"success": True})
     except Exception as e:
-        current_app.logger.error(f"Error saving theme: {e}", exc_info=True)
+        current_app.logger.error("Error saving theme: %s", e, exc_info=True)
         return jsonify({"success": False, "error": str(e)}), 500
+
 
 @app.context_processor
 def update_theme():
+    config_path = current_app.config.get("CONFIG_PATH", CONFIG_PATH)
     try:
-        with open('C:/space_ship/sonic_config.json', 'r') as f:
+        with open(config_path, 'r') as f:
             config = json.load(f)
     except Exception as e:
         config = {}
@@ -1736,6 +1743,7 @@ def update_theme():
         }
     }
     return dict(theme=theme)
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5001)

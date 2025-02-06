@@ -30,6 +30,25 @@
   .spin {
     animation: spin 1s linear infinite;
   }
+  /* Alert cell background colors based on alert status */
+  .alert-low {
+    background-color: #d4edda !important; /* subtle green */
+  }
+  .alert-medium {
+    background-color: #fff3cd !important; /* subtle yellow */
+  }
+  .alert-high {
+    background-color: #f8d7da !important; /* subtle red */
+  }
+  /* Center the table header and set its background to match the sidebar */
+  .table thead th {
+    text-align: center;
+    background-color: var(--bs-card-bg, #f3e5f5);
+  }
+  /* For consistency, set non-alert tbody cells to use the card background color */
+  .table tbody td:not(.alert-low):not(.alert-medium):not(.alert-high) {
+    background-color: var(--bs-card-bg, #ffffff);
+  }
 </style>
 {% endblock %}
 
@@ -68,7 +87,8 @@
 
   <!-- Positions Table Card -->
   <div class="card">
-    <div class="card-header">
+    <!-- Use the same background as the sidebar for consistency -->
+    <div class="card-header {% if theme.sidebar.bg %}{{ theme.sidebar.bg }}{% else %}bg-body-secondary{% endif %}">
       <h3 class="card-title">POSITIONS</h3>
     </div>
     <div class="card-body">
@@ -93,56 +113,89 @@
           <tr class="{{ pos.heat_alert_class }}">
             <td>
               {% if pos.asset_type == 'BTC' %}
-              <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="width: 30px; height: 30px;" />
+                <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="width: 40px; height: 40px;" />
               {% elif pos.asset_type == 'ETH' %}
-              <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="width: 30px; height: 30px;" />
+                <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="width: 40px; height: 40px;" />
               {% elif pos.asset_type == 'SOL' %}
-              <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="width: 30px; height: 30px;" />
+                <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="width: 40px; height: 40px;" />
               {% else %}
-              {{ pos.asset_type }}
+                {{ pos.asset_type }}
               {% endif %}
             </td>
             <td><b>{{ pos.position_type }}</b></td>
-            <td>
+            <!-- Profit Column: Append a green dollar sign only for medium and high alerts -->
+            <td class="{{ pos.profit_alert_class }}">
               {% if pos.pnl_after_fees_usd is defined and pos.pnl_after_fees_usd is not none %}
-              {{ "{:,.2f}".format(pos.pnl_after_fees_usd) }}
+                {{ "{:,.2f}".format(pos.pnl_after_fees_usd) }}
+                {% if pos.profit_alert_class in ['alert-medium', 'alert-high'] %}
+                  <span style="color: green;">💲</span>
+                {% endif %}
               {% else %}
-              N/A
+                N/A
               {% endif %}
             </td>
+            <!-- Collateral Column -->
             <td class="{{ pos.collateral_alert_class }}">
               {{ "{:,.2f}".format(pos.collateral) }}
+              {% if pos.collateral_alert_class == "alert-high" %}
+                <span style="color: red;">⚠️</span>
+              {% endif %}
             </td>
+            <!-- Value Column -->
             <td class="{{ pos.value_alert_class }}">
               {{ "{:,.2f}".format(pos.value) }}
+              {% if pos.value_alert_class == "alert-high" %}
+                <span style="color: red;">⚠️</span>
+              {% endif %}
             </td>
+            <!-- Size Column -->
             <td class="{{ pos.size_alert_class }}">
               {{ "{:,.2f}".format(pos.size) }}
+              {% if pos.size_alert_class == "alert-high" %}
+                <span style="color: red;">⚠️</span>
+              {% endif %}
             </td>
+            <!-- Leverage Column -->
             <td class="{{ pos.leverage_alert_class }}">
               {{ "{:,.2f}".format(pos.leverage) }}
+              {% if pos.leverage_alert_class == "alert-high" %}
+                <span style="color: red;">⚠️</span>
+              {% endif %}
             </td>
+            <!-- Travel % Column -->
             <td class="{{ pos.travel_liquid_alert_class }}">
               {% if pos.current_travel_percent is not none %}
-              {{ "{:,.2f}".format(pos.current_travel_percent) }}%
+                {{ "{:,.2f}".format(pos.current_travel_percent) }}%
+                {% if pos.travel_liquid_alert_class == "alert-high" %}
+                  <span style="color: red;">⚠️</span>
+                {% endif %}
               {% else %}
-              N/A
+                N/A
               {% endif %}
             </td>
+            <!-- Heat Index Column -->
             <td class="{{ pos.heat_alert_class }}">
               {% if pos.heat_index is not none %}
-              {{ "{:,.2f}".format(pos.heat_index) }}
+                {{ "{:,.2f}".format(pos.heat_index) }}
+                {% if pos.heat_alert_class == "alert-high" %}
+                  <span style="color: red;">⚠️</span>
+                {% endif %}
               {% else %}
-              N/A
+                N/A
               {% endif %}
             </td>
+            <!-- Liquidation Distance Column -->
             <td class="{{ pos.liqdist_alert_class }}">
               {% if pos.liquidation_distance is not none %}
-              {{ "{:,.2f}".format(pos.liquidation_distance) }}
+                {{ "{:,.2f}".format(pos.liquidation_distance) }}
+                {% if pos.liqdist_alert_class == "alert-high" %}
+                  <span style="color: red;">⚠️</span>
+                {% endif %}
               {% else %}
-              N/A
+                N/A
               {% endif %}
             </td>
+            <!-- Wallet Column -->
             <td>
               {% if pos.wallet_name %}
                 {% if pos.wallet_name.image_path %}
@@ -155,18 +208,18 @@
                     {% set wallet_filename = wallet_image %}
                   {% endif %}
                   {% set wallet_url = url_for('static', filename='images/' ~ wallet_filename) %}
-                  <img src="{{ wallet_url }}" alt="{{ pos.wallet_name.name }}" style="width: 30px; height: 30px; vertical-align: middle; margin-right: 5px;" />
+                  <img src="{{ wallet_url }}" alt="{{ pos.wallet_name.name }}" style="width: 40px; height: 40px; vertical-align: middle; margin-right: 5px;" />
                 {% endif %}
                 <span class="wallet-name">{{ pos.wallet_name.name }}</span>
               {% else %}
-              N/A
+                N/A
               {% endif %}
             </td>
           </tr>
           {% endfor %}
         </tbody>
         <tfoot>
-          <tr style="font-weight: bold; background-color: #f3e5f5; text-align: center !important;">
+          <tr style="font-weight: bold; background-color: var(--bs-card-bg, #f3e5f5); text-align: center !important;">
             <td>TOTALS</td>
             <td></td>
             <td id="footProfit">{{ "{:,.2f}".format(totals.get("total_profit", 0)) }}</td>

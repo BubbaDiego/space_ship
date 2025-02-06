@@ -163,8 +163,8 @@
         <div class="app-content">
           <div class="container-fluid">
             {% block content %}{% endblock %}
-            <!-- Auto-update info panel -->
-            <div id="updateInfo" class="alert alert-info mt-3" role="alert">
+            <!-- Auto-update info panel (smaller box with 12-hr PST times) -->
+            <div id="updateInfo" class="alert alert-info mt-3" role="alert" style="font-size: 0.8rem; padding: 5px;">
               <p class="mb-1">Positions last updated: <span id="last_update_time_positions">--</span></p>
               <p class="mb-0">Prices last updated: <span id="last_update_time_prices">--</span></p>
             </div>
@@ -246,8 +246,22 @@
       });
     </script>
 
-    <!-- AJAX Polling Script for Auto-Updating Data -->
+    <!-- AJAX Polling Script for Auto-Updating Data with 12-hr PST Formatting -->
     <script>
+      // Function to format an ISO datetime string to a 12-hr clock in PST (America/Los_Angeles)
+      function formatToPST(isoString) {
+        if (!isoString) return '--';
+        const date = new Date(isoString);
+        const options = {
+          hour: 'numeric',
+          minute: 'numeric',
+          second: 'numeric',
+          hour12: true,
+          timeZone: 'America/Los_Angeles'
+        };
+        return new Intl.DateTimeFormat('en-US', options).format(date);
+      }
+
       async function fetchLatestUpdate() {
         try {
           const response = await fetch('/latest_update_info');
@@ -256,8 +270,8 @@
             return;
           }
           const data = await response.json();
-          document.getElementById('last_update_time_positions').textContent = data.last_update_time_positions;
-          document.getElementById('last_update_time_prices').textContent = data.last_update_time_prices;
+          document.getElementById('last_update_time_positions').textContent = formatToPST(data.last_update_time_positions);
+          document.getElementById('last_update_time_prices').textContent = formatToPST(data.last_update_time_prices);
         } catch (error) {
           console.error("Error fetching update info:", error);
         }
@@ -265,7 +279,6 @@
 
       // Poll every 5 seconds
       setInterval(fetchLatestUpdate, 5000);
-
       // Initial fetch on page load
       fetchLatestUpdate();
     </script>

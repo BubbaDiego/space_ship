@@ -582,78 +582,63 @@ class DataLocker:
     # GET / SET last update times (system_vars table)
     # ----------------------------------------------------------------
 
-    def set_last_update_times(
-            self,
-            positions_dt: Optional[datetime] = None,
-            positions_source: Optional[str] = None,
-            prices_dt: Optional[datetime] = None,
-            prices_source: Optional[str] = None,
-            jupiter_dt: Optional[datetime] = None,
-            jupiter_source: Optional[str] = None
-    ):
-        """
-        Writes the given datetimes and sources into the system_vars row (id=1).
-        Pass None if you don't want to update a given field.
-        """
-        self._init_sqlite_if_needed()
-        current = self.get_last_update_times()
-        new_positions_dt = positions_dt.isoformat() if positions_dt else current.get("last_update_time_positions")
-        new_positions_src = positions_source if positions_source else current.get("last_update_positions_source")
-        new_prices_dt = prices_dt.isoformat() if prices_dt else current.get("last_update_time_prices")
-        new_prices_src = prices_source if prices_source else current.get("last_update_prices_source")
-        new_jupiter_dt = jupiter_dt.isoformat() if jupiter_dt else current.get("last_update_time_jupiter")
-        new_jupiter_src = jupiter_source if jupiter_source else current.get("last_update_jupiter_source")
-        self.cursor.execute("""
-            UPDATE system_vars
-               SET last_update_time_positions = ?,
-                   last_update_positions_source = ?,
-                   last_update_time_prices = ?,
-                   last_update_prices_source = ?,
-                   last_update_time_jupiter = ?,
-                   last_update_jupiter_source = ?
-             WHERE id = 1
-        """, (new_positions_dt, new_positions_src, new_prices_dt, new_prices_src, new_jupiter_dt, new_jupiter_src))
-        self.conn.commit()
-        self.logger.debug(
-            "Updated system_vars =>"
-            f" last_update_time_positions={new_positions_dt},"
-            f" last_update_positions_source={new_positions_src},"
-            f" last_update_time_prices={new_prices_dt},"
-            f" last_update_prices_source={new_prices_src},"
-            f" last_update_time_jupiter={new_jupiter_dt},"
-            f" last_update_jupiter_source={new_jupiter_src}"
-        )
+    def set_last_update_times(self, positions_dt=None, positions_source=None,
+                              prices_dt=None, prices_source=None, jupiter_dt=None):
+        # Get the current update times; default to an empty dict if none exists.
+        current = self.get_last_update_times() or {}
 
-    def get_last_update_times(self) -> dict:
-        self._init_sqlite_if_needed()
-        row = self.cursor.execute("""
-            SELECT
-                last_update_time_positions,
-                last_update_positions_source,
-                last_update_time_prices,
-                last_update_prices_source,
-                last_update_time_jupiter,
-                last_update_jupiter_source
-            FROM system_vars
-            WHERE id=1
-        """).fetchone()
-        if not row:
-            return {
-                "last_update_time_positions": None,
-                "last_update_positions_source": None,
-                "last_update_time_prices": None,
-                "last_update_prices_source": None,
-                "last_update_time_jupiter": None,
-                "last_update_jupiter_source": None
-            }
-        return {
-            "last_update_time_positions": row["last_update_time_positions"],
-            "last_update_positions_source": row["last_update_positions_source"],
-            "last_update_time_prices": row["last_update_time_prices"],
-            "last_update_prices_source": row["last_update_prices_source"],
-            "last_update_time_jupiter": row["last_update_time_jupiter"],
-            "last_update_jupiter_source": row["last_update_jupiter_source"]
-        }
+        new_positions_dt = positions_dt.isoformat() if positions_dt else current.get("last_update_time_positions", None)
+        new_prices_dt = prices_dt.isoformat() if prices_dt else current.get("last_update_time_prices", None)
+        new_jupiter_dt = jupiter_dt.isoformat() if jupiter_dt else current.get("last_update_time_jupiter", None)
+
+        # Now update the record in the update_times table.
+        # (Assuming you use an UPDATE statement if a record exists, or an INSERT otherwise.)
+        # For example:
+        cursor = self.conn.cursor()
+        if current:
+            cursor.execute("""
+                UPDATE update_times
+                   SET last_update_time_positions = ?,
+                       last_update_time_positions_source = ?,
+                       last_update_time_prices = ?,
+                       last_update_time_prices_source = ?,
+                       last_update_time_jupiter = ?
+                """, (new_positions_dt, positions_source, new_prices_dt, prices_source, new_jupiter_dt))
+        else:
+            cursor.execute("""
+                INSERT INTO update_times 
+                    (last_update_time_positions, last_update_time_positions_source,
+                     last_update_time_prices, last_update_time_prices_source,
+                     last_update_time_jupiter)
+                VALUES (?, ?, ?, ?, ?)
+                """, (new_positions_dt, positions_source, new_prices_dt, prices_source, new_jupiter_dt))
+        self.conn.commit()
+        cursor.close()
+
+    def get_last_update_times(self):
+        """
+        Retrieve the update times from the 'update_times' table.
+        Returns:
+            A dictionary with keys like 'last_update_time_positions',
+            'last_update_time_positions_source', 'last_update_time_prices',
+            'last_update_time_prices_source', and 'last_update_time_jupiter',
+            or an empty dictionary if no record is found.
+        """
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT last_update_time_positions, last_update_time_positions_source,
+                   last_update_time_prices, last_update_time_prices_source,
+                   last_update_time_jupiter
+              FROM update_times
+              LIMIT 1
+        """)
+        row = cursor.fetchone()
+        cursor.close()
+        if row is not None:
+            # Convert the sqlite3.Row to a normal dictionary.
+            return dict(row)
+        else:
+            return {}
 
     # ----------------------------------------------------------------
     # WALLET & BROKER

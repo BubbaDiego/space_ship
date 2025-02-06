@@ -48,9 +48,9 @@
       }
     },
     "collateral_ranges": {
-      "low": 0.0,
-      "medium": 0.0,
-      "high": 0.0,
+      "low": 1111.0,
+      "medium": 1111.0,
+      "high": 11111.0,
       "enabled": false,
       "low_notifications": {
         "call": false,
@@ -69,9 +69,9 @@
       }
     },
     "value_ranges": {
-      "low": 0.0,
-      "medium": 0.0,
-      "high": 0.0,
+      "low": 1111.0,
+      "medium": 1111.0,
+      "high": 1111.0,
       "enabled": false,
       "low_notifications": {
         "call": false,
@@ -90,9 +90,9 @@
       }
     },
     "size_ranges": {
-      "low": 0.0,
-      "medium": 0.0,
-      "high": 0.0,
+      "low": 11111.0,
+      "medium": 111111.0,
+      "high": 11111.0,
       "enabled": false,
       "low_notifications": {
         "call": false,
@@ -111,9 +111,9 @@
       }
     },
     "leverage_ranges": {
-      "low": 0.0,
-      "medium": 0.0,
-      "high": 0.0,
+      "low": 11111.0,
+      "medium": 111111.0,
+      "high": 11111.0,
       "enabled": false,
       "low_notifications": {
         "call": false,
@@ -132,9 +132,9 @@
       }
     },
     "liquidation_distance_ranges": {
-      "low": 0.0,
-      "medium": 0.0,
-      "high": 0.0,
+      "low": 1111111.0,
+      "medium": 111111.0,
+      "high": 11111.0,
       "enabled": false,
       "low_notifications": {
         "call": false,
@@ -155,18 +155,16 @@
     "travel_percent_liquid_ranges": {
       "enabled": true,
       "low": -25.0,
-      "medium": -50.0,
+      "low_notifications": {
+        "call": true
+      },
+      "medium": -30.0,
       "medium_notifications": {
         "call": true
       },
       "high": -75.0,
       "high_notifications": {
         "call": true
-      },
-      "low_notifications": {
-        "call": false,
-        "sms": false,
-        "email": false
       }
     },
     "travel_percent_profit_ranges": {
@@ -223,17 +221,17 @@
   "call_refractory_period": 4444,
   "theme_profiles": {
     "sidebar": {
-      "color_mode": "dark",
-      "bg": "bg-primary-subtle"
+      "color_mode": "",
+      "bg": "bg-info-subtle"
     },
     "navbar": {
       "color_mode": "dark",
-      "bg": "bg-danger"
+      "bg": ""
     }
   },
   "twilio_config": {
     "account_sid": "ACb606788ada5dccbfeeebed0f440099b3",
-    "auth_token": "d3e5a69821872a3ff9d5c90a5c59eafa",
+    "auth_token": "7f49703031e343b21aa11224dfa9b2db",
     "flow_sid": "FW5b3bf49ee04af4d23a118b613bbc0df2",
     "to_phone": "+16199804758",
     "from_phone": "+18336913467"

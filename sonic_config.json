@@ -190,7 +190,7 @@
     },
     "profit_ranges": {
       "enabled": true,
-      "low": 35.0,
+      "low": 3.0,
       "low_notifications": {
         "call": true
       },
@@ -217,8 +217,8 @@
       "recipient_number": "6199804758"
     }
   },
-  "alert_cooldown_seconds": 900,
-  "call_refractory_period": 4444,
+  "alert_cooldown_seconds": 6000,
+  "call_refractory_period": 1,
   "theme_profiles": {
     "sidebar": {
       "color_mode": "",

@@ -826,9 +826,29 @@ def jupiter_perps_proxy():
         app.logger.error(f"Error fetching Jupiter positions: {e}", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
-@app.route("/update_jupiter_positions", methods=["POST"])
-@app.route("/update_jupiter_positions", methods=["POST"])
+
+import json
+from datetime import datetime
+import requests
+from flask import jsonify
+
+import json
+from datetime import datetime
+import requests
+from flask import jsonify
+
+import json
+from datetime import datetime
+import requests
+from flask import jsonify
+
 def update_jupiter_positions():
+    """
+    Updates Jupiter positions by fetching data from the Jupiter API for each wallet.
+    New positions are inserted into the database, and duplicate positions (based on the 'id'
+    field populated with Jupiter's "positionPubkey") are skipped.
+    Logs a summary of how many positions were created versus duplicates.
+    """
     data_locker = DataLocker(DB_PATH)
     try:
         wallets_list = data_locker.read_wallets()
@@ -836,51 +856,44 @@ def update_jupiter_positions():
             app.logger.info("No wallets found in DB.")
             return jsonify({"message": "No wallets found in DB"}), 200
 
-        total_positions_imported = 0
-
+        new_positions = []
+        # Fetch positions for each wallet.
         for w in wallets_list:
             public_addr = w.get("public_address", "").strip()
             if not public_addr:
                 app.logger.info(f"Skipping wallet {w['name']} (no public_address).")
                 continue
 
-            jupiter_url = (
-                "https://perps-api.jup.ag/v1/positions"
-                f"?walletAddress={public_addr}&showTpslRequests=true"
-            )
+            jupiter_url = f"https://perps-api.jup.ag/v1/positions?walletAddress={public_addr}&showTpslRequests=true"
             resp = requests.get(jupiter_url)
             resp.raise_for_status()
             data = resp.json()
-
-            import json
-            print(f"Debug: Jupiter API response for wallet '{w['name']}' ({public_addr}):")
+            # Print out the raw JSON data stream from Jupiter
             print(json.dumps(data, indent=2))
-
-            print("All top-level elements from Jupiter response:")
-            for key, value in data.items():
-                print(f"{key}: {value}")
 
             data_list = data.get("dataList", [])
             if not data_list:
                 app.logger.info(f"No positions for wallet {w['name']} ({public_addr}).")
                 continue
 
-            new_positions = []
             for item in data_list:
                 try:
+                    # Use Jupiter's "positionPubkey" as the unique ID to align with other systems.
+                    pos_pubkey = item.get("positionPubkey")
+                    if not pos_pubkey:
+                        app.logger.warning(f"Skipping item for wallet {w['name']} because positionPubkey is missing")
+                        continue
+
                     epoch_time = float(item.get("updatedTime", 0))
                     updated_dt = datetime.fromtimestamp(epoch_time)
                     mint = item.get("marketMint", "")
                     asset_type = MINT_TO_ASSET.get(mint, "BTC")
                     side = item.get("side", "short").capitalize()
-
                     travel_pct_value = item.get("pnlChangePctAfterFees")
-                    if travel_pct_value is not None:
-                        travel_percent = float(travel_pct_value)
-                    else:
-                        travel_percent = 0.0
+                    travel_percent = float(travel_pct_value) if travel_pct_value is not None else 0.0
 
                     pos_dict = {
+                        "id": pos_pubkey,  # Use Jupiter's positionPubkey as the unique ID.
                         "asset_type": asset_type,
                         "position_type": side,
                         "entry_price": float(item.get("entryPrice", 0.0)),
@@ -894,47 +907,40 @@ def update_jupiter_positions():
                         "pnl_after_fees_usd": float(item.get("pnlAfterFeesUsd", 0.0)),
                         "current_travel_percent": travel_percent
                     }
-
-                    if "pnlAfterFeesUsd" in item:
-                        print(f"Debug: pnlAfterFeesUsd for wallet '{w['name']}' position: {item['pnlAfterFeesUsd']}")
-
-                    if "pnlChangePctAfterFees" in item:
-                        print(f"Debug: travel percent (pnlChangePctAfterFees) for wallet '{w['name']}' position: {item['pnlChangePctAfterFees']}")
-
                     new_positions.append(pos_dict)
                 except Exception as map_err:
                     app.logger.warning(f"Skipping item for wallet {w['name']} due to mapping error: {map_err}")
 
-            for p in new_positions:
-                dup_count = data_locker.cursor.execute("""
-                    SELECT COUNT(*) FROM positions
-                     WHERE wallet_name = ?
-                       AND asset_type = ?
-                       AND position_type = ?
-                       AND ABS(size - ?) < 0.000001
-                       AND ABS(collateral - ?) < 0.000001
-                       AND last_updated = ?
-                """, (
-                    p["wallet_name"],
-                    p["asset_type"],
-                    p["position_type"],
-                    p["size"],
-                    p["collateral"],
-                    p["last_updated"]
-                )).fetchone()
+        # Initialize counters for logging.
+        new_count = 0
+        duplicate_count = 0
 
-                if dup_count[0] == 0:
-                    data_locker.create_position(p)
-                    total_positions_imported += 1
-                else:
-                    app.logger.info(f"Skipping duplicate Jupiter position {p}")
+        # Process each fetched position.
+        for p in new_positions:
+            cursor = data_locker.conn.cursor()
+            # Check for duplicates based on the unique "id" (populated with positionPubkey)
+            cursor.execute("""
+                SELECT COUNT(*) FROM positions
+                 WHERE id = ?
+            """, (p["id"],))
+            dup_count = cursor.fetchone()
+            cursor.close()
 
+            if dup_count[0] == 0:
+                data_locker.create_position(p)
+                new_count += 1
+            else:
+                duplicate_count += 1
+                app.logger.info(f"Skipping duplicate Jupiter position: {p}")
+
+        # Log a summary of the import results.
+        app.logger.info(f"Imported {new_count} new Jupiter position(s); Skipped {duplicate_count} duplicate(s).")
+
+        # Optionally update balances.
         all_positions = data_locker.get_positions()
         total_brokerage_value = sum(pos["value"] for pos in all_positions)
-
         balance_vars = data_locker.get_balance_vars()
         old_wallet_balance = balance_vars["total_wallet_balance"]
-
         new_total_balance = old_wallet_balance + total_brokerage_value
 
         data_locker.set_balance_vars(
@@ -942,15 +948,16 @@ def update_jupiter_positions():
             total_balance=new_total_balance
         )
 
-        msg = (f"Imported {total_positions_imported} new Jupiter position(s). "
+        msg = (f"Imported {new_count} new Jupiter position(s). "
                f"BrokerageBalance={total_brokerage_value:.2f}, TotalBalance={new_total_balance:.2f}")
         app.logger.info(msg)
-
         return jsonify({"message": msg}), 200
 
-    except requests.exceptions.RequestException as e:
-        app.logger.error(f"Error fetching Jupiter: {e}", exc_info=True)
+    except Exception as e:
+        app.logger.error(f"Error in update_jupiter_positions: {e}", exc_info=True)
         return jsonify({"error": str(e)}), 500
+
+
 
 @app.route("/delete-all-jupiter-positions", methods=["POST"])
 def delete_all_jupiter_positions():

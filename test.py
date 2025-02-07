@@ -1,122 +1,72 @@
-#!/usr/bin/env python
-import os
+#!/usr/bin/env python3
 import sqlite3
+import os
+import sys
 
-# Determine the base directory and database path.
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-DB_PATH = os.path.join(BASE_DIR, "mother_brain.db")
+# Define the path to your database.
+DB_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "mother_brain.db")
 
-def create_tables():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-
-    # Create the update_times table to store last update times.
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS update_times (
-        id INTEGER PRIMARY KEY,
-        last_update_time_positions TEXT,
-        last_update_time_positions_source TEXT,
-        last_update_time_prices TEXT,
-        last_update_time_prices_source TEXT,
-        last_update_time_jupiter TEXT
-    );
-    """)
-
-    # Create the positions table.
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS positions (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        wallet_name TEXT,
-        asset_type TEXT,
-        position_type TEXT,
-        entry_price REAL,
-        liquidation_price REAL,
-        collateral REAL,
-        size REAL,
-        leverage REAL,
-        value REAL,
-        last_updated TEXT,
-        pnl_after_fees_usd REAL,
-        current_travel_percent REAL,
-        profit REAL DEFAULT 0.0
-    );
-    """)
-
-    # Create the prices table.
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS prices (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        asset_type TEXT,
-        current_price REAL,
-        last_update_time TEXT
-    );
-    """)
-
-    # Create the alerts table.
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS alerts (
-        id TEXT PRIMARY KEY,
-        alert_type TEXT,
-        asset_type TEXT,
-        trigger_value REAL,
-        condition TEXT,
-        status TEXT,
-        position_type TEXT,
-        wallet_name TEXT,
-        frequency INTEGER,
-        counter INTEGER,
-        liquidation_distance REAL,
-        target_travel_percent REAL,
-        liquidation_price REAL,
-        notes TEXT
-    );
-    """)
-
-    # Create the brokers table.
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS brokers (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        image_path TEXT,
-        web_address TEXT,
-        total_holding REAL
-    );
-    """)
-
-    # Create the wallets table.
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS wallets (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        public_address TEXT,
-        private_address TEXT,
-        image_path TEXT,
-        balance REAL
-    );
-    """)
-
-    # Create the api_counters table.
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS api_counters (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        counter_name TEXT,
-        counter_value INTEGER
-    );
-    """)
-
-    # Create the balance_vars table.
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS balance_vars (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        total_wallet_balance REAL,
-        total_brokerage_balance REAL,
-        total_balance REAL
-    );
-    """)
-
-    conn.commit()
-    conn.close()
-    print("Tables created successfully in", DB_PATH)
+def create_update_times_table(db_path):
+    print("========================================")
+    print("Starting update_times table fixer script")
+    print("========================================")
+    print(f"Connecting to database at: {db_path}")
+    try:
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        print("Successfully connected to the database.")
+    except Exception as e:
+        print(f"Failed to connect to database: {e}")
+        sys.exit(1)
+    
+    try:
+        # Check if the table "update_times" exists.
+        print("Checking for the 'update_times' table...")
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='update_times'")
+        result = cursor.fetchone()
+        
+        if result:
+            print("Table 'update_times' already exists.")
+        else:
+            print("Table 'update_times' not found. Creating table now...")
+            create_query = """
+                CREATE TABLE update_times (
+                    id INTEGER PRIMARY KEY,
+                    last_update_time_positions DATETIME,
+                    last_update_positions_source TEXT,
+                    last_update_time_prices DATETIME,
+                    last_update_prices_source TEXT,
+                    last_update_time_jupiter DATETIME,
+                    last_update_jupiter_source TEXT
+                );
+            """
+            cursor.execute(create_query)
+            print("Table 'update_times' created successfully.")
+            
+            # Insert a default row with id=1.
+            insert_query = """
+                INSERT INTO update_times (
+                    id, last_update_time_positions, last_update_positions_source,
+                    last_update_time_prices, last_update_prices_source,
+                    last_update_time_jupiter, last_update_jupiter_source
+                ) VALUES (
+                    1, NULL, NULL, NULL, NULL, NULL, NULL
+                );
+            """
+            cursor.execute(insert_query)
+            conn.commit()
+            print("Default row inserted into 'update_times'.")
+    except sqlite3.Error as e:
+        print(f"SQLite error: {e}")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+    finally:
+        conn.close()
+        print("Database connection closed.")
+        print("========================================")
+        print("Script completed.")
+        print("========================================")
 
 if __name__ == "__main__":
-    create_tables()
+    create_update_times_table(DB_PATH)

@@ -230,6 +230,14 @@ class AlertManager:
         return msg
 
     def check_profit(self, pos: Dict[str, Any]) -> str:
+        """
+        Evaluate the profit alert state such that:
+         - If profit is less than the low threshold (e.g., profit < 10), no alert is triggered.
+         - If profit is between the low and medium thresholds, a low alert is triggered.
+         - If profit is between the medium and high thresholds, a medium alert is triggered.
+         - If profit exceeds the high threshold, a high alert is triggered.
+         Only show an alert if profit breaches upward.
+        """
         asset_code = pos.get("asset_type", "???").upper()
         asset_full = self.ASSET_FULL_NAMES.get(asset_code, asset_code)
         position_type = pos.get("position_type", "").capitalize()
@@ -261,16 +269,15 @@ class AlertManager:
             logger.error("%s %s (ID: %s): Error parsing profit thresholds: %s", asset_full, position_type, position_id, e)
             return ""
 
-        current_level = "none"
-        if profit_val >= high_thresh and high_thresh > 0:
-            current_level = "high"
-        elif profit_val >= med_thresh and med_thresh > 0:
-            current_level = "medium"
-        elif profit_val >= low_thresh and low_thresh > 0:
-            current_level = "low"
-        else:
-            self.last_profit[f"profit-{asset_full}-{position_type}-{position_id}"] = "none"
+        # For profit, we want alerts only when profit exceeds thresholds upward.
+        if profit_val < low_thresh:
             return ""
+        elif profit_val < med_thresh:
+            current_level = "low"
+        elif profit_val < high_thresh:
+            current_level = "medium"
+        else:
+            current_level = "high"
 
         profit_key = f"profit-{asset_full}-{position_type}-{position_id}"
         last_level = self.last_profit.get(profit_key, "none")

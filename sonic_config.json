@@ -29,7 +29,8 @@
   },
   "alert_ranges": {
     "heat_index_ranges": {
-      "low": 190.0,
+      "enabled": true,
+      "low": 444.0,
       "low_notifications": {
         "call": true
       },
@@ -62,7 +63,6 @@
       "high": 11111.0
     },
     "travel_percent_liquid_ranges": {
-      "enabled": true,
       "low": -25.0,
       "low_notifications": {
         "call": true
@@ -82,7 +82,6 @@
       "high": 0.0
     },
     "profit_ranges": {
-      "enabled": true,
       "low": 3.0,
       "low_notifications": {
         "call": true

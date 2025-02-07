@@ -584,36 +584,60 @@ class DataLocker:
 
     def set_last_update_times(self, positions_dt=None, positions_source=None,
                               prices_dt=None, prices_source=None, jupiter_dt=None):
-        # Get the current update times; default to an empty dict if none exists.
+        """
+        Update the last update times in the system_vars table (row with id=1).
+        """
+        # Get the current update times from system_vars.
         current = self.get_last_update_times() or {}
-
         new_positions_dt = positions_dt.isoformat() if positions_dt else current.get("last_update_time_positions", None)
         new_prices_dt = prices_dt.isoformat() if prices_dt else current.get("last_update_time_prices", None)
         new_jupiter_dt = jupiter_dt.isoformat() if jupiter_dt else current.get("last_update_time_jupiter", None)
 
-        # Now update the record in the update_times table.
-        # (Assuming you use an UPDATE statement if a record exists, or an INSERT otherwise.)
-        # For example:
         cursor = self.conn.cursor()
         if current:
             cursor.execute("""
-                UPDATE update_times
+                UPDATE system_vars
                    SET last_update_time_positions = ?,
-                       last_update_time_positions_source = ?,
+                       last_update_positions_source = ?,
                        last_update_time_prices = ?,
-                       last_update_time_prices_source = ?,
+                       last_update_prices_source = ?,
                        last_update_time_jupiter = ?
-                """, (new_positions_dt, positions_source, new_prices_dt, prices_source, new_jupiter_dt))
+                 WHERE id = 1
+            """, (new_positions_dt, positions_source, new_prices_dt, prices_source, new_jupiter_dt))
         else:
             cursor.execute("""
-                INSERT INTO update_times 
-                    (last_update_time_positions, last_update_time_positions_source,
-                     last_update_time_prices, last_update_time_prices_source,
-                     last_update_time_jupiter)
-                VALUES (?, ?, ?, ?, ?)
-                """, (new_positions_dt, positions_source, new_prices_dt, prices_source, new_jupiter_dt))
+                INSERT INTO system_vars 
+                    (id, last_update_time_positions, last_update_positions_source,
+                     last_update_time_prices, last_update_prices_source, last_update_time_jupiter)
+                VALUES (1, ?, ?, ?, ?, ?)
+            """, (new_positions_dt, positions_source, new_prices_dt, prices_source, new_jupiter_dt))
         self.conn.commit()
         cursor.close()
+
+    def get_last_update_times(self):
+        """
+        Retrieve the update times from the system_vars table (row with id=1).
+        Returns:
+            A dictionary with keys like 'last_update_time_positions',
+            'last_update_positions_source', 'last_update_time_prices',
+            'last_update_prices_source', and 'last_update_time_jupiter',
+            or an empty dictionary if no record is found.
+        """
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT last_update_time_positions, last_update_positions_source,
+                   last_update_time_prices, last_update_prices_source,
+                   last_update_time_jupiter
+              FROM system_vars
+             WHERE id = 1
+             LIMIT 1
+        """)
+        row = cursor.fetchone()
+        cursor.close()
+        if row is not None:
+            return dict(row)
+        else:
+            return {}
 
     def get_last_update_times(self):
         """

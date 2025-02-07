@@ -49,14 +49,18 @@
   .table tbody td:not(.alert-low):not(.alert-medium):not(.alert-high) {
     background-color: var(--bs-card-bg, #ffffff);
   }
+  /* Bold text for numbers if needed */
+  .fw-bold {
+    font-weight: bold;
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container my-3">
-  <!-- Reusable Update Info Boxes Component -->
+  <!-- Update Info Boxes -->
   <div class="update-info-boxes">
-    <!-- Crypto (Positions) Update Info Box -->
+    <!-- Crypto Update Info Box -->
     <div class="info-box" id="update-crypto-all-btn">
       <span class="info-box-icon bg-info">
         <img src="{{ url_for('static', filename='images/crypto_icon.jpg') }}" alt="Crypto" id="crypto-icon" />
@@ -87,8 +91,8 @@
 
   <!-- Positions Table Card -->
   <div class="card">
-    <!-- Use the same background as the sidebar for consistency -->
-    <div class="card-header {% if theme.sidebar.bg %}{{ theme.sidebar.bg }}{% else %}bg-body-secondary{% endif %}">
+    <!-- Title bar matches the sidebar color exactly -->
+    <div class="card-header {{ theme.sidebar.bg or 'bg-primary' }}">
       <h3 class="card-title">POSITIONS</h3>
     </div>
     <div class="card-body">
@@ -110,7 +114,8 @@
         </thead>
         <tbody>
           {% for pos in positions|sort(attribute='size', reverse=True) %}
-          <tr class="{{ pos.heat_alert_class }}">
+          <tr>
+            <!-- Asset Column -->
             <td>
               {% if pos.asset_type == 'BTC' %}
                 <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="width: 40px; height: 40px;" />
@@ -122,13 +127,14 @@
                 {{ pos.asset_type }}
               {% endif %}
             </td>
+            <!-- Position Type Column -->
             <td><b>{{ pos.position_type }}</b></td>
-            <!-- Profit Column: Append a green dollar sign only for medium and high alerts -->
+            <!-- Profit Column: Only show '$' if alert level is medium or high -->
             <td class="{{ pos.profit_alert_class }}">
               {% if pos.pnl_after_fees_usd is defined and pos.pnl_after_fees_usd is not none %}
                 {{ "{:,.2f}".format(pos.pnl_after_fees_usd) }}
                 {% if pos.profit_alert_class in ['alert-medium', 'alert-high'] %}
-                  <span style="color: green;">💲</span>
+                  <span class="fw-bold">$</span>
                 {% endif %}
               {% else %}
                 N/A
@@ -137,38 +143,23 @@
             <!-- Collateral Column -->
             <td class="{{ pos.collateral_alert_class }}">
               {{ "{:,.2f}".format(pos.collateral) }}
-              {% if pos.collateral_alert_class == "alert-high" %}
-                <span style="color: red;">⚠️</span>
-              {% endif %}
             </td>
             <!-- Value Column -->
             <td class="{{ pos.value_alert_class }}">
               {{ "{:,.2f}".format(pos.value) }}
-              {% if pos.value_alert_class == "alert-high" %}
-                <span style="color: red;">⚠️</span>
-              {% endif %}
             </td>
             <!-- Size Column -->
             <td class="{{ pos.size_alert_class }}">
               {{ "{:,.2f}".format(pos.size) }}
-              {% if pos.size_alert_class == "alert-high" %}
-                <span style="color: red;">⚠️</span>
-              {% endif %}
             </td>
             <!-- Leverage Column -->
             <td class="{{ pos.leverage_alert_class }}">
               {{ "{:,.2f}".format(pos.leverage) }}
-              {% if pos.leverage_alert_class == "alert-high" %}
-                <span style="color: red;">⚠️</span>
-              {% endif %}
             </td>
             <!-- Travel % Column -->
             <td class="{{ pos.travel_liquid_alert_class }}">
               {% if pos.current_travel_percent is not none %}
                 {{ "{:,.2f}".format(pos.current_travel_percent) }}%
-                {% if pos.travel_liquid_alert_class == "alert-high" %}
-                  <span style="color: red;">⚠️</span>
-                {% endif %}
               {% else %}
                 N/A
               {% endif %}
@@ -177,9 +168,6 @@
             <td class="{{ pos.heat_alert_class }}">
               {% if pos.heat_index is not none %}
                 {{ "{:,.2f}".format(pos.heat_index) }}
-                {% if pos.heat_alert_class == "alert-high" %}
-                  <span style="color: red;">⚠️</span>
-                {% endif %}
               {% else %}
                 N/A
               {% endif %}
@@ -188,9 +176,6 @@
             <td class="{{ pos.liqdist_alert_class }}">
               {% if pos.liquidation_distance is not none %}
                 {{ "{:,.2f}".format(pos.liquidation_distance) }}
-                {% if pos.liqdist_alert_class == "alert-high" %}
-                  <span style="color: red;">⚠️</span>
-                {% endif %}
               {% else %}
                 N/A
               {% endif %}
@@ -219,10 +204,14 @@
           {% endfor %}
         </tbody>
         <tfoot>
-          <tr style="font-weight: bold; background-color: var(--bs-card-bg, #f3e5f5); text-align: center !important;">
+          {% set total_profit = 0 %}
+          {% for pos in positions %}
+            {% set total_profit = total_profit + pos.pnl_after_fees_usd %}
+          {% endfor %}
+          <tr style="font-weight: bold; background-color: {{ theme.sidebar.bg or 'bg-primary' }}; text-align: center !important;">
             <td>TOTALS</td>
             <td></td>
-            <td id="footProfit">{{ "{:,.2f}".format(totals.get("total_profit", 0)) }}</td>
+            <td id="footProfit">{{ "{:,.2f}".format(total_profit) }}</td>
             <td id="footCollateral">{{ "{:,.2f}".format(totals.get("total_collateral", 0)) }}</td>
             <td id="footValue">{{ "{:,.2f}".format(totals.get("total_value", 0)) }}</td>
             <td id="footSize">{{ "{:,.2f}".format(totals.get("total_size", 0)) }}</td>
@@ -243,7 +232,18 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   console.log("Positions extra_scripts loaded");
-  // Crypto (Positions) Update Info Box refresh logic
+  // Define a function to update positions (used by both buttons)
+  const updatePositions = () => {
+    fetch("/update_jupiter?source=user", { method: "POST" })
+      .then(response => response.json())
+      .then(data => {
+        console.log("Update response:", data);
+        window.location.reload();
+      })
+      .catch(err => console.error("Error updating positions:", err));
+  };
+
+  // Crypto Update Info Box refresh logic
   const cryptoInfoBox = document.getElementById("update-crypto-all-btn");
   const cryptoIcon = document.getElementById("crypto-icon");
   if (cryptoInfoBox) {
@@ -251,14 +251,7 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("Crypto box clicked");
       cryptoIcon.classList.add("spin");
       setTimeout(() => {
-        fetch("/update_crypto?source=user", { method: "POST" })
-          .then(response => response.json())
-          .then(data => {
-            console.log("Crypto update response:", data);
-            window.location.reload();
-          })
-          .catch(err => console.error("Error updating Crypto:", err))
-          .finally(() => cryptoIcon.classList.remove("spin"));
+        updatePositions();
       }, 1500);
     });
   } else {
@@ -272,14 +265,9 @@ document.addEventListener("DOMContentLoaded", function () {
     jupiterInfoBox.addEventListener("click", function () {
       console.log("Jupiter box clicked");
       jupiterIcon.classList.add("spin");
-      fetch("/update_jupiter?source=user", { method: "POST" })
-        .then(response => response.json())
-        .then(data => {
-          console.log("Jupiter update response:", data);
-          window.location.reload();
-        })
-        .catch(err => console.error("Error updating Jupiter:", err))
-        .finally(() => jupiterIcon.classList.remove("spin"));
+      setTimeout(() => {
+        updatePositions();
+      }, 1500);
     });
   } else {
     console.error("Jupiter info box not found");

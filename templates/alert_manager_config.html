@@ -2,17 +2,17 @@
 
 {% block content %}
 <div class="container-fluid">
-  <h1 class="mb-4">Alert Manager Configuration</h1>
+  <h1 class="mb-4 text-center">Alert Manager Configuration</h1>
 
   <!-- Alert Ranges Section -->
   <div class="card mb-4">
     <div class="card-header">
-      <h3 class="card-title">Alert Ranges</h3>
+      <h3 class="card-title text-center">Alert Ranges</h3>
     </div>
     <div class="card-body">
       <form id="alert-config-form" method="POST" action="{{ url_for('update_alert_config') }}">
         <div class="table-responsive">
-          <table class="table table-bordered">
+          <table class="table table-bordered text-center">
             <thead class="bg-light text-dark">
               <tr>
                 <th>Metric</th>
@@ -99,7 +99,7 @@
             </tbody>
           </table>
         </div>
-        <div class="mt-3">
+        <div class="text-center mt-3">
           <button type="submit" class="btn btn-primary">Save Alert Ranges</button>
           <button type="reset" class="btn btn-secondary">Cancel</button>
         </div>
@@ -110,22 +110,22 @@
   <!-- System Options Section -->
   <div class="card mb-4">
     <div class="card-header">
-      <h3 class="card-title">System Options</h3>
+      <h3 class="card-title text-center">System Options</h3>
     </div>
     <div class="card-body">
       <form id="system-options-form" method="POST" action="{{ url_for('update_system_options') }}">
-        <div class="mb-3">
+        <div class="mb-3 text-center">
           <label for="alert_cooldown_seconds" class="form-label">Alert Cooldown (seconds)</label>
-          <input type="number" step="1" id="alert_cooldown_seconds" name="alert_cooldown_seconds" class="form-control">
+          <input type="number" step="1" id="alert_cooldown_seconds" name="alert_cooldown_seconds" class="form-control w-50 mx-auto">
         </div>
-        <div class="mb-3">
+        <div class="mb-3 text-center">
           <label for="call_refractory_period" class="form-label">Call Refractory Period (seconds)</label>
-          <input type="number" step="1" id="call_refractory_period" name="call_refractory_period" class="form-control">
+          <input type="number" step="1" id="call_refractory_period" name="call_refractory_period" class="form-control w-50 mx-auto">
         </div>
-        <div class="mb-3">
+        <div class="text-center mb-3">
           <button type="button" id="reset-refractory" class="btn btn-warning">Reset Refractory Clock</button>
         </div>
-        <div class="mt-3">
+        <div class="text-center mt-3">
           <button type="submit" class="btn btn-primary">Save System Options</button>
         </div>
       </form>
@@ -140,105 +140,120 @@
 <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/js/OverlayScrollbars.min.js"></script>
 <script src="{{ url_for('static', filename='AdminLTE/dist/js/adminlte.js') }}"></script>
 <script>
-  // Function to load configuration from the backend and populate the form
+$(document).ready(function(){
+  // Function to load configuration from the backend
   function loadConfig() {
-    $.getJSON("{{ url_for('api_get_config') }}", function(config) {
-      console.log("Loaded config:", config);
-      // Populate system options
-      if (config.alert_cooldown_seconds)
-        $("#alert_cooldown_seconds").val(config.alert_cooldown_seconds);
-      if (config.call_refractory_period)
-        $("#call_refractory_period").val(config.call_refractory_period);
-
-      // Populate alert ranges for each metric
-      if (config.alert_ranges) {
-        const metrics = [
-          "heat_index_ranges",
-          "collateral_ranges",
-          "value_ranges",
-          "size_ranges",
-          "leverage_ranges",
-          "liquidation_distance_ranges",
-          "travel_percent_liquid_ranges",
-          "travel_percent_profit_ranges",
-          "profit_ranges"
-        ];
-        metrics.forEach(function(metric) {
-          if (config.alert_ranges[metric]) {
-            $("#" + metric + "_enabled").prop("checked", config.alert_ranges[metric].enabled);
-            $("#" + metric + "_low").val(config.alert_ranges[metric].low);
-            $("#" + metric + "_medium").val(config.alert_ranges[metric].medium);
-            $("#" + metric + "_high").val(config.alert_ranges[metric].high);
-            if (config.alert_ranges[metric].low_notifications) {
-              $("#" + metric + "_low_call").prop("checked", config.alert_ranges[metric].low_notifications.call);
-              $("#" + metric + "_low_sms").prop("checked", config.alert_ranges[metric].low_notifications.sms);
-              $("#" + metric + "_low_email").prop("checked", config.alert_ranges[metric].low_notifications.email);
+    $.ajax({
+      url: "{{ url_for('api_get_config') }}",
+      type: "GET",
+      dataType: "json",
+      cache: false,
+      data: { "_": new Date().getTime() }, // Cache busting
+      success: function(config) {
+        console.log("Loaded config:", config);
+        // Populate system options
+        if (typeof config.alert_cooldown_seconds !== "undefined") {
+          $("#alert_cooldown_seconds").val(config.alert_cooldown_seconds);
+        }
+        if (typeof config.call_refractory_period !== "undefined") {
+          $("#call_refractory_period").val(config.call_refractory_period);
+        }
+        // Populate alert ranges for each metric
+        if (config.alert_ranges) {
+          var metrics = [
+            "heat_index_ranges",
+            "collateral_ranges",
+            "value_ranges",
+            "size_ranges",
+            "leverage_ranges",
+            "liquidation_distance_ranges",
+            "travel_percent_liquid_ranges",
+            "travel_percent_profit_ranges",
+            "profit_ranges"
+          ];
+          metrics.forEach(function(metric) {
+            var m = config.alert_ranges[metric];
+            if (m) {
+              $("#" + metric + "_enabled").prop("checked", m.enabled);
+              $("#" + metric + "_low").val(m.low);
+              $("#" + metric + "_medium").val(m.medium);
+              $("#" + metric + "_high").val(m.high);
+              if (m.low_notifications) {
+                $("#" + metric + "_low_call").prop("checked", m.low_notifications.call);
+                $("#" + metric + "_low_sms").prop("checked", m.low_notifications.sms);
+                $("#" + metric + "_low_email").prop("checked", m.low_notifications.email);
+              }
+              if (m.medium_notifications) {
+                $("#" + metric + "_medium_call").prop("checked", m.medium_notifications.call);
+                $("#" + metric + "_medium_sms").prop("checked", m.medium_notifications.sms);
+                $("#" + metric + "_medium_email").prop("checked", m.medium_notifications.email);
+              }
+              if (m.high_notifications) {
+                $("#" + metric + "_high_call").prop("checked", m.high_notifications.call);
+                $("#" + metric + "_high_sms").prop("checked", m.high_notifications.sms);
+                $("#" + metric + "_high_email").prop("checked", m.high_notifications.email);
+              }
             }
-            if (config.alert_ranges[metric].medium_notifications) {
-              $("#" + metric + "_medium_call").prop("checked", config.alert_ranges[metric].medium_notifications.call);
-              $("#" + metric + "_medium_sms").prop("checked", config.alert_ranges[metric].medium_notifications.sms);
-              $("#" + metric + "_medium_email").prop("checked", config.alert_ranges[metric].medium_notifications.email);
-            }
-            if (config.alert_ranges[metric].high_notifications) {
-              $("#" + metric + "_high_call").prop("checked", config.alert_ranges[metric].high_notifications.call);
-              $("#" + metric + "_high_sms").prop("checked", config.alert_ranges[metric].high_notifications.sms);
-              $("#" + metric + "_high_email").prop("checked", config.alert_ranges[metric].high_notifications.email);
-            }
-          }
-        });
+          });
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.error("Error loading config:", textStatus, errorThrown);
+        console.error("Response text:", jqXHR.responseText);
+        alert("Failed to load configuration file. Check console for details.");
       }
     });
   }
 
-  $(document).ready(function(){
-    loadConfig();
+  // Immediately load the configuration on document ready
+  loadConfig();
 
-    // Handle System Options Form submission
-    $('#system-options-form').on('submit', function(e){
-      e.preventDefault();
-      const formData = $(this).serialize();
-      console.log("Submitting system options form:", formData);
-      $.post("{{ url_for('update_system_options') }}", formData)
-        .done(function(data) {
-          console.log("System options update response:", data);
-          alert('System options updated successfully!');
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-          console.error("Failed to update system options:", textStatus, errorThrown);
-          alert('Failed to update system options.');
-        });
-    });
-
-    // Reset Refractory Clock button
-    $('#reset-refractory').on('click', function(e){
-      e.preventDefault();
-      console.log("Resetting refractory clock...");
-      $.post("{{ url_for('reset_refractory') }}")
-        .done(function(data){
-          console.log("Refractory clock reset response:", data);
-          alert('Refractory clock reset successfully!');
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-          console.error("Failed to reset refractory clock:", textStatus, errorThrown);
-          alert('Failed to reset refractory clock.');
-        });
-    });
-
-    // Handle Alert Ranges Form submission
-    $('#alert-config-form').on('submit', function(e){
-      e.preventDefault();
-      const formData = $(this).serialize();
-      console.log("Submitting alert config form:", formData);
-      $.post("{{ url_for('update_alert_config') }}", formData)
-        .done(function(data){
-          console.log("Alert config update response:", data);
-          alert('Alert configuration updated successfully!');
-        })
-        .fail(function(jqXHR, textStatus, errorThrown){
-          console.error("Failed to update alert config:", textStatus, errorThrown);
-          alert('Failed to update alert configuration.');
-        });
-    });
+  // Handle System Options Form submission
+  $("#system-options-form").on("submit", function(e){
+    e.preventDefault();
+    var formData = $(this).serialize();
+    console.log("Submitting system options form:", formData);
+    $.post("{{ url_for('update_system_options') }}", formData)
+      .done(function(data){
+        console.log("System options update response:", data);
+        alert("System options updated successfully!");
+      })
+      .fail(function(jqXHR, textStatus, errorThrown){
+        console.error("Failed to update system options:", textStatus, errorThrown);
+        alert("Failed to update system options.");
+      });
   });
+
+  // Reset Refractory Clock button
+  $("#reset-refractory").on("click", function(e){
+    e.preventDefault();
+    console.log("Resetting refractory clock...");
+    $.post("{{ url_for('reset_refractory') }}")
+      .done(function(data){
+        console.log("Refractory clock reset response:", data);
+        alert("Refractory clock reset successfully!");
+      })
+      .fail(function(jqXHR, textStatus, errorThrown){
+        console.error("Failed to reset refractory clock:", textStatus, errorThrown);
+        alert("Failed to reset refractory clock.");
+      });
+  });
+
+  // Handle Alert Ranges Form submission
+  $("#alert-config-form").on("submit", function(e){
+    e.preventDefault();
+    var formData = $(this).serialize();
+    console.log("Submitting alert config form:", formData);
+    $.post("{{ url_for('update_alert_config') }}", formData)
+      .done(function(data){
+        console.log("Alert config update response:", data);
+        alert("Alert configuration updated successfully!");
+      })
+      .fail(function(jqXHR, textStatus, errorThrown){
+        console.error("Failed to update alert config:", textStatus, errorThrown);
+        alert("Failed to update alert configuration.");
+      });
+  });
+});
 </script>
 {% endblock extra_scripts %}

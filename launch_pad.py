@@ -5,7 +5,7 @@ import json
 import smtplib
 import logging
 import sqlite3
-from config_manager import load_json_config
+from config_manager import load_config, load_json_config, update_config, deep_merge_dicts
 from typing import Dict, Any, Optional, List
 from datetime import datetime, timedelta
 from flask_socketio import SocketIO, emit
@@ -858,7 +858,8 @@ def delete_alert(alert_id):
     return redirect(url_for("alerts"))
 
 
-@app.route("/update_jupiter", methods=["POST"])
+#@app.route("/update_jupiter", methods=["POST"])
+@app.route("/update_jupiter", methods=["GET", "POST"])
 def update_jupiter():
     source = request.args.get("source") or request.form.get("source") or "API"
     data_locker = DataLocker(DB_PATH)
@@ -889,6 +890,26 @@ def update_jupiter():
         "last_update_time_prices": now.isoformat()
     }), 200
 
+
+
+@app.route('/update_alert_config', methods=['POST'])
+def update_alert_config():
+    try:
+        # Load the existing configuration
+        config = load_config("sonic_config.json")
+        # Convert the submitted form data into a nested dict
+        form_data = request.form.to_dict(flat=True)
+        updated_alerts = parse_alert_config_form(form_data)
+        # Update only the "alert_ranges" portion of the configuration
+        config["alert_ranges"] = updated_alerts
+        # Save the updated configuration using update_config
+        updated_config = update_config(config, "sonic_config.json")
+        # Optionally, reload the configuration in your alert manager:
+        manager.reload_config()
+        return jsonify({"success": True})
+    except Exception as e:
+        logger.error("Error updating alert config: %s", e, exc_info=True)
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/latest_update_info")
 def latest_update_info():
@@ -1308,21 +1329,6 @@ def price_charts():
             chart_data[asset].append([epoch_ms, price])
     conn.close()
     return render_template("price_charts.html", chart_data=chart_data, timeframe=hours)
-
-
-@app.route('/update_alert_config', methods=['POST'])
-def update_alert_config():
-    try:
-        config = load_json_config("sonic_config.json")
-        form_data = request.form.to_dict(flat=True)
-        updated_alerts = parse_alert_config_form(form_data)
-        config["alert_ranges"] = updated_alerts
-        save_config(config, "sonic_config.json")
-        manager.reload_config()
-        return jsonify({"success": True})
-    except Exception as e:
-        logger.error("Error updating alert config: %s", e, exc_info=True)
-        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/hedge-report")

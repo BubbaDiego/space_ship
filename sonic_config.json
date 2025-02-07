@@ -12,8 +12,8 @@
     "logging_enabled": true,
     "log_level": "DEBUG",
     "console_output": true,
-    "log_file": "C:/space_ship/price_monitor.log",
-    "db_path": "C:/space_ship/mother_brain.db",
+    "log_file": "price_monitor.log",
+    "db_path": "mother_brain.db",
     "price_monitor_enabled": true,
     "alert_monitor_enabled": true,
     "sonic_monitor_loop_time": 300,
@@ -84,15 +84,15 @@
       "enabled": true
     },
     "profit_ranges": {
-      "low": 3.0,
+      "low": 11.0,
       "low_notifications": {
         "call": true
       },
-      "medium": 50.0,
+      "medium": 100.0,
       "medium_notifications": {
         "call": true
       },
-      "high": 100.0,
+      "high": 200.0,
       "high_notifications": {
         "call": true
       },

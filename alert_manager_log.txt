@@ -38650,3 +38650,890 @@ twilio.base.exceptions.TwilioRestException: HTTP 401 error: Unable to create rec
 2025-02-07 04:45:44,430 - AlertManagerLogger - INFO - Solana Short (ID: FCxiRhbQrK7nPGNGXWXS2owDGyYQTCJH3peqWF4RjWTE): Travel alert 'LOW' suppressed due to cooldown.
 2025-02-07 04:45:44,430 - AlertManagerLogger - INFO - Found 0 active price alerts.
 2025-02-07 04:45:44,430 - AlertManagerLogger - INFO - No alerts triggered in this cycle.
+2025-02-07 04:46:25,881 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-07 04:46:25,881 - AlertManagerLogger - INFO - Solana Short (ID: FCxiRhbQrK7nPGNGXWXS2owDGyYQTCJH3peqWF4RjWTE): Travel alert 'LOW' suppressed due to cooldown.
+2025-02-07 04:46:25,881 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-07 04:46:25,881 - AlertManagerLogger - INFO - No alerts triggered in this cycle.
+2025-02-07 04:46:38,991 - AlertManagerLogger - INFO - Alert configuration reloaded: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-07 04:46:54,500 - AlertManagerLogger - INFO - Alert configuration reloaded: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-07 04:52:49,598 - AlertManagerLogger - INFO - Checking alerts for 3 positions.
+2025-02-07 04:52:49,599 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-07 04:52:49,599 - AlertManagerLogger - INFO - No alerts triggered in this cycle.
+2025-02-07 04:57:29,974 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-07 04:57:29,974 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-07 04:57:29,974 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-07 04:57:29,974 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-07 04:57:29,975 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-07 04:57:29,975 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-07 04:57:29,975 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-07 04:57:29,975 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-07 05:20:50,264 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-07 05:20:50,264 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-07 05:20:50,264 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-07 05:20:50,264 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-07 05:20:50,265 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-07 05:20:50,265 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-07 05:20:50,265 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-07 05:20:50,265 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-07 05:23:37,986 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-07 05:23:37,987 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-07 05:23:38,360 - AlertManagerLogger - INFO - Twilio alert sent.
+2025-02-07 06:21:41,635 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-07 06:21:41,635 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-07 06:21:41,635 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-07 06:21:41,636 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-07 06:21:41,638 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-07 06:21:41,638 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-07 06:21:41,638 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-07 06:21:41,638 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-07 06:21:42,438 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-07 06:21:42,438 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-07 06:21:42,438 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-07 06:21:42,438 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-07 06:21:42,439 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-07 06:21:42,439 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-07 06:21:42,439 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-07 06:21:42,439 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-07 06:22:15,944 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-07 06:22:15,944 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-07 06:22:16,276 - AlertManagerLogger - INFO - Twilio alert sent.
+2025-02-07 07:15:36,008 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-07 07:15:36,008 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-07 07:15:36,008 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-07 07:15:36,008 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-07 07:15:36,009 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-07 07:15:36,009 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-07 07:15:36,009 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-07 07:15:36,009 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-07 07:15:36,929 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-07 07:15:36,929 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-07 07:15:36,929 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-07 07:15:36,929 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-07 07:15:36,930 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-07 07:15:36,930 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-07 07:15:36,930 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-07 07:15:36,930 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-07 07:15:48,681 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-07 07:15:48,681 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-07 07:15:49,077 - AlertManagerLogger - INFO - Twilio alert sent.
+2025-02-07 07:25:47,737 - AlertManagerLogger - DEBUG - Initializing AlertManager with db_path=C:\space_ship\mother_brain.db, poll_interval=60, config_path=C:\space_ship\sonic_config.json
+2025-02-07 07:25:47,740 - AlertManagerLogger - DEBUG - Loaded configuration: {
+  "price_config": {
+    "assets": [
+      "BTC",
+      "ETH",
+      "SOL"
+    ],
+    "currency": "USD",
+    "cmc_api_key": "c51c0c22-1bf3-4674-86bf-36f39a912d1a"
+  },
+  "system_config": {
+    "logging_enabled": true,
+    "log_level": "DEBUG",
+    "console_output": true,
+    "log_file": "C:/space_ship/price_monitor.log",
+    "db_path": "C:/space_ship/mother_brain.db",
+    "price_monitor_enabled": true,
+    "alert_monitor_enabled": true,
+    "sonic_monitor_loop_time": 300,
+    "last_price_update_time": null
+  },
+  "api_config": {
+    "coingecko_api_enabled": "ENABLE",
+    "kucoin_api_enabled": "ENABLE",
+    "coinmarketcap_api_enabled": "ENABLE",
+    "coinpaprika_api_enabled": "ENABLE",
+    "binance_api_enabled": "ENABLE",
+    "coinmarketcap_api_key": "c51c0c22-1bf3-4674-86bf-36f39a912d1a"
+  },
+  "alert_ranges": {
+    "heat_index_ranges": {
+      "enabled": true,
+      "low": 444.0,
+      "low_notifications": {
+        "call": true
+      },
+      "medium": 444.0,
+      "high": 777.0
+    },
+    "collateral_ranges": {
+      "low": 1111.0,
+      "medium": 1111.0,
+      "high": 11111.0
+    },
+    "value_ranges": {
+      "low": 1111.0,
+      "medium": 1111.0,
+      "high": 1111.0
+    },
+    "size_ranges": {
+      "low": 11111.0,
+      "medium": 111111.0,
+      "high": 11111.0
+    },
+    "leverage_ranges": {
+      "low": 11111.0,
+      "medium": 111111.0,
+      "high": 11111.0
+    },
+    "liquidation_distance_ranges": {
+      "low": 1111111.0,
+      "medium": 111111.0,
+      "high": 11111.0
+    },
+    "travel_percent_liquid_ranges": {
+      "low": -40.0,
+      "low_notifications": {
+        "call": true
+      },
+      "medium": -50.0,
+      "medium_notifications": {
+        "call": true
+      },
+      "high": -75.0,
+      "high_notifications": {
+        "call": true
+      },
+      "enabled": true
+    },
+    "travel_percent_profit_ranges": {
+      "low": 0.0,
+      "medium": 0.0,
+      "high": 0.0,
+      "enabled": true
+    },
+    "profit_ranges": {
+      "low": 50.0,
+      "low_notifications": {
+        "call": true
+      },
+      "medium": 100.0,
+      "medium_notifications": {
+        "call": true
+      },
+      "high": 200.0,
+      "high_notifications": {
+        "call": true
+      },
+      "enabled": true
+    }
+  },
+  "notification_config": {
+    "email": {
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587,
+      "smtp_user": "bubba.diego@gmail.com",
+      "smtp_password": "pzix taan afbe igxb",
+      "recipient_email": "bubba.diego@gmail.com"
+    },
+    "sms": {
+      "carrier_gateway": "txt.att.net",
+      "recipient_number": "6199804758"
+    }
+  },
+  "alert_cooldown_seconds": 6000,
+  "call_refractory_period": 1,
+  "theme_profiles": {
+    "sidebar": {
+      "color_mode": "",
+      "bg": "bg-info-subtle"
+    },
+    "navbar": {
+      "color_mode": "dark",
+      "bg": ""
+    }
+  },
+  "twilio_config": {
+    "account_sid": "ACb606788ada5dccbfeeebed0f440099b3",
+    "auth_token": "abf48a300d482348610d76beb3cef326",
+    "flow_sid": "FW5b3bf49ee04af4d23a118b613bbc0df2",
+    "to_phone": "+16199804758",
+    "from_phone": "+18336913467"
+  }
+}
+2025-02-07 07:25:47,741 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-07 07:25:47,741 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-07 07:25:47,741 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-07 07:25:47,741 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-07 07:25:47,741 - AlertManagerLogger - INFO - Starting alert monitoring loop.
+2025-02-07 07:25:47,741 - AlertManagerLogger - DEBUG - Fetched positions: [
+  {
+    "id": "FCxiRhbQrK7nPGNGXWXS2owDGyYQTCJH3peqWF4RjWTE",
+    "asset_type": "SOL",
+    "position_type": "Short",
+    "entry_price": 198.52,
+    "liquidation_price": 211.17,
+    "current_travel_percent": -7.33,
+    "value": 1411.7,
+    "collateral": 1506.21,
+    "size": 22663.21,
+    "wallet_name": "LandoVault",
+    "leverage": 15.04,
+    "last_updated": "2025-02-07T06:14:14",
+    "alert_reference_id": null,
+    "hedge_buddy_id": null,
+    "current_price": 0.0,
+    "liquidation_distance": null,
+    "heat_index": 0.0,
+    "current_heat_index": 0.0,
+    "pnl_after_fees_usd": -110.37
+  },
+  {
+    "id": "BLqPNiZq7X8CLq5pWfdR88qonytf82nTNi14qG28fHkr",
+    "asset_type": "SOL",
+    "position_type": "Long",
+    "entry_price": 202.91,
+    "liquidation_price": 197.64,
+    "current_travel_percent": -68.53,
+    "value": 152.33,
+    "collateral": 449.28,
+    "size": 15653.61,
+    "wallet_name": "LandoVault",
+    "leverage": 34.84,
+    "last_updated": "2025-02-07T06:57:06",
+    "alert_reference_id": null,
+    "hedge_buddy_id": null,
+    "current_price": 0.0,
+    "liquidation_distance": null,
+    "heat_index": 0.0,
+    "current_heat_index": 0.0,
+    "pnl_after_fees_usd": -307.91
+  },
+  {
+    "id": "FfrwvedUR8wfQcpy5HpaNttvQDC9pEiDPvNHHaQeZiPB",
+    "asset_type": "BTC",
+    "position_type": "Short",
+    "entry_price": 98462.19,
+    "liquidation_price": 103795.07,
+    "current_travel_percent": -4.92,
+    "value": 509.06,
+    "collateral": 528.56,
+    "size": 9294.85,
+    "wallet_name": "R2Vault",
+    "leverage": 17.58,
+    "last_updated": "2025-02-07T06:52:57",
+    "alert_reference_id": null,
+    "hedge_buddy_id": null,
+    "current_price": 0.0,
+    "liquidation_distance": null,
+    "heat_index": 0.0,
+    "current_heat_index": 0.0,
+    "pnl_after_fees_usd": -26.02
+  },
+  {
+    "id": "9Vc3YqjzsNMenfSFMZL6sNURqPC9dyBkzM28CPyLfpn5",
+    "asset_type": "BTC",
+    "position_type": "Long",
+    "entry_price": 100129.52,
+    "liquidation_price": 94224.54,
+    "current_travel_percent": -27.05,
+    "value": 280.11,
+    "collateral": 378.11,
+    "size": 6130.21,
+    "wallet_name": "R2Vault",
+    "leverage": 16.21,
+    "last_updated": "2025-02-07T06:53:56",
+    "alert_reference_id": null,
+    "hedge_buddy_id": null,
+    "current_price": 0.0,
+    "liquidation_distance": null,
+    "heat_index": 0.0,
+    "current_heat_index": 0.0,
+    "pnl_after_fees_usd": -102.29
+  }
+]
+2025-02-07 07:25:47,743 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-07 07:25:47,743 - AlertManagerLogger - DEBUG - Solana Short (ID: FCxiRhbQrK7nPGNGXWXS2owDGyYQTCJH3peqWF4RjWTE): profit_val = -94.510000
+2025-02-07 07:25:47,743 - AlertManagerLogger - DEBUG - Solana Short (ID: FCxiRhbQrK7nPGNGXWXS2owDGyYQTCJH3peqWF4RjWTE): profit config: {'low': 50.0, 'low_notifications': {'call': True}, 'medium': 100.0, 'medium_notifications': {'call': True}, 'high': 200.0, 'high_notifications': {'call': True}, 'enabled': True}
+2025-02-07 07:25:47,743 - AlertManagerLogger - DEBUG - Solana Short (ID: FCxiRhbQrK7nPGNGXWXS2owDGyYQTCJH3peqWF4RjWTE): Profit thresholds - Low: 50.000000, Medium: 100.000000, High: 200.000000
+2025-02-07 07:25:47,743 - AlertManagerLogger - DEBUG - Solana Short (ID: FCxiRhbQrK7nPGNGXWXS2owDGyYQTCJH3peqWF4RjWTE): profit_val below low_thresh; no alert.
+2025-02-07 07:25:47,743 - AlertManagerLogger - DEBUG - Solana Short (ID: FCxiRhbQrK7nPGNGXWXS2owDGyYQTCJH3peqWF4RjWTE): current_travel_percent = -7.330000
+2025-02-07 07:25:47,743 - AlertManagerLogger - DEBUG - Solana Short (ID: FCxiRhbQrK7nPGNGXWXS2owDGyYQTCJH3peqWF4RjWTE): travel_percent_liquid config: {'low': -40.0, 'low_notifications': {'call': True}, 'medium': -50.0, 'medium_notifications': {'call': True}, 'high': -75.0, 'high_notifications': {'call': True}, 'enabled': True}
+2025-02-07 07:25:47,743 - AlertManagerLogger - DEBUG - Solana Short (ID: FCxiRhbQrK7nPGNGXWXS2owDGyYQTCJH3peqWF4RjWTE): Thresholds - Low: -40.000000, Medium: -50.000000, High: -75.000000
+2025-02-07 07:25:47,743 - AlertManagerLogger - DEBUG - Solana Short (ID: FCxiRhbQrK7nPGNGXWXS2owDGyYQTCJH3peqWF4RjWTE): current_travel_percent does not breach any thresholds.
+2025-02-07 07:25:47,743 - AlertManagerLogger - DEBUG - Solana Long (ID: BLqPNiZq7X8CLq5pWfdR88qonytf82nTNi14qG28fHkr): profit_val = -296.950000
+2025-02-07 07:25:47,743 - AlertManagerLogger - DEBUG - Solana Long (ID: BLqPNiZq7X8CLq5pWfdR88qonytf82nTNi14qG28fHkr): profit config: {'low': 50.0, 'low_notifications': {'call': True}, 'medium': 100.0, 'medium_notifications': {'call': True}, 'high': 200.0, 'high_notifications': {'call': True}, 'enabled': True}
+2025-02-07 07:25:47,743 - AlertManagerLogger - DEBUG - Solana Long (ID: BLqPNiZq7X8CLq5pWfdR88qonytf82nTNi14qG28fHkr): Profit thresholds - Low: 50.000000, Medium: 100.000000, High: 200.000000
+2025-02-07 07:25:47,744 - AlertManagerLogger - DEBUG - Solana Long (ID: BLqPNiZq7X8CLq5pWfdR88qonytf82nTNi14qG28fHkr): profit_val below low_thresh; no alert.
+2025-02-07 07:25:47,744 - AlertManagerLogger - DEBUG - Solana Long (ID: BLqPNiZq7X8CLq5pWfdR88qonytf82nTNi14qG28fHkr): current_travel_percent = -68.530000
+2025-02-07 07:25:47,744 - AlertManagerLogger - DEBUG - Solana Long (ID: BLqPNiZq7X8CLq5pWfdR88qonytf82nTNi14qG28fHkr): travel_percent_liquid config: {'low': -40.0, 'low_notifications': {'call': True}, 'medium': -50.0, 'medium_notifications': {'call': True}, 'high': -75.0, 'high_notifications': {'call': True}, 'enabled': True}
+2025-02-07 07:25:47,744 - AlertManagerLogger - DEBUG - Solana Long (ID: BLqPNiZq7X8CLq5pWfdR88qonytf82nTNi14qG28fHkr): Thresholds - Low: -40.000000, Medium: -50.000000, High: -75.000000
+2025-02-07 07:25:47,744 - AlertManagerLogger - DEBUG - Solana Long (ID: BLqPNiZq7X8CLq5pWfdR88qonytf82nTNi14qG28fHkr): Triggering travel alert with message: Travel Percent Liquid ALERT: Solana Long (Wallet: LandoVault) - Travel% = -68.53%, Level = MEDIUM
+2025-02-07 07:25:47,744 - AlertManagerLogger - DEBUG - Travel alert triggered: Travel Percent Liquid ALERT: Solana Long (Wallet: LandoVault) - Travel% = -68.53%, Level = MEDIUM
+2025-02-07 07:25:47,744 - AlertManagerLogger - DEBUG - Bitcoin Short (ID: FfrwvedUR8wfQcpy5HpaNttvQDC9pEiDPvNHHaQeZiPB): profit_val = -19.500000
+2025-02-07 07:25:47,744 - AlertManagerLogger - DEBUG - Bitcoin Short (ID: FfrwvedUR8wfQcpy5HpaNttvQDC9pEiDPvNHHaQeZiPB): profit config: {'low': 50.0, 'low_notifications': {'call': True}, 'medium': 100.0, 'medium_notifications': {'call': True}, 'high': 200.0, 'high_notifications': {'call': True}, 'enabled': True}
+2025-02-07 07:25:47,744 - AlertManagerLogger - DEBUG - Bitcoin Short (ID: FfrwvedUR8wfQcpy5HpaNttvQDC9pEiDPvNHHaQeZiPB): Profit thresholds - Low: 50.000000, Medium: 100.000000, High: 200.000000
+2025-02-07 07:25:47,744 - AlertManagerLogger - DEBUG - Bitcoin Short (ID: FfrwvedUR8wfQcpy5HpaNttvQDC9pEiDPvNHHaQeZiPB): profit_val below low_thresh; no alert.
+2025-02-07 07:25:47,744 - AlertManagerLogger - DEBUG - Bitcoin Short (ID: FfrwvedUR8wfQcpy5HpaNttvQDC9pEiDPvNHHaQeZiPB): current_travel_percent = -4.920000
+2025-02-07 07:25:47,746 - AlertManagerLogger - DEBUG - Bitcoin Short (ID: FfrwvedUR8wfQcpy5HpaNttvQDC9pEiDPvNHHaQeZiPB): travel_percent_liquid config: {'low': -40.0, 'low_notifications': {'call': True}, 'medium': -50.0, 'medium_notifications': {'call': True}, 'high': -75.0, 'high_notifications': {'call': True}, 'enabled': True}
+2025-02-07 07:25:47,746 - AlertManagerLogger - DEBUG - Bitcoin Short (ID: FfrwvedUR8wfQcpy5HpaNttvQDC9pEiDPvNHHaQeZiPB): Thresholds - Low: -40.000000, Medium: -50.000000, High: -75.000000
+2025-02-07 07:25:47,746 - AlertManagerLogger - DEBUG - Bitcoin Short (ID: FfrwvedUR8wfQcpy5HpaNttvQDC9pEiDPvNHHaQeZiPB): current_travel_percent does not breach any thresholds.
+2025-02-07 07:25:47,746 - AlertManagerLogger - DEBUG - Bitcoin Long (ID: 9Vc3YqjzsNMenfSFMZL6sNURqPC9dyBkzM28CPyLfpn5): profit_val = -98.000000
+2025-02-07 07:25:47,746 - AlertManagerLogger - DEBUG - Bitcoin Long (ID: 9Vc3YqjzsNMenfSFMZL6sNURqPC9dyBkzM28CPyLfpn5): profit config: {'low': 50.0, 'low_notifications': {'call': True}, 'medium': 100.0, 'medium_notifications': {'call': True}, 'high': 200.0, 'high_notifications': {'call': True}, 'enabled': True}
+2025-02-07 07:25:47,746 - AlertManagerLogger - DEBUG - Bitcoin Long (ID: 9Vc3YqjzsNMenfSFMZL6sNURqPC9dyBkzM28CPyLfpn5): Profit thresholds - Low: 50.000000, Medium: 100.000000, High: 200.000000
+2025-02-07 07:25:47,746 - AlertManagerLogger - DEBUG - Bitcoin Long (ID: 9Vc3YqjzsNMenfSFMZL6sNURqPC9dyBkzM28CPyLfpn5): profit_val below low_thresh; no alert.
+2025-02-07 07:25:47,746 - AlertManagerLogger - DEBUG - Bitcoin Long (ID: 9Vc3YqjzsNMenfSFMZL6sNURqPC9dyBkzM28CPyLfpn5): current_travel_percent = -27.050000
+2025-02-07 07:25:47,746 - AlertManagerLogger - DEBUG - Bitcoin Long (ID: 9Vc3YqjzsNMenfSFMZL6sNURqPC9dyBkzM28CPyLfpn5): travel_percent_liquid config: {'low': -40.0, 'low_notifications': {'call': True}, 'medium': -50.0, 'medium_notifications': {'call': True}, 'high': -75.0, 'high_notifications': {'call': True}, 'enabled': True}
+2025-02-07 07:25:47,746 - AlertManagerLogger - DEBUG - Bitcoin Long (ID: 9Vc3YqjzsNMenfSFMZL6sNURqPC9dyBkzM28CPyLfpn5): Thresholds - Low: -40.000000, Medium: -50.000000, High: -75.000000
+2025-02-07 07:25:47,748 - AlertManagerLogger - DEBUG - Bitcoin Long (ID: 9Vc3YqjzsNMenfSFMZL6sNURqPC9dyBkzM28CPyLfpn5): current_travel_percent does not breach any thresholds.
+2025-02-07 07:25:47,748 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-07 07:25:47,748 - AlertManagerLogger - DEBUG - Aggregated alerts: ['Travel Percent Liquid ALERT: Solana Long (Wallet: LandoVault) - Travel% = -68.53%, Level = MEDIUM']
+2025-02-07 07:25:47,748 - AlertManagerLogger - DEBUG - Sending aggregated alert call with message: 1 alerts triggered:
+Travel Percent Liquid ALERT: Solana Long (Wallet: LandoVault) - Travel% = -68.53%, Level = MEDIUM
+2025-02-07 07:25:47,748 - AlertManagerLogger - DEBUG - Sending call alert with message: 1 alerts triggered:
+Travel Percent Liquid ALERT: Solana Long (Wallet: LandoVault) - Travel% = -68.53%, Level = MEDIUM
+2025-02-07 07:25:48,092 - AlertManagerLogger - DEBUG - Twilio flow triggered with message: 1 alerts triggered:
+Travel Percent Liquid ALERT: Solana Long (Wallet: LandoVault) - Travel% = -68.53%, Level = MEDIUM
+2025-02-07 07:25:48,092 - AlertManagerLogger - INFO - Twilio alert sent.
+2025-02-07 07:25:48,114 - AlertManagerLogger - DEBUG - Initializing AlertManager with db_path=C:\space_ship\mother_brain.db, poll_interval=60, config_path=C:\space_ship\sonic_config.json
+2025-02-07 07:25:48,115 - AlertManagerLogger - DEBUG - Loaded configuration: {
+  "price_config": {
+    "assets": [
+      "BTC",
+      "ETH",
+      "SOL"
+    ],
+    "currency": "USD",
+    "cmc_api_key": "c51c0c22-1bf3-4674-86bf-36f39a912d1a"
+  },
+  "system_config": {
+    "logging_enabled": true,
+    "log_level": "DEBUG",
+    "console_output": true,
+    "log_file": "C:/space_ship/price_monitor.log",
+    "db_path": "C:/space_ship/mother_brain.db",
+    "price_monitor_enabled": true,
+    "alert_monitor_enabled": true,
+    "sonic_monitor_loop_time": 300,
+    "last_price_update_time": null
+  },
+  "api_config": {
+    "coingecko_api_enabled": "ENABLE",
+    "kucoin_api_enabled": "ENABLE",
+    "coinmarketcap_api_enabled": "ENABLE",
+    "coinpaprika_api_enabled": "ENABLE",
+    "binance_api_enabled": "ENABLE",
+    "coinmarketcap_api_key": "c51c0c22-1bf3-4674-86bf-36f39a912d1a"
+  },
+  "alert_ranges": {
+    "heat_index_ranges": {
+      "enabled": true,
+      "low": 444.0,
+      "low_notifications": {
+        "call": true
+      },
+      "medium": 444.0,
+      "high": 777.0
+    },
+    "collateral_ranges": {
+      "low": 1111.0,
+      "medium": 1111.0,
+      "high": 11111.0
+    },
+    "value_ranges": {
+      "low": 1111.0,
+      "medium": 1111.0,
+      "high": 1111.0
+    },
+    "size_ranges": {
+      "low": 11111.0,
+      "medium": 111111.0,
+      "high": 11111.0
+    },
+    "leverage_ranges": {
+      "low": 11111.0,
+      "medium": 111111.0,
+      "high": 11111.0
+    },
+    "liquidation_distance_ranges": {
+      "low": 1111111.0,
+      "medium": 111111.0,
+      "high": 11111.0
+    },
+    "travel_percent_liquid_ranges": {
+      "low": -40.0,
+      "low_notifications": {
+        "call": true
+      },
+      "medium": -50.0,
+      "medium_notifications": {
+        "call": true
+      },
+      "high": -75.0,
+      "high_notifications": {
+        "call": true
+      },
+      "enabled": true
+    },
+    "travel_percent_profit_ranges": {
+      "low": 0.0,
+      "medium": 0.0,
+      "high": 0.0,
+      "enabled": true
+    },
+    "profit_ranges": {
+      "low": 50.0,
+      "low_notifications": {
+        "call": true
+      },
+      "medium": 100.0,
+      "medium_notifications": {
+        "call": true
+      },
+      "high": 200.0,
+      "high_notifications": {
+        "call": true
+      },
+      "enabled": true
+    }
+  },
+  "notification_config": {
+    "email": {
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587,
+      "smtp_user": "bubba.diego@gmail.com",
+      "smtp_password": "pzix taan afbe igxb",
+      "recipient_email": "bubba.diego@gmail.com"
+    },
+    "sms": {
+      "carrier_gateway": "txt.att.net",
+      "recipient_number": "6199804758"
+    }
+  },
+  "alert_cooldown_seconds": 6000,
+  "call_refractory_period": 1,
+  "theme_profiles": {
+    "sidebar": {
+      "color_mode": "",
+      "bg": "bg-info-subtle"
+    },
+    "navbar": {
+      "color_mode": "dark",
+      "bg": ""
+    }
+  },
+  "twilio_config": {
+    "account_sid": "ACb606788ada5dccbfeeebed0f440099b3",
+    "auth_token": "abf48a300d482348610d76beb3cef326",
+    "flow_sid": "FW5b3bf49ee04af4d23a118b613bbc0df2",
+    "to_phone": "+16199804758",
+    "from_phone": "+18336913467"
+  }
+}
+2025-02-07 07:25:48,115 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-07 07:25:48,115 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-07 07:25:48,115 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-07 07:25:48,115 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-07 10:18:05,223 - AlertManagerLogger - DEBUG - Initializing AlertManager with db_path=C:\space_ship\mother_brain.db, poll_interval=60, config_path=C:\space_ship\sonic_config.json
+2025-02-07 10:18:05,225 - AlertManagerLogger - DEBUG - Loaded configuration: {
+  "price_config": {
+    "assets": [
+      "BTC",
+      "ETH",
+      "SOL"
+    ],
+    "currency": "USD",
+    "cmc_api_key": "c51c0c22-1bf3-4674-86bf-36f39a912d1a"
+  },
+  "system_config": {
+    "logging_enabled": true,
+    "log_level": "DEBUG",
+    "console_output": true,
+    "log_file": "C:/space_ship/price_monitor.log",
+    "db_path": "C:/space_ship/mother_brain.db",
+    "price_monitor_enabled": true,
+    "alert_monitor_enabled": true,
+    "sonic_monitor_loop_time": 300,
+    "last_price_update_time": null
+  },
+  "api_config": {
+    "coingecko_api_enabled": "ENABLE",
+    "kucoin_api_enabled": "ENABLE",
+    "coinmarketcap_api_enabled": "ENABLE",
+    "coinpaprika_api_enabled": "ENABLE",
+    "binance_api_enabled": "ENABLE",
+    "coinmarketcap_api_key": "c51c0c22-1bf3-4674-86bf-36f39a912d1a"
+  },
+  "alert_ranges": {
+    "heat_index_ranges": {
+      "enabled": true,
+      "low": 444.0,
+      "low_notifications": {
+        "call": true
+      },
+      "medium": 444.0,
+      "high": 777.0
+    },
+    "collateral_ranges": {
+      "low": 1111.0,
+      "medium": 1111.0,
+      "high": 11111.0
+    },
+    "value_ranges": {
+      "low": 1111.0,
+      "medium": 1111.0,
+      "high": 1111.0
+    },
+    "size_ranges": {
+      "low": 11111.0,
+      "medium": 111111.0,
+      "high": 11111.0
+    },
+    "leverage_ranges": {
+      "low": 11111.0,
+      "medium": 111111.0,
+      "high": 11111.0
+    },
+    "liquidation_distance_ranges": {
+      "low": 1111111.0,
+      "medium": 111111.0,
+      "high": 11111.0
+    },
+    "travel_percent_liquid_ranges": {
+      "low": -40.0,
+      "low_notifications": {
+        "call": true
+      },
+      "medium": -50.0,
+      "medium_notifications": {
+        "call": true
+      },
+      "high": -75.0,
+      "high_notifications": {
+        "call": true
+      },
+      "enabled": true
+    },
+    "travel_percent_profit_ranges": {
+      "low": 0.0,
+      "medium": 0.0,
+      "high": 0.0,
+      "enabled": true
+    },
+    "profit_ranges": {
+      "low": 50.0,
+      "low_notifications": {
+        "call": true
+      },
+      "medium": 100.0,
+      "medium_notifications": {
+        "call": true
+      },
+      "high": 200.0,
+      "high_notifications": {
+        "call": true
+      },
+      "enabled": true
+    }
+  },
+  "notification_config": {
+    "email": {
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587,
+      "smtp_user": "bubba.diego@gmail.com",
+      "smtp_password": "pzix taan afbe igxb",
+      "recipient_email": "bubba.diego@gmail.com"
+    },
+    "sms": {
+      "carrier_gateway": "txt.att.net",
+      "recipient_number": "6199804758"
+    }
+  },
+  "alert_cooldown_seconds": 6000,
+  "call_refractory_period": 1,
+  "theme_profiles": {
+    "sidebar": {
+      "color_mode": "",
+      "bg": "bg-info-subtle"
+    },
+    "navbar": {
+      "color_mode": "dark",
+      "bg": ""
+    }
+  },
+  "twilio_config": {
+    "account_sid": "ACb606788ada5dccbfeeebed0f440099b3",
+    "auth_token": "abf48a300d482348610d76beb3cef326",
+    "flow_sid": "FW5b3bf49ee04af4d23a118b613bbc0df2",
+    "to_phone": "+16199804758",
+    "from_phone": "+18336913467"
+  }
+}
+2025-02-07 10:18:05,225 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-07 10:18:05,225 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-07 10:18:05,225 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-07 10:18:05,226 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-07 10:18:06,609 - AlertManagerLogger - DEBUG - Initializing AlertManager with db_path=C:\space_ship\mother_brain.db, poll_interval=60, config_path=C:\space_ship\sonic_config.json
+2025-02-07 10:18:06,610 - AlertManagerLogger - DEBUG - Loaded configuration: {
+  "price_config": {
+    "assets": [
+      "BTC",
+      "ETH",
+      "SOL"
+    ],
+    "currency": "USD",
+    "cmc_api_key": "c51c0c22-1bf3-4674-86bf-36f39a912d1a"
+  },
+  "system_config": {
+    "logging_enabled": true,
+    "log_level": "DEBUG",
+    "console_output": true,
+    "log_file": "C:/space_ship/price_monitor.log",
+    "db_path": "C:/space_ship/mother_brain.db",
+    "price_monitor_enabled": true,
+    "alert_monitor_enabled": true,
+    "sonic_monitor_loop_time": 300,
+    "last_price_update_time": null
+  },
+  "api_config": {
+    "coingecko_api_enabled": "ENABLE",
+    "kucoin_api_enabled": "ENABLE",
+    "coinmarketcap_api_enabled": "ENABLE",
+    "coinpaprika_api_enabled": "ENABLE",
+    "binance_api_enabled": "ENABLE",
+    "coinmarketcap_api_key": "c51c0c22-1bf3-4674-86bf-36f39a912d1a"
+  },
+  "alert_ranges": {
+    "heat_index_ranges": {
+      "enabled": true,
+      "low": 444.0,
+      "low_notifications": {
+        "call": true
+      },
+      "medium": 444.0,
+      "high": 777.0
+    },
+    "collateral_ranges": {
+      "low": 1111.0,
+      "medium": 1111.0,
+      "high": 11111.0
+    },
+    "value_ranges": {
+      "low": 1111.0,
+      "medium": 1111.0,
+      "high": 1111.0
+    },
+    "size_ranges": {
+      "low": 11111.0,
+      "medium": 111111.0,
+      "high": 11111.0
+    },
+    "leverage_ranges": {
+      "low": 11111.0,
+      "medium": 111111.0,
+      "high": 11111.0
+    },
+    "liquidation_distance_ranges": {
+      "low": 1111111.0,
+      "medium": 111111.0,
+      "high": 11111.0
+    },
+    "travel_percent_liquid_ranges": {
+      "low": -40.0,
+      "low_notifications": {
+        "call": true
+      },
+      "medium": -50.0,
+      "medium_notifications": {
+        "call": true
+      },
+      "high": -75.0,
+      "high_notifications": {
+        "call": true
+      },
+      "enabled": true
+    },
+    "travel_percent_profit_ranges": {
+      "low": 0.0,
+      "medium": 0.0,
+      "high": 0.0,
+      "enabled": true
+    },
+    "profit_ranges": {
+      "low": 50.0,
+      "low_notifications": {
+        "call": true
+      },
+      "medium": 100.0,
+      "medium_notifications": {
+        "call": true
+      },
+      "high": 200.0,
+      "high_notifications": {
+        "call": true
+      },
+      "enabled": true
+    }
+  },
+  "notification_config": {
+    "email": {
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587,
+      "smtp_user": "bubba.diego@gmail.com",
+      "smtp_password": "pzix taan afbe igxb",
+      "recipient_email": "bubba.diego@gmail.com"
+    },
+    "sms": {
+      "carrier_gateway": "txt.att.net",
+      "recipient_number": "6199804758"
+    }
+  },
+  "alert_cooldown_seconds": 6000,
+  "call_refractory_period": 1,
+  "theme_profiles": {
+    "sidebar": {
+      "color_mode": "",
+      "bg": "bg-info-subtle"
+    },
+    "navbar": {
+      "color_mode": "dark",
+      "bg": ""
+    }
+  },
+  "twilio_config": {
+    "account_sid": "ACb606788ada5dccbfeeebed0f440099b3",
+    "auth_token": "abf48a300d482348610d76beb3cef326",
+    "flow_sid": "FW5b3bf49ee04af4d23a118b613bbc0df2",
+    "to_phone": "+16199804758",
+    "from_phone": "+18336913467"
+  }
+}
+2025-02-07 10:18:06,610 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-07 10:18:06,610 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-07 10:18:06,610 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-07 10:18:06,610 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-07 10:20:08,948 - AlertManagerLogger - DEBUG - Reloaded configuration: {
+  "price_config": {
+    "assets": [
+      "BTC",
+      "ETH",
+      "SOL"
+    ],
+    "currency": "USD",
+    "cmc_api_key": "c51c0c22-1bf3-4674-86bf-36f39a912d1a"
+  },
+  "system_config": {
+    "logging_enabled": true,
+    "log_level": "DEBUG",
+    "console_output": true,
+    "log_file": "C:/space_ship/price_monitor.log",
+    "db_path": "C:/space_ship/mother_brain.db",
+    "price_monitor_enabled": true,
+    "alert_monitor_enabled": true,
+    "sonic_monitor_loop_time": 300,
+    "last_price_update_time": null
+  },
+  "api_config": {
+    "coingecko_api_enabled": "ENABLE",
+    "kucoin_api_enabled": "ENABLE",
+    "coinmarketcap_api_enabled": "ENABLE",
+    "coinpaprika_api_enabled": "ENABLE",
+    "binance_api_enabled": "ENABLE",
+    "coinmarketcap_api_key": "c51c0c22-1bf3-4674-86bf-36f39a912d1a"
+  },
+  "alert_ranges": {
+    "heat_index_ranges": {
+      "enabled": true,
+      "low": 444.0,
+      "low_notifications": {
+        "call": true
+      },
+      "medium": 444.0,
+      "high": 777.0
+    },
+    "collateral_ranges": {
+      "low": 1111.0,
+      "medium": 1111.0,
+      "high": 11111.0
+    },
+    "value_ranges": {
+      "low": 1111.0,
+      "medium": 1111.0,
+      "high": 1111.0
+    },
+    "size_ranges": {
+      "low": 11111.0,
+      "medium": 111111.0,
+      "high": 11111.0
+    },
+    "leverage_ranges": {
+      "low": 11111.0,
+      "medium": 111111.0,
+      "high": 11111.0
+    },
+    "liquidation_distance_ranges": {
+      "low": 1111111.0,
+      "medium": 111111.0,
+      "high": 11111.0
+    },
+    "travel_percent_liquid_ranges": {
+      "low": -40.0,
+      "low_notifications": {
+        "call": true
+      },
+      "medium": -50.0,
+      "medium_notifications": {
+        "call": true
+      },
+      "high": -75.0,
+      "high_notifications": {
+        "call": true
+      },
+      "enabled": true
+    },
+    "travel_percent_profit_ranges": {
+      "low": 0.0,
+      "medium": 0.0,
+      "high": 0.0,
+      "enabled": true
+    },
+    "profit_ranges": {
+      "low": 37.0,
+      "low_notifications": {
+        "call": true
+      },
+      "medium": 100.0,
+      "medium_notifications": {
+        "call": true
+      },
+      "high": 200.0,
+      "high_notifications": {
+        "call": true
+      },
+      "enabled": true
+    }
+  },
+  "notification_config": {
+    "email": {
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587,
+      "smtp_user": "bubba.diego@gmail.com",
+      "smtp_password": "pzix taan afbe igxb",
+      "recipient_email": "bubba.diego@gmail.com"
+    },
+    "sms": {
+      "carrier_gateway": "txt.att.net",
+      "recipient_number": "6199804758"
+    }
+  },
+  "alert_cooldown_seconds": 6000,
+  "call_refractory_period": 1,
+  "theme_profiles": {
+    "sidebar": {
+      "color_mode": "",
+      "bg": "bg-info-subtle"
+    },
+    "navbar": {
+      "color_mode": "dark",
+      "bg": ""
+    }
+  },
+  "twilio_config": {
+    "account_sid": "ACb606788ada5dccbfeeebed0f440099b3",
+    "auth_token": "abf48a300d482348610d76beb3cef326",
+    "flow_sid": "FW5b3bf49ee04af4d23a118b613bbc0df2",
+    "to_phone": "+16199804758",
+    "from_phone": "+18336913467"
+  }
+}
+2025-02-07 10:20:08,948 - AlertManagerLogger - INFO - Alert configuration reloaded: Cooldown=6000 sec, Refractory Period=1 sec

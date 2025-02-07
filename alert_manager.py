@@ -15,9 +15,9 @@ from twilio.base.exceptions import TwilioRestException
 logger = logging.getLogger("AlertManagerLogger")
 logger.setLevel(logging.DEBUG)
 
-# Console handler: INFO level for concise output to console
+# Console handler: DEBUG level for detailed output
 console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.INFO)
+console_handler.setLevel(logging.DEBUG)
 
 # File handler: DEBUG level for detailed records
 file_handler = logging.FileHandler("alert_manager_log.txt")
@@ -30,7 +30,6 @@ file_handler.setFormatter(formatter)
 if not logger.handlers:
     logger.addHandler(console_handler)
     logger.addHandler(file_handler)
-
 
 # ================================
 # Twilio Helper Function (Simplified)
@@ -54,9 +53,9 @@ def trigger_twilio_flow(custom_message: str, twilio_config: dict) -> str:
         from_=from_phone,
         parameters={"custom_message": custom_message}
     )
+    logger.debug("Twilio flow triggered with message: %s", custom_message)
     logger.info("Twilio alert sent.")
     return execution.sid
-
 
 # ================================
 # Helper for Alert Classification
@@ -65,10 +64,11 @@ METRIC_DIRECTIONS = {
     "size": "increasing_bad",
 }
 
-
 def get_alert_class(value: float, low_thresh: float, med_thresh: float, high_thresh: float,
                     metric: str) -> str:
     direction = METRIC_DIRECTIONS.get(metric, "increasing_bad")
+    logger.debug("get_alert_class: value=%f, thresholds=(low=%f, med=%f, high=%f), direction=%s",
+                 value, low_thresh, med_thresh, high_thresh, direction)
     if direction == "increasing_bad":
         if value < low_thresh:
             return "alert-low"
@@ -86,9 +86,8 @@ def get_alert_class(value: float, low_thresh: float, med_thresh: float, high_thr
     else:
         return "alert-low"
 
-
 # ================================
-# AlertManager Class with Aggregated Alerts
+# AlertManager Class with Aggregated Alerts and Extensive Debug Logging
 # ================================
 class AlertManager:
     ASSET_FULL_NAMES = {
@@ -107,10 +106,8 @@ class AlertManager:
         self.last_triggered: Dict[str, float] = {}
         self.last_call_triggered: Dict[str, float] = {}
 
-        logger.info("Initializing AlertManager...")
-        logger.info("  DB Path       : %s", db_path)
-        logger.info("  Poll Interval : %d seconds", poll_interval)
-        logger.info("  Config Path   : %s", os.path.abspath(config_path))
+        logger.debug("Initializing AlertManager with db_path=%s, poll_interval=%d, config_path=%s",
+                     db_path, poll_interval, os.path.abspath(config_path))
 
         # Import dependencies from your project.
         from data_locker import DataLocker
@@ -121,6 +118,7 @@ class AlertManager:
         from config_manager import load_config
         db_conn = self.data_locker.get_db_connection()
         self.config = load_config(self.config_path, db_conn)
+        logger.debug("Loaded configuration: %s", json.dumps(self.config, indent=2))
         logger.info("Configuration: Alert Cooldown=%s sec, Call Refractory=%s sec",
                     self.config.get("alert_cooldown_seconds"),
                     self.config.get("call_refractory_period"))
@@ -145,6 +143,7 @@ class AlertManager:
         self.config = load_config(self.config_path, db_conn)
         self.cooldown = self.config.get("alert_cooldown_seconds", 900)
         self.call_refractory_period = self.config.get("call_refractory_period", 3600)
+        logger.debug("Reloaded configuration: %s", json.dumps(self.config, indent=2))
         logger.info("Alert configuration reloaded: Cooldown=%d sec, Refractory Period=%d sec",
                     self.cooldown, self.call_refractory_period)
 
@@ -162,21 +161,25 @@ class AlertManager:
         aggregated_alerts: List[str] = []
 
         positions = self.data_locker.read_positions()
+        logger.debug("Fetched positions: %s", json.dumps(positions, indent=2))
         logger.info("Checking alerts for %d positions.", len(positions))
         for pos in positions:
             profit_alert = self.check_profit(pos)
             if profit_alert:
+                logger.debug("Profit alert triggered: %s", profit_alert)
                 aggregated_alerts.append(profit_alert)
             travel_alert = self.check_travel_percent_liquid(pos)
             if travel_alert:
+                logger.debug("Travel alert triggered: %s", travel_alert)
                 aggregated_alerts.append(travel_alert)
 
         price_alerts = self.check_price_alerts()
         aggregated_alerts.extend(price_alerts)
+        logger.debug("Aggregated alerts: %s", aggregated_alerts)
 
         if aggregated_alerts:
-            # Prepend the count of alerts
             message = f"{len(aggregated_alerts)} alerts triggered:\n" + "\n".join(aggregated_alerts)
+            logger.debug("Sending aggregated alert call with message: %s", message)
             self.send_call(message, "aggregated-alert")
         else:
             logger.info("No alerts triggered in this cycle.")
@@ -192,11 +195,16 @@ class AlertManager:
             logger.error("%s %s (ID: %s): Error converting travel percent: %s", asset_full, position_type, position_id, e)
             return ""
 
+        logger.debug("%s %s (ID: %s): current_travel_percent = %f", asset_full, position_type, position_id, current_val)
+
         if current_val >= 0:
+            logger.debug("%s %s (ID: %s): current_travel_percent is non-negative; no alert.", asset_full, position_type, position_id)
             return ""
 
         tpli_config = self.config.get("alert_ranges", {}).get("travel_percent_liquid_ranges", {})
+        logger.debug("%s %s (ID: %s): travel_percent_liquid config: %s", asset_full, position_type, position_id, tpli_config)
         if not tpli_config.get("enabled", False):
+            logger.debug("%s %s (ID: %s): Travel alert disabled in config.", asset_full, position_type, position_id)
             return ""
 
         try:
@@ -204,8 +212,10 @@ class AlertManager:
             medium = float(tpli_config.get("medium", -50.0))
             high = float(tpli_config.get("high", -75.0))
         except Exception as e:
-            logger.error("%s %s (ID: %s): Error parsing thresholds: %s", asset_full, position_type, position_id, e)
+            logger.error("%s %s (ID: %s): Error parsing travel percent thresholds: %s", asset_full, position_type, position_id, e)
             return ""
+
+        logger.debug("%s %s (ID: %s): Thresholds - Low: %f, Medium: %f, High: %f", asset_full, position_type, position_id, low, medium, high)
 
         alert_level = ""
         if current_val <= high:
@@ -215,29 +225,23 @@ class AlertManager:
         elif current_val <= low:
             alert_level = "LOW"
         else:
+            logger.debug("%s %s (ID: %s): current_travel_percent does not breach any thresholds.", asset_full, position_type, position_id)
             return ""
 
         key = f"{asset_full}-{position_type}-{position_id}-travel-{alert_level}"
         now = time.time()
         last_time = self.last_triggered.get(key, 0)
         if now - last_time < self.cooldown:
-            logger.info("%s %s (ID: %s): Travel alert '%s' suppressed due to cooldown.", asset_full, position_type, position_id, alert_level)
+            logger.info("%s %s (ID: %s): Travel alert '%s' suppressed due to cooldown. (Elapsed: %f sec)", asset_full, position_type, position_id, alert_level, now - last_time)
             return ""
         self.last_triggered[key] = now
         wallet_name = pos.get("wallet_name", "Unknown")
         msg = (f"Travel Percent Liquid ALERT: {asset_full} {position_type} (Wallet: {wallet_name}) - "
                f"Travel% = {current_val:.2f}%, Level = {alert_level}")
+        logger.debug("%s %s (ID: %s): Triggering travel alert with message: %s", asset_full, position_type, position_id, msg)
         return msg
 
     def check_profit(self, pos: Dict[str, Any]) -> str:
-        """
-        Evaluate the profit alert state such that:
-         - If profit is less than the low threshold (e.g., profit < 10), no alert is triggered.
-         - If profit is between the low and medium thresholds, a low alert is triggered.
-         - If profit is between the medium and high thresholds, a medium alert is triggered.
-         - If profit exceeds the high threshold, a high alert is triggered.
-         Only show an alert if profit breaches upward.
-        """
         asset_code = pos.get("asset_type", "???").upper()
         asset_full = self.ASSET_FULL_NAMES.get(asset_code, asset_code)
         position_type = pos.get("position_type", "").capitalize()
@@ -257,8 +261,12 @@ class AlertManager:
                 logger.error("%s %s (ID: %s): Error computing fallback profit: %s", asset_full, position_type, position_id, e)
                 return ""
 
+        logger.debug("%s %s (ID: %s): profit_val = %f", asset_full, position_type, position_id, profit_val)
+
         profit_config = self.config.get("alert_ranges", {}).get("profit_ranges", {})
+        logger.debug("%s %s (ID: %s): profit config: %s", asset_full, position_type, position_id, profit_config)
         if not profit_config.get("enabled", False):
+            logger.debug("%s %s (ID: %s): Profit alert disabled in config.", asset_full, position_type, position_id)
             return ""
 
         try:
@@ -269,8 +277,11 @@ class AlertManager:
             logger.error("%s %s (ID: %s): Error parsing profit thresholds: %s", asset_full, position_type, position_id, e)
             return ""
 
-        # For profit, we want alerts only when profit exceeds thresholds upward.
+        logger.debug("%s %s (ID: %s): Profit thresholds - Low: %f, Medium: %f, High: %f",
+                     asset_full, position_type, position_id, low_thresh, med_thresh, high_thresh)
+
         if profit_val < low_thresh:
+            logger.debug("%s %s (ID: %s): profit_val below low_thresh; no alert.", asset_full, position_type, position_id)
             return ""
         elif profit_val < med_thresh:
             current_level = "low"
@@ -282,18 +293,25 @@ class AlertManager:
         profit_key = f"profit-{asset_full}-{position_type}-{position_id}"
         last_level = self.last_profit.get(profit_key, "none")
         level_order = {"none": 0, "low": 1, "medium": 2, "high": 3}
+        logger.debug("%s %s (ID: %s): Profit alert levels - last: %s, current: %s",
+                     asset_full, position_type, position_id, last_level, current_level)
         if level_order[current_level] <= level_order[last_level]:
             self.last_profit[profit_key] = current_level
+            logger.debug("%s %s (ID: %s): No upward breach in profit levels; no alert triggered.", asset_full, position_type, position_id)
             return ""
 
         now = time.time()
         last_time = self.last_triggered.get(profit_key, 0)
         if now - last_time < self.cooldown:
             self.last_profit[profit_key] = current_level
+            logger.info("%s %s (ID: %s): Profit alert suppressed due to cooldown. (Elapsed: %f sec)",
+                        asset_full, position_type, position_id, now - last_time)
             return ""
         self.last_triggered[profit_key] = now
         msg = (f"Profit ALERT: {asset_full} {position_type} profit of {profit_val:.2f} "
                f"(Level: {current_level.upper()})")
+        logger.debug("%s %s (ID: %s): Triggering profit alert with message: %s",
+                     asset_full, position_type, position_id, msg)
         self.last_profit[profit_key] = current_level
         return msg
 
@@ -306,6 +324,7 @@ class AlertManager:
         ]
         logger.info("Found %d active price alerts.", len(price_alerts))
         for alert in price_alerts:
+            logger.debug("Processing price alert: %s", json.dumps(alert, indent=2))
             asset_code = alert.get("asset_type", "BTC").upper()
             asset_full = self.ASSET_FULL_NAMES.get(asset_code, asset_code)
             position_id = alert.get("position_id") or alert.get("id") or "unknown"
@@ -316,8 +335,10 @@ class AlertManager:
             condition = alert.get("condition", "ABOVE").upper()
             price_info = self.data_locker.get_latest_price(asset_code)
             if not price_info:
+                logger.debug("%s: No price info found; skipping alert.", asset_full)
                 continue
             current_price = float(price_info.get("current_price", 0.0))
+            logger.debug("%s: Condition: %s, Trigger: %f, Current Price: %f", asset_full, condition, trigger_val, current_price)
             if (condition == "ABOVE" and current_price >= trigger_val) or (condition != "ABOVE" and current_price <= trigger_val):
                 msg = self.handle_price_alert_trigger(alert, current_price, asset_full)
                 if msg:
@@ -330,6 +351,7 @@ class AlertManager:
         now = time.time()
         last_time = self.last_triggered.get(key, 0)
         if now - last_time < self.cooldown:
+            logger.info("%s: Price alert suppressed due to cooldown. (Elapsed: %f sec)", asset_full, now - last_time)
             return ""
         self.last_triggered[key] = now
         cond = alert.get("condition", "ABOVE").upper()
@@ -342,20 +364,21 @@ class AlertManager:
         msg = (f"Price ALERT: {asset_full} {position_type}" +
                (f", Wallet: {wallet_name}" if wallet_name != "Unknown" else "") +
                f" - Condition: {cond}, Trigger: {trig_val}, Current: {current_price}")
+        logger.debug("%s: Triggering price alert with message: %s", asset_full, msg)
         return msg
 
     def send_call(self, body: str, key: str):
         now = time.time()
         last_call_time = self.last_call_triggered.get(key, 0)
         if now - last_call_time < self.call_refractory_period:
-            logger.info("Call alert for '%s' suppressed due to refractory period.", key)
+            logger.info("Call alert for '%s' suppressed due to refractory period. (Elapsed: %f sec)", key, now - last_call_time)
             return
         try:
+            logger.debug("Sending call alert with message: %s", body)
             trigger_twilio_flow(body, self.twilio_config)
             self.last_call_triggered[key] = now
         except Exception as e:
             logger.error("Error sending call for '%s': %s", key, e, exc_info=True)
-
 
 # ================================
 # Configuration Helpers
@@ -373,7 +396,6 @@ def load_json_config(json_path: str) -> dict:
         logger.error("Error parsing JSON from '%s': %s", json_path, e)
         return {}
 
-
 def save_config(config: dict, json_path: str):
     try:
         with open(json_path, 'w', encoding='utf-8') as f:
@@ -381,7 +403,6 @@ def save_config(config: dict, json_path: str):
         logger.debug("Configuration saved to: %s", os.path.abspath(json_path))
     except Exception as e:
         logger.error("Error saving configuration to '%s': %s", json_path, e)
-
 
 # ================================
 # Main Execution

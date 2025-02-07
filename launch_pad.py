@@ -1439,35 +1439,19 @@ def price_charts():
 @app.route('/update_alert_config', methods=['POST'])
 def update_alert_config():
     try:
-        # Assuming you have a function to load your JSON config
-        config = load_json_config("sonic_config.json")  # make sure this is imported properly
-
+        config = load_json_config("sonic_config.json")
         form_data = request.form.to_dict(flat=True)
         updated_alerts = parse_alert_config_form(form_data)
-
-        # Set defaults for unchecked checkboxes or missing keys:
-        expected_metrics = [
-            "heat_index_ranges", "collateral_ranges", "value_ranges", "size_ranges",
-            "leverage_ranges", "liquidation_distance_ranges", "travel_percent_liquid_ranges",
-            "travel_percent_profit_ranges", "profit_ranges"
-        ]
-        for metric in expected_metrics:
-            if metric not in updated_alerts:
-                updated_alerts[metric] = {}
-            updated_alerts[metric].setdefault("enabled", False)
-            for thresh in ["low", "medium", "high"]:
-                updated_alerts[metric].setdefault(thresh, 0.0)
-            for notif in ["low_notifications", "medium_notifications", "high_notifications"]:
-                updated_alerts[metric].setdefault(notif, {"call": False, "sms": False, "email": False})
-
         config["alert_ranges"] = updated_alerts
+        save_config(config, "sonic_config.json")
 
-        save_config(config, "sonic_config.json")  # Ensure this function is defined and imported
+        # Immediately reload the configuration in the alert manager
+        manager.reload_config()
+
         return jsonify({"success": True})
     except Exception as e:
         logger.error("Error updating alert config: %s", e, exc_info=True)
         return jsonify({"error": str(e)}), 500
-
 
 
 @app.route("/hedge-report")
@@ -1677,6 +1661,7 @@ def parse_alert_config_form(form_data: dict) -> dict:
 
 
 @app.route("/api/update_config", methods=["POST"])
+@app.route('/api/update_config', methods=['POST'])
 def api_update_config():
     try:
         new_config = request.get_json()
@@ -1690,11 +1675,14 @@ def api_update_config():
         existing_data["alert_ranges"] = new_config["alert_ranges"]
         with open(CONFIG_PATH, "w", encoding="utf-8") as f:
             json.dump(existing_data, f, indent=2)
-        return jsonify({"message": "Alert configuration updated successfully"}), 200
+
+        # Reload the configuration immediately
+        manager.reload_config()
+
+        return jsonify({"message": "Alert configuration updated and reloaded successfully"}), 200
     except Exception as e:
         logger.exception("Error updating alert configuration")
         return jsonify({"error": str(e)}), 500
-
 
 
 @app.route('/save_theme', methods=['POST'])

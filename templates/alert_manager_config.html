@@ -143,14 +143,26 @@
   // Function to load configuration from the backend and populate the form
   function loadConfig() {
     $.getJSON("{{ url_for('api_get_config') }}", function(config) {
+      console.log("Loaded config:", config);
       // Populate system options
       if (config.alert_cooldown_seconds)
         $("#alert_cooldown_seconds").val(config.alert_cooldown_seconds);
       if (config.call_refractory_period)
         $("#call_refractory_period").val(config.call_refractory_period);
 
+      // Populate alert ranges for each metric
       if (config.alert_ranges) {
-        const metrics = ["heat_index_ranges", "collateral_ranges", "value_ranges", "size_ranges", "leverage_ranges", "liquidation_distance_ranges", "travel_percent_liquid_ranges", "travel_percent_profit_ranges", "profit_ranges"];
+        const metrics = [
+          "heat_index_ranges",
+          "collateral_ranges",
+          "value_ranges",
+          "size_ranges",
+          "leverage_ranges",
+          "liquidation_distance_ranges",
+          "travel_percent_liquid_ranges",
+          "travel_percent_profit_ranges",
+          "profit_ranges"
+        ];
         metrics.forEach(function(metric) {
           if (config.alert_ranges[metric]) {
             $("#" + metric + "_enabled").prop("checked", config.alert_ranges[metric].enabled);
@@ -185,11 +197,14 @@
     $('#system-options-form').on('submit', function(e){
       e.preventDefault();
       const formData = $(this).serialize();
+      console.log("Submitting system options form:", formData);
       $.post("{{ url_for('update_system_options') }}", formData)
         .done(function(data) {
+          console.log("System options update response:", data);
           alert('System options updated successfully!');
         })
-        .fail(function() {
+        .fail(function(jqXHR, textStatus, errorThrown) {
+          console.error("Failed to update system options:", textStatus, errorThrown);
           alert('Failed to update system options.');
         });
     });
@@ -197,11 +212,14 @@
     // Reset Refractory Clock button
     $('#reset-refractory').on('click', function(e){
       e.preventDefault();
+      console.log("Resetting refractory clock...");
       $.post("{{ url_for('reset_refractory') }}")
         .done(function(data){
+          console.log("Refractory clock reset response:", data);
           alert('Refractory clock reset successfully!');
         })
-        .fail(function(){
+        .fail(function(jqXHR, textStatus, errorThrown) {
+          console.error("Failed to reset refractory clock:", textStatus, errorThrown);
           alert('Failed to reset refractory clock.');
         });
     });
@@ -210,14 +228,17 @@
     $('#alert-config-form').on('submit', function(e){
       e.preventDefault();
       const formData = $(this).serialize();
+      console.log("Submitting alert config form:", formData);
       $.post("{{ url_for('update_alert_config') }}", formData)
         .done(function(data){
+          console.log("Alert config update response:", data);
           alert('Alert configuration updated successfully!');
         })
-        .fail(function(){
+        .fail(function(jqXHR, textStatus, errorThrown){
+          console.error("Failed to update alert config:", textStatus, errorThrown);
           alert('Failed to update alert configuration.');
         });
     });
   });
 </script>
-{% endblock %}
+{% endblock extra_scripts %}

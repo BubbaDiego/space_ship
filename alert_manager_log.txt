@@ -37806,3 +37806,248 @@ twilio.base.exceptions.TwilioRestException: HTTP 409 error: Unable to create rec
 2025-02-06 17:57:42,499 - AlertManagerLogger - INFO - Solana Long (ID: BLqPNiZq7X8CLq5pWfdR88qonytf82nTNi14qG28fHkr): Travel alert 'MEDIUM' suppressed due to cooldown.
 2025-02-06 17:57:42,499 - AlertManagerLogger - INFO - Found 0 active price alerts.
 2025-02-06 17:57:42,499 - AlertManagerLogger - INFO - No alerts triggered in this cycle.
+2025-02-06 18:06:10,248 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:06:10,249 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:06:10,249 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:06:10,249 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:06:10,250 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:06:10,250 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:06:10,250 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:06:10,250 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:06:58,790 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:06:58,790 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:06:58,790 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:06:58,790 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:06:58,791 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:06:58,791 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:06:58,792 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:06:58,792 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:06:59,600 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:06:59,600 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:06:59,600 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:06:59,600 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:06:59,601 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:06:59,601 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:06:59,601 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:06:59,601 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:07:33,614 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-06 18:07:33,614 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-06 18:07:33,838 - AlertManagerLogger - ERROR - Error sending call for 'aggregated-alert': HTTP 401 error: Unable to create record: Authenticate
+Traceback (most recent call last):
+  File "C:\space_ship\alert_manager.py", line 336, in send_call
+    trigger_twilio_flow(body, self.twilio_config)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\space_ship\alert_manager.py", line 52, in trigger_twilio_flow
+    execution = client.studio.v2.flows(flow_sid).executions.create(
+        to=to_phone,
+        from_=from_phone,
+        parameters={"custom_message": custom_message}
+    )
+  File "C:\SonicStation\.venv\Lib\site-packages\twilio\rest\studio\v2\flow\execution\__init__.py", line 437, in create
+    payload = self._version.create(
+        method="POST", uri=self._uri, data=data, headers=headers
+    )
+  File "C:\SonicStation\.venv\Lib\site-packages\twilio\base\version.py", line 463, in create
+    return self._parse_create(method, uri, response)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SonicStation\.venv\Lib\site-packages\twilio\base\version.py", line 435, in _parse_create
+    raise self.exception(method, uri, response, "Unable to create record")
+twilio.base.exceptions.TwilioRestException: HTTP 401 error: Unable to create record: Authenticate
+2025-02-06 18:08:05,664 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-06 18:08:05,664 - AlertManagerLogger - INFO - Solana Long (ID: BLqPNiZq7X8CLq5pWfdR88qonytf82nTNi14qG28fHkr): Travel alert 'MEDIUM' suppressed due to cooldown.
+2025-02-06 18:08:05,664 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-06 18:08:05,664 - AlertManagerLogger - INFO - No alerts triggered in this cycle.
+2025-02-06 18:08:29,288 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-06 18:08:29,288 - AlertManagerLogger - INFO - Solana Long (ID: BLqPNiZq7X8CLq5pWfdR88qonytf82nTNi14qG28fHkr): Travel alert 'MEDIUM' suppressed due to cooldown.
+2025-02-06 18:08:29,288 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-06 18:08:29,288 - AlertManagerLogger - INFO - No alerts triggered in this cycle.
+2025-02-06 18:08:56,244 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-06 18:08:56,244 - AlertManagerLogger - INFO - Solana Long (ID: BLqPNiZq7X8CLq5pWfdR88qonytf82nTNi14qG28fHkr): Travel alert 'MEDIUM' suppressed due to cooldown.
+2025-02-06 18:08:56,244 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-06 18:08:56,244 - AlertManagerLogger - INFO - No alerts triggered in this cycle.
+2025-02-06 18:09:15,475 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:09:15,476 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:09:15,476 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:09:15,476 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:09:15,477 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:09:15,477 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:09:15,477 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:09:15,477 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:09:16,282 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:09:16,283 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:09:16,283 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:09:16,283 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:09:16,284 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:09:16,284 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:09:16,284 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:09:16,284 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:09:27,261 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-06 18:09:27,261 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-06 18:09:27,486 - AlertManagerLogger - ERROR - Error sending call for 'aggregated-alert': HTTP 401 error: Unable to create record: Authenticate
+Traceback (most recent call last):
+  File "C:\space_ship\alert_manager.py", line 336, in send_call
+    trigger_twilio_flow(body, self.twilio_config)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\space_ship\alert_manager.py", line 52, in trigger_twilio_flow
+    execution = client.studio.v2.flows(flow_sid).executions.create(
+        to=to_phone,
+        from_=from_phone,
+        parameters={"custom_message": custom_message}
+    )
+  File "C:\SonicStation\.venv\Lib\site-packages\twilio\rest\studio\v2\flow\execution\__init__.py", line 437, in create
+    payload = self._version.create(
+        method="POST", uri=self._uri, data=data, headers=headers
+    )
+  File "C:\SonicStation\.venv\Lib\site-packages\twilio\base\version.py", line 463, in create
+    return self._parse_create(method, uri, response)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SonicStation\.venv\Lib\site-packages\twilio\base\version.py", line 435, in _parse_create
+    raise self.exception(method, uri, response, "Unable to create record")
+twilio.base.exceptions.TwilioRestException: HTTP 401 error: Unable to create record: Authenticate
+2025-02-06 18:11:08,701 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:11:08,701 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:11:08,702 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:11:08,702 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:11:08,703 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:11:08,704 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:11:08,704 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:11:08,704 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:11:09,801 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:11:09,801 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:11:09,801 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:11:09,802 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:11:09,803 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:11:09,803 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:11:09,803 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:11:09,803 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:11:20,537 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-06 18:11:20,538 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-06 18:11:20,538 - AlertManagerLogger - INFO - No alerts triggered in this cycle.
+2025-02-06 18:11:59,368 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-06 18:11:59,368 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-06 18:11:59,368 - AlertManagerLogger - INFO - No alerts triggered in this cycle.
+2025-02-06 18:12:13,586 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:12:13,586 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:12:13,586 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:12:13,586 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:12:13,587 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:12:13,587 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:12:13,587 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:12:13,587 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:12:14,370 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:12:14,370 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:12:14,371 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:12:14,371 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:12:14,372 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:12:14,372 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:12:14,372 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:12:14,372 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:12:23,869 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-06 18:12:23,870 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-06 18:12:24,339 - AlertManagerLogger - INFO - Twilio alert sent.
+2025-02-06 18:13:18,060 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:13:18,060 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:13:18,060 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:13:18,060 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:13:18,061 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:13:18,061 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:13:18,061 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:13:18,061 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:13:18,874 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:13:18,874 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:13:18,874 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:13:18,874 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:13:18,875 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:13:18,875 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:13:18,875 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:13:18,875 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:17:44,203 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:17:44,204 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:17:44,204 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:17:44,204 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:17:44,205 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:17:44,205 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:17:44,205 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:17:44,205 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:19:00,922 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-06 18:19:00,922 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-06 18:19:01,238 - AlertManagerLogger - INFO - Twilio alert sent.
+2025-02-06 18:21:43,652 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:21:43,652 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:21:43,652 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:21:43,652 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:21:43,653 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:21:43,653 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:21:43,653 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:21:43,653 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:21:44,489 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:21:44,489 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:21:44,489 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:21:44,489 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:21:44,490 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:21:44,490 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:21:44,490 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:21:44,490 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:21:55,693 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-06 18:21:55,693 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-06 18:21:55,988 - AlertManagerLogger - INFO - Twilio alert sent.
+2025-02-06 18:22:29,604 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-06 18:22:29,604 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-06 18:22:29,604 - AlertManagerLogger - INFO - No alerts triggered in this cycle.
+2025-02-06 18:22:43,009 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-06 18:22:43,009 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-06 18:22:43,010 - AlertManagerLogger - INFO - No alerts triggered in this cycle.
+2025-02-06 18:24:25,247 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-06 18:24:25,247 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-06 18:24:25,247 - AlertManagerLogger - INFO - No alerts triggered in this cycle.
+2025-02-06 18:28:43,423 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:28:43,423 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:28:43,423 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:28:43,424 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:28:43,424 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:28:43,424 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:28:43,424 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:28:43,425 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:29:05,788 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:29:05,788 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:29:05,788 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:29:05,788 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:29:05,790 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:29:05,790 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:29:05,790 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:29:05,790 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:29:06,587 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:29:06,587 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:29:06,587 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:29:06,587 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:29:06,588 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:29:06,588 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:29:06,588 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:29:06,588 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:35:39,136 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:35:39,136 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:35:39,136 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:35:39,136 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:35:39,138 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:35:39,138 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:35:39,138 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:35:39,138 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:35:39,969 - AlertManagerLogger - INFO - Initializing AlertManager...
+2025-02-06 18:35:39,969 - AlertManagerLogger - INFO -   DB Path       : C:\space_ship\mother_brain.db
+2025-02-06 18:35:39,969 - AlertManagerLogger - INFO -   Poll Interval : 60 seconds
+2025-02-06 18:35:39,969 - AlertManagerLogger - INFO -   Config Path   : C:\space_ship\sonic_config.json
+2025-02-06 18:35:39,970 - AlertManagerLogger - INFO - Configuration: Alert Cooldown=6000 sec, Call Refractory=1 sec
+2025-02-06 18:35:39,970 - AlertManagerLogger - INFO - Twilio configuration: Present
+2025-02-06 18:35:39,970 - AlertManagerLogger - INFO - Alert settings: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:35:39,971 - AlertManagerLogger - INFO - AlertManager is ready.
+2025-02-06 18:35:51,492 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-06 18:35:51,492 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-06 18:35:51,492 - AlertManagerLogger - INFO - No alerts triggered in this cycle.
+2025-02-06 18:36:09,526 - AlertManagerLogger - INFO - Alert configuration reloaded: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:36:17,616 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-06 18:36:17,616 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-06 18:36:17,956 - AlertManagerLogger - INFO - Twilio alert sent.
+2025-02-06 18:37:07,007 - AlertManagerLogger - INFO - Alert configuration reloaded: Cooldown=6000 sec, Refractory Period=1 sec
+2025-02-06 18:37:18,701 - AlertManagerLogger - INFO - Checking alerts for 4 positions.
+2025-02-06 18:37:18,701 - AlertManagerLogger - INFO - Found 0 active price alerts.
+2025-02-06 18:37:18,995 - AlertManagerLogger - INFO - Twilio alert sent.

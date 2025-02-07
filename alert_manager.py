@@ -136,6 +136,18 @@ class AlertManager:
         self.monitor_enabled = self.config.get("system_config", {}).get("alert_monitor_enabled", True)
         logger.info("AlertManager is ready.")
 
+    def reload_config(self):
+        """
+        Reload configuration from the JSON file to update alert thresholds.
+        """
+        from config_manager import load_config
+        db_conn = self.data_locker.get_db_connection()
+        self.config = load_config(self.config_path, db_conn)
+        self.cooldown = self.config.get("alert_cooldown_seconds", 900)
+        self.call_refractory_period = self.config.get("call_refractory_period", 3600)
+        logger.info("Alert configuration reloaded: Cooldown=%d sec, Refractory Period=%d sec",
+                    self.cooldown, self.call_refractory_period)
+
     def run(self):
         logger.info("Starting alert monitoring loop.")
         while True:
@@ -173,7 +185,6 @@ class AlertManager:
         asset_code = pos.get("asset_type", "???").upper()
         asset_full = self.ASSET_FULL_NAMES.get(asset_code, asset_code)
         position_type = pos.get("position_type", "").capitalize()
-        # Use either "position_id" or "id" provided by Jupiter
         position_id = pos.get("position_id") or pos.get("id") or "unknown"
         try:
             current_val = float(pos.get("current_travel_percent", 0.0))

@@ -204,10 +204,7 @@
           {% endfor %}
         </tbody>
         <tfoot>
-          {% set total_profit = 0 %}
-          {% for pos in positions %}
-            {% set total_profit = total_profit + pos.pnl_after_fees_usd %}
-          {% endfor %}
+          {% set total_profit = positions|sum(attribute='pnl_after_fees_usd') %}
           <tr style="font-weight: bold; background-color: {{ theme.sidebar.bg or 'bg-primary' }}; text-align: center !important;">
             <td>TOTALS</td>
             <td></td>

@@ -1,0 +1,240 @@
+# Project Specification: Crypto Price Monitoring & Alert System
+
+## Overview
+This project is a **crypto price monitoring and alert system** designed to track cryptocurrency prices across multiple sources (CoinGecko, CoinMarketCap, CoinPaprika, Binance), store data, and trigger alerts based on configurable thresholds. The system also integrates with Twilio for SMS notifications and provides a Flask-based web interface for user interaction.
+
+## Project Components
+### 1. **Price Fetchers**
+- **`coinpaprika_fetcher.py`** - Fetches price data from CoinPaprika API.
+- **`coingecko_fetcher.py`** - Fetches price data from CoinGecko API.
+- **`coinmarketcap_fetcher.py`** - Fetches price data from CoinMarketCap API.
+- **`binance_fetcher.py`** - Fetches price data from Binance API.
+
+### 2. **API Integrations**
+- **`update_jupiter_API.py`** - Posts updates to an external Jupiter API using an SSL certificate.
+- **`twilio_message_api.py`** - Uses Twilio API to send SMS notifications.
+
+### 3. **Alert Management**
+- **`alert_manager.py`** - Monitors price changes, evaluates alerts, and triggers notifications.
+
+### 4. **Configuration Management**
+- **`config_manager.py`** - Handles loading and updating of the system configuration.
+- **`config.py`** - Defines the structure for application configuration.
+
+### 5. **Price Monitoring & Calculation Services**
+- **`price_monitor.py`** - Periodically fetches and stores price data.
+- **`calc_services.py`** - Contains logic for price calculations, leverage, heat index, and alert evaluation.
+
+### 6. **Logging & Debugging**
+- **`logging_config.py`** - Configures logging for the project.
+
+### 7. **Database Management**
+- **`data_locker.py`** - Handles SQLite interactions for storing prices, alerts, and position data.
+
+### 8. **Web Application**
+- **`launch_pad.py`** - Flask-based web application that provides a UI for viewing and managing alerts, positions, and configurations.
+
+### 9. **Data Models**
+- **`models.py`** - Defines data structures such as Price, Alert, and Position using Python classes and enums.
+
+## System Functionality
+### 1. **Fetching Crypto Prices**
+The system fetches real-time prices from:
+- **CoinGecko** (`coingecko_fetcher.py`)
+- **CoinMarketCap** (`coinmarketcap_fetcher.py`)
+- **CoinPaprika** (`coinpaprika_fetcher.py`)
+- **Binance** (`binance_fetcher.py`)
+
+Each fetcher runs asynchronously and stores results in the SQLite database.
+
+### 2. **Storing and Managing Prices**
+The **`data_locker.py`** module saves price data in the SQLite database. Each price entry includes:
+- Asset Type (e.g., BTC, ETH, SOL)
+- Current Price
+- Source (CoinGecko, Binance, etc.)
+- Timestamp
+
+### 3. **Alert Evaluation & Notifications**
+The **`alert_manager.py`** module checks if any stored asset prices cross user-defined thresholds. If an alert condition is met, it triggers:
+- A database log entry for the alert
+- A Twilio SMS notification (via `twilio_message_api.py`)
+
+Alerts can be configured for:
+- Price Thresholds (above/below a value)
+- Percent Changes (up/down X% over Y minutes)
+- Travel Percent (how close an asset is to liquidation)
+
+### 4. **Flask Web Interface**
+The **`launch_pad.py`** module provides a web UI where users can:
+- View real-time and historical price data
+- Configure alert thresholds
+- Manage exchange accounts and wallets
+- Enable or disable specific price sources
+
+### 5. **Logging and Debugging**
+The **`logging_config.py`** module sets up logging for all major components, including:
+- API requests
+- Database operations
+- Alert triggers
+- System errors
+
+### 6. **Jupiter API Integration**
+The **`update_jupiter_API.py`** script sends updates to an external service (**Jupiter API**) whenever new price data is available. It verifies SSL certificates before making a request.
+
+## Key Technologies Used
+- **Python** (asyncio, aiohttp, Flask, sqlite3)
+- **Twilio API** (for SMS alerts)
+- **CoinGecko API, CoinMarketCap API, CoinPaprika API, Binance API**
+- **SQLite** (for storing historical price data and alert triggers)
+- **Flask** (for web interface and API endpoints)
+
+## How to Run the Project
+### 1. **Install Dependencies**
+```sh
+pip install -r requirements.txt
+```
+
+### 2. **Set Up Environment Variables**
+Create a `.env` file with the following:
+```
+TWILIO_ACCOUNT_SID=your_sid
+TWILIO_AUTH_TOKEN=your_auth_token
+TWILIO_FLOW_SID=your_flow_id
+TWILIO_TO_PHONE=your_phone_number
+TWILIO_FROM_PHONE=your_twilio_number
+```
+
+### 3. **Initialize the Database**
+```sh
+python data_locker.py --init-db
+```
+
+### 4. **Start the Flask Web Server**
+```sh
+python launch_pad.py
+```
+
+### 5. **Run Price Monitoring Services**
+```sh
+python price_monitor.py
+```
+
+### 6. **Trigger a Manual Price Update**
+```sh
+python update_jupiter_API.py
+```
+
+# Project Specification: Crypto Price Monitoring & Alert System
+
+## Overview
+This project is a **crypto price monitoring and alert system** designed to track cryptocurrency prices across multiple sources (CoinGecko, CoinMarketCap, CoinPaprika, Binance), store data, and trigger alerts based on configurable thresholds. The system also integrates with Twilio for SMS notifications and provides a Flask-based web interface for user interaction.
+
+## Project Components
+### 1. **Price Fetchers**
+- **`coinpaprika_fetcher.py`** - Fetches price data from CoinPaprika API.
+  - `fetch_current_coinpaprika(ids: List[str]) -> Dict[str, float]`
+- **`coingecko_fetcher.py`** - Fetches price data from CoinGecko API.
+  - `fetch_current_coingecko(symbols: List[str], currency: str = "USD") -> Dict[str, float]`
+- **`coinmarketcap_fetcher.py`** - Fetches price data from CoinMarketCap API.
+  - `fetch_current_cmc(symbols: List[str], currency: str, api_key: str) -> Dict[str, float]`
+  - `fetch_historical_cmc(symbol: str, start_date: str, end_date: str, currency: str, api_key: str) -> List[Dict[str, Any]]`
+- **`binance_fetcher.py`** - Fetches price data from Binance API.
+  - `fetch_current_binance(symbols: List[str]) -> Dict[str, float]`
+
+### 2. **API Integrations**
+- **`update_jupiter_API.py`** - Posts updates to an external Jupiter API using an SSL certificate.
+  - `main()`
+- **`twilio_message_api.py`** - Uses Twilio API to send SMS notifications.
+  - `trigger_twilio_flow(custom_message)`
+
+### 3. **Alert Management**
+- **`alert_manager.py`** - Monitors price changes, evaluates alerts, and triggers notifications.
+  - `trigger_twilio_flow(custom_message: str, twilio_config: dict) -> str`
+  - `get_alert_class(value: float, low_thresh: float, med_thresh: float, high_thresh: float, metric: str) -> str`
+  - `reload_config()`
+  - `run()`
+  - `check_alerts()`
+  - `check_travel_percent_liquid(pos: Dict[str, Any]) -> str`
+  - `check_profit(pos: Dict[str, Any]) -> str`
+  - `check_price_alerts() -> List[str]`
+  - `handle_price_alert_trigger(alert: dict, current_price: float, asset_full: str) -> str`
+  - `send_call(body: str, key: str)`
+
+### 4. **Configuration Management**
+- **`config_manager.py`** - Handles loading and updating of the system configuration.
+  - `load_config(json_path: str, db_conn: Optional[Any]) -> Dict[str, Any]`
+  - `update_config(new_config: Dict[str, Any], json_path: str, db_conn: Optional[Any]) -> Dict[str, Any]`
+- **`config.py`** - Defines the structure for application configuration.
+  - `AppConfig.__init__()`
+  - `model_dump()`
+  - `deep_merge_dicts(base: Dict[str, Any], overrides: Dict[str, Any]) -> Dict[str, Any]`
+
+### 5. **Price Monitoring & Calculation Services**
+- **`price_monitor.py`** - Periodically fetches and stores price data.
+  - `initialize_monitor()`
+  - `update_prices()`
+  - `_fetch_coingecko_prices()`
+  - `_fetch_coinpaprika_prices()`
+  - `_fetch_binance_prices()`
+  - `_fetch_cmc_prices()`
+- **`calc_services.py`** - Contains logic for price calculations, leverage, heat index, and alert evaluation.
+  - `calculate_value(position)`
+  - `calculate_leverage(size: float, collateral: float) -> float`
+  - `calculate_travel_percent(position_type: str, entry_price: float, current_price: float, liquidation_price: float) -> float`
+  - `calculate_liquid_distance(current_price: float, liquidation_price: float) -> float`
+  - `calculate_heat_index(position: dict) -> Optional[float]`
+  - `get_alert_class(value: float, low_thresh: Optional[float], med_thresh: Optional[float], high_thresh: Optional[float], direction: str) -> str`
+
+### 6. **Logging & Debugging**
+- **`logging_config.py`** - Configures logging for the project.
+  - `setup_logging(config: Config)`
+
+### 7. **Database Management**
+- **`data_locker.py`** - Handles SQLite interactions for storing prices, alerts, and position data.
+  - (All methods previously listed)
+
+### 8. **Web Application**
+- **`launch_pad.py`** - Flask-based web application that provides a UI for viewing and managing alerts, positions, and configurations.
+  - `index()`
+  - `theme_options()`
+  - `positions()`
+  - `exchanges()`
+  - `alerts()`
+  - `prices()`
+  - `update_prices()`
+  - `update_jupiter_positions()`
+  - `manual_check_alerts()`
+  - `delete_all_positions()`
+  - `delete_all_jupiter_positions()`
+  - `delete_alert(alert_id)`
+  - `alert_options()`
+  - `system_options()`
+  - `reset_refractory()`
+  - `latest_update_info()`
+  - `positions_data_api()`
+  - `database_viewer()`
+  - `heat()`
+  - `hedge_report()`
+  - `assets()`
+  - `add_wallet()`
+  - `add_broker()`
+  - `delete_wallet(wallet_name)`
+  - `delete_broker(broker_name)`
+
+### 9. **Data Models**
+- **`models.py`** - Defines data structures such as Price, Alert, and Position using Python classes and enums.
+  - (All methods previously listed)
+
+(This document now includes a complete list of all functions and methods in each project file.)
+
+
+
+## Future Enhancements
+- **Add support for more exchanges (Kraken, Coinbase, etc.)**
+- **Implement a real-time WebSocket feed for live price updates**
+- **Enhance UI with React or Vue.js**
+- **Integrate machine learning to predict price trends**
+
+## Conclusion
+This project provides a comprehensive system for monitoring cryptocurrency prices, managing alerts, and sending notifications. With its modular design, it can be extended to support additional exchanges, notification methods, and alert conditions.
+

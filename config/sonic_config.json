@@ -1,0 +1,253 @@
+{
+  "price_config": {
+    "assets": [
+      "BTC",
+      "ETH",
+      "SOL"
+    ],
+    "currency": "USD",
+    "cmc_api_key": "c51c0c22-1bf3-4674-86bf-36f39a912d1a"
+  },
+  "system_config": {
+    "logging_enabled": true,
+    "log_level": "DEBUG",
+    "console_output": true,
+    "log_file": "price_monitor.log",
+    "db_path": "mother_brain.db",
+    "price_monitor_enabled": true,
+    "alert_monitor_enabled": true,
+    "sonic_monitor_loop_time": 300,
+    "last_price_update_time": null
+  },
+  "api_config": {
+    "coingecko_api_enabled": "ENABLE",
+    "kucoin_api_enabled": "ENABLE",
+    "coinmarketcap_api_enabled": "ENABLE",
+    "coinpaprika_api_enabled": "ENABLE",
+    "binance_api_enabled": "ENABLE",
+    "coinmarketcap_api_key": "c51c0c22-1bf3-4674-86bf-36f39a912d1a"
+  },
+  "alert_ranges": {
+    "heat_index_ranges": {
+      "enabled": true,
+      "low": 444.0,
+      "low_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "medium": 444.0,
+      "high": 777.0,
+      "medium_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "high_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      }
+    },
+    "collateral_ranges": {
+      "low": 1111.0,
+      "medium": 1111.0,
+      "high": 11111.0,
+      "enabled": true,
+      "low_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "medium_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "high_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      }
+    },
+    "value_ranges": {
+      "low": 1111.0,
+      "medium": 1111.0,
+      "high": 1111.0,
+      "enabled": true,
+      "low_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "medium_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "high_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      }
+    },
+    "size_ranges": {
+      "low": 11111.0,
+      "medium": 111111.0,
+      "high": 11111.0,
+      "enabled": true,
+      "low_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "medium_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "high_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      }
+    },
+    "leverage_ranges": {
+      "low": 11111.0,
+      "medium": 111111.0,
+      "high": 11111.0,
+      "enabled": true,
+      "low_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "medium_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "high_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      }
+    },
+    "liquidation_distance_ranges": {
+      "low": 1111111.0,
+      "medium": 111111.0,
+      "high": 11111.0,
+      "enabled": true,
+      "low_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "medium_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "high_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      }
+    },
+    "travel_percent_liquid_ranges": {
+      "low": -40.0,
+      "low_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "medium": -50.0,
+      "medium_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "high": -75.0,
+      "high_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "enabled": true
+    },
+    "travel_percent_profit_ranges": {
+      "low": 0.0,
+      "medium": 0.0,
+      "high": 0.0,
+      "enabled": true,
+      "low_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "medium_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "high_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      }
+    },
+    "profit_ranges": {
+      "low": 6.0,
+      "low_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "medium": 50.0,
+      "medium_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "high": 100.0,
+      "high_notifications": {
+        "call": true,
+        "sms": true,
+        "email": true
+      },
+      "enabled": true
+    }
+  },
+  "notification_config": {
+    "email": {
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587,
+      "smtp_user": "bubba.diego@gmail.com",
+      "smtp_password": "pzix taan afbe igxb",
+      "recipient_email": "bubba.diego@gmail.com"
+    },
+    "sms": {
+      "carrier_gateway": "txt.att.net",
+      "recipient_number": "6199804758"
+    }
+  },
+  "alert_cooldown_seconds": 6000,
+  "call_refractory_period": 1,
+  "theme_profiles": {
+    "sidebar": {
+      "color_mode": "light",
+      "bg": "bg-primary-subtle"
+    },
+    "navbar": {
+      "color_mode": "light",
+      "bg": ""
+    }
+  },
+  "twilio_config": {
+    "account_sid": "ACb606788ada5dccbfeeebed0f440099b3",
+    "auth_token": "abf48a300d482348610d76beb3cef326",
+    "flow_sid": "FW5b3bf49ee04af4d23a118b613bbc0df2",
+    "to_phone": "+16199804758",
+    "from_phone": "+18336913467"
+  }
+}

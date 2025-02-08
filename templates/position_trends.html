@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1 class="mb-4">Position Trends (Last {{ timeframe }} Hours)</h1>
+
+  <!-- Timeframe Selection Form using radio buttons -->
+  <form id="timeframeForm" method="GET" class="mb-4">
+    <label class="mb-2 d-block">Select Timeframe (Hours):</label>
+    <div class="btn-group" role="group" aria-label="Timeframe selection">
+      <input type="radio" class="btn-check" name="hours" id="hours1" value="1" autocomplete="off" {% if timeframe == 1 %}checked{% endif %} onchange="this.form.submit();">
+      <label class="btn btn-outline-primary" for="hours1">1</label>
+
+      <input type="radio" class="btn-check" name="hours" id="hours3" value="3" autocomplete="off" {% if timeframe == 3 %}checked{% endif %} onchange="this.form.submit();">
+      <label class="btn btn-outline-primary" for="hours3">3</label>
+
+      <input type="radio" class="btn-check" name="hours" id="hours6" value="6" autocomplete="off" {% if timeframe == 6 %}checked{% endif %} onchange="this.form.submit();">
+      <label class="btn btn-outline-primary" for="hours6">6</label>
+
+      <input type="radio" class="btn-check" name="hours" id="hours12" value="12" autocomplete="off" {% if timeframe == 12 %}checked{% endif %} onchange="this.form.submit();">
+      <label class="btn btn-outline-primary" for="hours12">12</label>
+
+      <input type="radio" class="btn-check" name="hours" id="hours24" value="24" autocomplete="off" {% if timeframe == 24 %}checked{% endif %} onchange="this.form.submit();">
+      <label class="btn btn-outline-primary" for="hours24">24</label>
+    </div>
+  </form>
+
+  <!-- Charts: two rows of three charts each -->
+  <div class="row">
+    <!-- Collateral Chart -->
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <strong>Collateral</strong>
+        </div>
+        <div class="card-body">
+          <div id="chart-collateral"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Value Chart -->
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <strong>Value</strong>
+        </div>
+        <div class="card-body">
+          <div id="chart-value"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Size Chart -->
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <strong>Size</strong>
+        </div>
+        <div class="card-body">
+          <div id="chart-size"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Average Leverage Chart -->
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <strong>Average Leverage</strong>
+        </div>
+        <div class="card-body">
+          <div id="chart-leverage"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Average Travel % Chart -->
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <strong>Average Travel %</strong>
+        </div>
+        <div class="card-body">
+          <div id="chart-travel"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Average Heat Chart -->
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <strong>Average Heat</strong>
+        </div>
+        <div class="card-body">
+          <div id="chart-heat"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Include ApexCharts from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+  var chartData = {{ chart_data | tojson }};
+  var currentTimeframe = {{ timeframe }};
+
+  function formatNumber(val) {
+    return Number(val).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  // Create chart options for a given metric
+  function createChartOptions(title, data) {
+    return {
+      chart: {
+        type: 'line',
+        height: 300,
+        zoom: { enabled: false }
+      },
+      stroke: {
+        curve: 'smooth',
+        width: 3
+      },
+      markers: { size: 0 },
+      grid: { borderColor: '#f1f1f1' },
+      dataLabels: { enabled: false },
+      series: [{
+        name: title,
+        data: data
+      }],
+      xaxis: {
+        type: 'datetime',
+        labels: {
+          formatter: function(val) {
+            return new Date(val).toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+              timeZone: "America/Los_Angeles"
+            });
+          }
+        }
+      },
+      yaxis: {
+        labels: {
+          formatter: function(val) {
+            return formatNumber(val);
+          }
+        }
+      },
+      title: {
+        text: title + " (Last " + currentTimeframe + " Hours)",
+        align: 'center',
+        style: { fontSize: '16px', fontWeight: 'bold' }
+      },
+      tooltip: {
+        y: {
+          formatter: function(val) {
+            return formatNumber(val);
+          }
+        }
+      }
+    };
+  }
+
+  // Render charts for each metric
+  var collateralChart = new ApexCharts(document.querySelector("#chart-collateral"), createChartOptions("Collateral", chartData.collateral));
+  var valueChart = new ApexCharts(document.querySelector("#chart-value"), createChartOptions("Value", chartData.value));
+  var sizeChart = new ApexCharts(document.querySelector("#chart-size"), createChartOptions("Size", chartData.size));
+  var leverageChart = new ApexCharts(document.querySelector("#chart-leverage"), createChartOptions("Average Leverage", chartData.avg_leverage));
+  var travelChart = new ApexCharts(document.querySelector("#chart-travel"), createChartOptions("Average Travel %", chartData.avg_travel_percent));
+  var heatChart = new ApexCharts(document.querySelector("#chart-heat"), createChartOptions("Average Heat", chartData.avg_heat));
+
+  collateralChart.render();
+  valueChart.render();
+  sizeChart.render();
+  leverageChart.render();
+  travelChart.render();
+  heatChart.render();
+</script>
+{% endblock %}

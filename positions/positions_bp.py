@@ -1,0 +1,479 @@
+import logging
+from flask import (
+    Blueprint, request, jsonify, render_template, redirect, url_for, flash, current_app
+)
+from datetime import datetime
+import pytz
+import json
+
+from data.data_locker import DataLocker
+from config.config_manager import load_config
+from utils.calc_services import CalcServices  # Updated: now from utils folder
+from positions.position_service import PositionService
+from config.config_constants import DB_PATH, CONFIG_PATH
+
+logger = logging.getLogger("PositionsBlueprint")
+logger.setLevel(logging.DEBUG)
+
+positions_bp = Blueprint("positions", __name__, template_folder="templates")
+
+
+def _convert_iso_to_pst(iso_str):
+    if not iso_str or iso_str == "N/A":
+        return "N/A"
+    pst = pytz.timezone("US/Pacific")
+    try:
+        dt_obj = datetime.fromisoformat(iso_str)
+        dt_pst = dt_obj.astimezone(pst)
+        return dt_pst.strftime("%m/%d/%Y %I:%M:%S %p %Z")
+    except Exception as e:
+        logger.error(f"Error converting timestamp: {e}")
+        return "N/A"
+
+
+@positions_bp.route("/", methods=["GET"])
+def list_positions():
+    try:
+        positions = PositionService.get_all_positions(DB_PATH)
+        dl = DataLocker.get_instance(DB_PATH)
+        for pos in positions:
+            wallet_name = pos.get("wallet_name")
+            pos["wallet_name"] = dl.get_wallet_by_name(wallet_name) if wallet_name else None
+
+        config_data = load_config(CONFIG_PATH)
+        alert_dict = config_data.get("alert_ranges", {})
+
+        def get_alert_class_local(value, low, med, high):
+            try:
+                low = float(low) if low not in (None, "") else float('-inf')
+            except:
+                low = float('-inf')
+            try:
+                med = float(med) if med not in (None, "") else float('inf')
+            except:
+                med = float('inf')
+            try:
+                high = float(high) if high not in (None, "") else float('inf')
+            except:
+                high = float('inf')
+            if value >= high:
+                return "alert-high"
+            elif value >= med:
+                return "alert-medium"
+            elif value >= low:
+                return "alert-low"
+            else:
+                return ""
+
+        liqd_cfg = alert_dict.get("liquidation_distance_ranges", {})
+        liqd_low = liqd_cfg.get("low", 0.0)
+        liqd_med = liqd_cfg.get("medium", 0.0)
+        liqd_high = liqd_cfg.get("high", None)
+        for pos in positions:
+            liqd = float(pos.get("liquidation_distance") or 0.0)
+            pos["liqdist_alert_class"] = get_alert_class_local(liqd, liqd_low, liqd_med, liqd_high)
+
+        hi_cfg = alert_dict.get("heat_index_ranges", {})
+        hi_low = hi_cfg.get("low", 0.0)
+        hi_med = hi_cfg.get("medium", 0.0)
+        hi_high = hi_cfg.get("high", None)
+        for pos in positions:
+            heat_val = float(pos.get("heat_index") or 0.0)
+            pos["heat_alert_class"] = get_alert_class_local(heat_val, hi_low, hi_med, hi_high)
+
+        totals_dict = CalcServices().calculate_totals(positions)
+        dl = DataLocker.get_instance(DB_PATH)
+        times_dict = dl.get_last_update_times() or {}
+        pos_time_iso = times_dict.get("last_update_time_positions", "N/A")
+        pos_time_formatted = _convert_iso_to_pst(pos_time_iso)
+
+        return render_template("positions.html",
+                               positions=positions,
+                               totals=totals_dict,
+                               last_update_positions=pos_time_formatted,
+                               last_update_positions_source=times_dict.get("last_update_positions_source", "N/A"))
+    except Exception as e:
+        logger.error(f"Error in listing positions: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+@positions_bp.route("/table", methods=["GET"])
+def positions_table():
+    try:
+        dl = DataLocker.get_instance(DB_PATH)
+        positions = PositionService.get_all_positions(DB_PATH)
+        totals = CalcServices().calculate_totals(positions)
+        return render_template("positions_table.html", positions=positions, totals=totals)
+    except Exception as e:
+        logger.error(f"Error in positions_table: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+@positions_bp.route("/edit/<position_id>", methods=["POST"])
+def edit_position(position_id):
+    try:
+        dl = DataLocker.get_instance(DB_PATH)
+        size = float(request.form.get("size", 0.0))
+        collateral = float(request.form.get("collateral", 0.0))
+        dl.update_position(position_id, size, collateral)
+        return redirect(url_for("positions.list_positions"))
+    except Exception as e:
+        logger.error(f"Error updating position {position_id}: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+@positions_bp.route("/delete/<position_id>", methods=["POST"])
+def delete_position(position_id):
+    try:
+        dl = DataLocker.get_instance(DB_PATH)
+        dl.delete_position(position_id)
+        return redirect(url_for("positions.list_positions"))
+    except Exception as e:
+        logger.error(f"Error deleting position {position_id}: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+@positions_bp.route("/delete-all", methods=["POST"])
+def delete_all_positions():
+    try:
+        dl = DataLocker.get_instance(DB_PATH)
+        dl.delete_all_positions()
+        return redirect(url_for("positions.list_positions"))
+    except Exception as e:
+        logger.error(f"Error deleting all positions: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+@positions_bp.route("/upload", methods=["POST"])
+def upload_positions():
+    try:
+        dl = DataLocker.get_instance(DB_PATH)
+        if "file" not in request.files:
+            return jsonify({"error": "No file part in request"}), 400
+        file = request.files["file"]
+        if not file:
+            return jsonify({"error": "Empty file"}), 400
+        file_contents = file.read().decode("utf-8").strip()
+        if not file_contents:
+            return jsonify({"error": "Uploaded file is empty"}), 400
+        positions_list = json.loads(file_contents)
+        if not isinstance(positions_list, list):
+            return jsonify({"error": "Top-level JSON must be a list"}), 400
+        for pos_dict in positions_list:
+            if "wallet_name" in pos_dict:
+                pos_dict["wallet"] = pos_dict["wallet_name"]
+            dl.create_position(pos_dict)
+        return jsonify({"message": "Positions uploaded successfully"}), 200
+    except Exception as e:
+        logger.error(f"Error uploading positions: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+@positions_bp.route("/api/data", methods=["GET"])
+def positions_data_api():
+    try:
+        dl = DataLocker.get_instance(DB_PATH)
+        mini_prices = []
+        for asset in ["BTC", "ETH", "SOL"]:
+            row = dl.get_latest_price(asset)
+            if row:
+                mini_prices.append({
+                    "asset_type": row["asset_type"],
+                    "current_price": float(row["current_price"])
+                })
+        positions = PositionService.get_all_positions(DB_PATH)
+        for pos in positions:
+            wallet_name = pos.get("wallet_name")
+            pos["wallet_name"] = dl.get_wallet_by_name(wallet_name) if wallet_name else None
+        totals_dict = CalcServices().calculate_totals(positions)
+        return jsonify({
+            "mini_prices": mini_prices,
+            "positions": positions,
+            "totals": totals_dict
+        })
+    except Exception as e:
+        logger.error(f"Error in positions_data_api: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+@positions_bp.route("/mobile", methods=["GET"])
+def positions_mobile():
+    try:
+        dl = DataLocker.get_instance(DB_PATH)
+        calc = CalcServices()
+        positions = PositionService.get_all_positions(DB_PATH)
+        for pos in positions:
+            wallet_name = pos.get("wallet_name")
+            pos["wallet_name"] = dl.get_wallet_by_name(wallet_name) if wallet_name else None
+        config_data = load_config(CONFIG_PATH)
+        alert_dict = config_data.get("alert_ranges", {})
+
+        def get_alert_class_local(value, low_thresh, med_thresh, high_thresh):
+            try:
+                low_thresh = float(low_thresh) if low_thresh not in (None, "") else float('-inf')
+            except ValueError:
+                low_thresh = float('-inf')
+            try:
+                med_thresh = float(med_thresh) if med_thresh not in (None, "") else float('inf')
+            except ValueError:
+                med_thresh = float('inf')
+            try:
+                high_thresh = float(high_thresh) if high_thresh not in (None, "") else float('inf')
+            except ValueError:
+                high_thresh = float('inf')
+            if value >= high_thresh:
+                return "alert-high"
+            elif value >= med_thresh:
+                return "alert-medium"
+            elif value >= low_thresh:
+                return "alert-low"
+            else:
+                return ""
+
+        hi_cfg = alert_dict.get("heat_index_ranges", {})
+        hi_low = hi_cfg.get("low", 0.0)
+        hi_med = hi_cfg.get("medium", 0.0)
+        hi_high = hi_cfg.get("high", None)
+        coll_cfg = alert_dict.get("collateral_ranges", {})
+        coll_low = coll_cfg.get("low", 0.0)
+        coll_med = coll_cfg.get("medium", 0.0)
+        coll_high = coll_cfg.get("high", None)
+        val_cfg = alert_dict.get("value_ranges", {})
+        val_low = val_cfg.get("low", 0.0)
+        val_med = val_cfg.get("medium", 0.0)
+        val_high = val_cfg.get("high", None)
+        size_cfg = alert_dict.get("size_ranges", {})
+        size_low = size_cfg.get("low", 0.0)
+        size_med = size_cfg.get("medium", 0.0)
+        size_high = size_cfg.get("high", None)
+        lev_cfg = alert_dict.get("leverage_ranges", {})
+        lev_low = lev_cfg.get("low", 0.0)
+        lev_med = lev_cfg.get("medium", 0.0)
+        lev_high = lev_cfg.get("high", None)
+        liqd_cfg = alert_dict.get("liquidation_distance_ranges", {})
+        liqd_low = liqd_cfg.get("low", 0.0)
+        liqd_med = liqd_cfg.get("medium", 0.0)
+        liqd_high = liqd_cfg.get("high", None)
+        tliq_cfg = alert_dict.get("travel_percent_liquid_ranges", {})
+        tliq_low = tliq_cfg.get("low", 0.0)
+        tliq_med = tliq_cfg.get("medium", 0.0)
+        tliq_high = tliq_cfg.get("high", None)
+        tprof_cfg = alert_dict.get("travel_percent_profit_ranges", {})
+        tprof_low = tprof_cfg.get("low", 0.0)
+        tprof_med = tprof_cfg.get("medium", 0.0)
+        tprof_high = tprof_cfg.get("high", None)
+        profit_cfg = alert_dict.get("profit_ranges", {})
+        profit_low = profit_cfg.get("low", 0.0)
+        profit_med = profit_cfg.get("medium", 0.0)
+        profit_high = profit_cfg.get("high", None)
+        for pos in positions:
+            heat_val = float(pos.get("heat_index", 0.0))
+            pos["heat_alert_class"] = get_alert_class_local(heat_val, hi_low, hi_med, hi_high)
+            coll_val = float(pos.get("collateral", 0.0))
+            pos["collateral_alert_class"] = get_alert_class_local(coll_val, coll_low, coll_med, coll_high)
+            val = float(pos.get("value", 0.0))
+            pos["value_alert_class"] = get_alert_class_local(val, val_low, val_med, val_high)
+            sz = float(pos.get("size", 0.0))
+            pos["size_alert_class"] = get_alert_class_local(sz, size_low, size_med, size_high)
+            lev = float(pos.get("leverage", 0.0))
+            pos["leverage_alert_class"] = get_alert_class_local(lev, lev_low, lev_med, lev_high)
+            liqd = float(pos.get("liquidation_distance", 0.0))
+            pos["liqdist_alert_class"] = get_alert_class_local(liqd, liqd_low, liqd_med, liqd_high)
+            tliq_val = float(pos.get("current_travel_percent", 0.0))
+            pos["travel_liquid_alert_class"] = get_alert_class_local(tliq_val, tliq_low, tliq_med, tliq_high)
+            tprof_val = float(pos.get("current_travel_percent", 0.0))
+            pos["travel_profit_alert_class"] = get_alert_class_local(tprof_val, tprof_low, tprof_med, tprof_high)
+            profit_val = float(pos.get("pnl_after_fees_usd", 0.0))
+            # Assuming get_profit_alert_class is defined elsewhere or imported.
+            pos["profit_alert_class"] = get_profit_alert_class(profit_val, profit_low, profit_med, profit_high)
+        times_dict = DataLocker.get_instance(DB_PATH).get_last_update_times() or {}
+        pos_time_iso = times_dict.get("last_update_time_positions", "N/A")
+        pos_time_formatted = _convert_iso_to_pst(pos_time_iso)
+        return render_template("positions_mobile.html",
+                               positions=positions,
+                               totals=CalcServices().calculate_totals(positions),
+                               last_update_positions=pos_time_formatted,
+                               last_update_positions_source=times_dict.get("last_update_positions_source", "N/A"))
+    except Exception as e:
+        logger.error(f"Error in /positions_mobile: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+@positions_bp.route("/heat", methods=["GET"])
+def heat():
+    try:
+        dl = DataLocker.get_instance(DB_PATH)
+        # Get raw positions and update them with the latest price using PositionService
+        positions_data = dl.read_positions()
+        positions_data = PositionService.fill_positions_with_latest_price(positions_data)
+        # Instantiate CalcServices and prepare positions for display
+        calc = CalcServices()
+        positions_data = calc.prepare_positions_for_display(positions_data)
+        # Ensure every position has a defined travel_percent (fallback to current_travel_percent if missing)
+        for pos in positions_data:
+            if 'travel_percent' not in pos or pos['travel_percent'] is None:
+                pos['travel_percent'] = pos.get('current_travel_percent', 0)
+        # Calculate aggregated totals
+        totals = calc.calculate_totals(positions_data)
+
+        # Build heat_data structure grouped by asset and position type
+        heat_data = {"totals": {"short": totals.get("short", {}), "long": totals.get("long", {})}}
+        for asset in ["BTC", "ETH", "SOL"]:
+            heat_data[asset] = {"short": None, "long": None}
+        grouped = {}
+        for pos in positions_data:
+            asset = pos.get("asset_type", "Unknown").upper()
+            pos_type = pos.get("position_type", "").lower()
+            if asset not in grouped:
+                grouped[asset] = {"short": [], "long": []}
+            if pos_type in ["short", "long"]:
+                grouped[asset][pos_type].append(pos)
+        for asset in ["BTC", "ETH", "SOL"]:
+            for pos_type in ["short", "long"]:
+                if asset in grouped and grouped[asset][pos_type]:
+                    # For production, compute aggregates as needed; here we take the first position
+                    heat_data[asset][pos_type] = grouped[asset][pos_type][0]
+                else:
+                    heat_data[asset][pos_type] = None
+
+        times_dict = dl.get_last_update_times() or {}
+        pos_time_iso = times_dict.get("last_update_time_positions", "N/A")
+        pos_time_formatted = _convert_iso_to_pst(pos_time_iso)
+
+        return render_template("hedge_report.html",
+                               heat_data=heat_data,
+                               last_update_positions=pos_time_formatted,
+                               last_update_positions_source=times_dict.get("last_update_positions_source", "N/A"))
+    except Exception as e:
+        logger.error(f"Error in /heat route: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+@positions_bp.route("/delete-alert/<alert_id>", methods=["POST"])
+def delete_alert(alert_id):
+    dl = DataLocker.get_instance(DB_PATH)
+    dl.delete_alert(alert_id)
+    flash("Alert deleted!", "success")
+    return redirect(url_for("alerts"))
+
+
+@positions_bp.route("/update_jupiter", methods=["GET", "POST"])
+def update_jupiter():
+    source = request.args.get("source") or request.form.get("source") or "API"
+    dl = DataLocker.get_instance(DB_PATH)
+    delete_all_jupiter_positions()  # Assuming this function is defined in the main app context
+    jupiter_resp, jupiter_code = update_jupiter_positions()
+    if jupiter_code != 200:
+        return jupiter_resp, jupiter_code
+    prices_resp = update_prices()
+    if prices_resp.status_code != 200:
+        return prices_resp
+    manual_check_alerts()
+    now = datetime.now()
+    dl.set_last_update_times(
+        positions_dt=now,
+        positions_source=source,
+        prices_dt=now,
+        prices_source=source
+    )
+    try:
+        record_positions_snapshot(DB_PATH)
+    except Exception as e:
+        logger.error(f"Error recording positions snapshot: {e}", exc_info=True)
+    socketio.emit('data_updated', {
+        'message': f"Jupiter positions + Prices updated successfully by {source}!",
+        'last_update_time_positions': now.isoformat(),
+        'last_update_time_prices': now.isoformat()
+    })
+    return jsonify({
+        "message": f"Jupiter positions + Prices updated successfully by {source}!",
+        "source": source,
+        "last_update_time_positions": now.isoformat(),
+        "last_update_time_prices": now.isoformat()
+    }), 200
+
+
+@positions_bp.route("/update_alert_config", methods=["POST"])
+def update_alert_config():
+    try:
+        config = load_config("sonic_config.json")
+        form_data = request.form.to_dict(flat=True)
+        updated_alerts = parse_nested_form(form_data)
+        config["alert_ranges"] = updated_alerts
+        updated_config = update_config(config, "sonic_config.json")
+        manager.reload_config()
+        return jsonify({"success": True})
+    except Exception as e:
+        logger.error("Error updating alert config: %s", e, exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+@positions_bp.route("/save_theme", methods=["POST"])
+def save_theme():
+    try:
+        new_theme_data = request.get_json()
+        if not new_theme_data:
+            return jsonify({"success": False, "error": "No data received"}), 400
+        config_path = current_app.config.get("CONFIG_PATH", CONFIG_PATH)
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+        config.setdefault("theme_profiles", {})
+        config["theme_profiles"]["sidebar"] = new_theme_data.get("sidebar", config["theme_profiles"].get("sidebar", {}))
+        config["theme_profiles"]["navbar"] = new_theme_data.get("navbar", config["theme_profiles"].get("navbar", {}))
+        with open(config_path, 'w') as f:
+            json.dump(config, f, indent=2)
+        return jsonify({"success": True})
+    except Exception as e:
+        current_app.logger.error("Error saving theme: %s", e, exc_info=True)
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@positions_bp.context_processor
+def update_theme():
+    config_path = current_app.config.get("CONFIG_PATH", CONFIG_PATH)
+    try:
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+    except Exception as e:
+        config = {}
+    theme = {
+        'sidebar': {
+            'bg': config.get('sidebar_bg', 'bg-primary'),
+            'color_mode': config.get('sidebar_mode', 'dark')
+        },
+        'navbar': {
+            'bg': config.get('navbar_bg', 'bg-secondary'),
+            'color_mode': config.get('navbar_mode', 'dark')
+        }
+    }
+    return dict(theme=theme)
+
+
+# ---------------------------------------------------------------------------
+# Helper: Parse Alert Config Form
+# ---------------------------------------------------------------------------
+def parse_nested_form(form_data: dict) -> dict:
+    updated = {}
+    for full_key, value in form_data.items():
+        if full_key.startswith("alert_ranges[") and full_key.endswith("]"):
+            inner = full_key[len("alert_ranges["):-1]
+            parts = inner.split("][")
+            if len(parts) == 2:
+                metric, field = parts
+                if metric not in updated:
+                    updated[metric] = {}
+                if field in ["enabled"]:
+                    updated[metric][field] = True
+                else:
+                    try:
+                        updated[metric][field] = float(value)
+                    except ValueError:
+                        updated[metric][field] = value
+            elif len(parts) == 3:
+                metric, subfield, field = parts
+                if metric not in updated:
+                    updated[metric] = {}
+                if subfield not in updated[metric]:
+                    updated[metric][subfield] = {}
+                updated[metric][subfield][field] = True
+    return updated

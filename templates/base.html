@@ -91,14 +91,23 @@
                   <p>Dashboard</p>
                 </a>
               </li>
+              <!-- Updated endpoint: Changed from 'positions' to 'position_trends' -->
               <li class="nav-item">
-                <a href="{{ url_for('positions') }}" class="nav-link">
+                <a href="{{ url_for('position_trends') }}" class="nav-link">
                   <i class="nav-icon bi bi-briefcase"></i>
                   <p>Positions</p>
                 </a>
               </li>
+              <!-- New nav item for Positions Table -->
               <li class="nav-item">
-                <a href="{{ url_for('price_charts') }}" class="nav-link">
+                <a href="{{ url_for('positions.positions_table') }}" class="nav-link">
+                  <i class="nav-icon bi bi-table"></i>
+                  <p>Positions Table</p>
+                </a>
+              </li>
+              <!-- Updated endpoint: Changed from 'price_chart_view' to 'price_charts_view' -->
+              <li class="nav-item">
+                <a href="{{ url_for('price_charts_view') }}" class="nav-link">
                   <i class="nav-icon bi bi-currency-dollar"></i>
                   <p>Prices</p>
                 </a>

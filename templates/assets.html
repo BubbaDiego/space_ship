@@ -1,4 +1,4 @@
-{% extends "sonic_admin.html" %}
+{% extends "base.html" %}
 {% block content %}
 
 <style>
@@ -56,7 +56,6 @@
       <div class="card-header">Total Brokerage Balance</div>
       <div class="card-body text-center">
         <div class="display-4 mb-2">
-          <!-- Format with comma separators -->
           {{ "{:,.2f}".format(total_brokerage_balance) }}
         </div>
         <small class="text-muted">(From system_vars)</small>
@@ -125,23 +124,14 @@
               <td>{{ "{:,.2f}".format(b.total_holding) }}</td>
               <td>
                 {% if b.image_path %}
-                  <img
-                    src="{{ b.image_path }}"
-                    alt="broker-image"
-                    style="width:40px; height:40px; object-fit:cover;"
-                  />
+                  <img src="{{ b.image_path }}" alt="broker-image" style="width:40px; height:40px; object-fit:cover;" />
                 {% else %}
                   N/A
                 {% endif %}
               </td>
               <td>
                 <a href="{{ url_for('edit_broker', broker_name=b.name) }}" class="btn btn-sm btn-secondary">Edit</a>
-                <form
-                  method="POST"
-                  action="{{ url_for('delete_broker', broker_name=b.name) }}"
-                  style="display:inline;"
-                  onsubmit="return confirm('Delete broker {{ b.name }}?');"
-                >
+                <form method="POST" action="{{ url_for('delete_broker', broker_name=b.name) }}" style="display:inline;" onsubmit="return confirm('Delete broker {{ b.name }}?');">
                   <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                 </form>
               </td>
@@ -205,23 +195,14 @@
               <td>{{ "{:,.2f}".format(w.balance) }}</td>
               <td>
                 {% if w.image_path %}
-                  <img
-                    src="{{ w.image_path }}"
-                    alt="wallet-image"
-                    style="width:40px; height:40px; object-fit:cover;"
-                  />
+                  <img src="{{ w.image_path }}" alt="wallet-image" style="width:40px; height:40px; object-fit:cover;" />
                 {% else %}
                   N/A
                 {% endif %}
               </td>
               <td>
                 <a href="{{ url_for('edit_wallet', wallet_name=w.name) }}" class="btn btn-sm btn-secondary">Edit</a>
-                <form
-                  method="POST"
-                  action="{{ url_for('delete_wallet', wallet_name=w.name) }}"
-                  style="display:inline;"
-                  onsubmit="return confirm('Delete wallet {{ w.name }}?');"
-                >
+                <form method="POST" action="{{ url_for('delete_wallet', wallet_name=w.name) }}" style="display:inline;" onsubmit="return confirm('Delete wallet {{ w.name }}?');">
                   <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                 </form>
               </td>

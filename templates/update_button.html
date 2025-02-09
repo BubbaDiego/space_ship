@@ -1,0 +1,60 @@
+{# update_button.html #}
+{% set update_type = update_type | default('all') %}
+<div class="update-button" data-type="{{ update_type }}">
+  {% if update_type == 'crypto' %}
+    <img id="update-button-img-{{ update_type }}" 
+         src="{{ url_for('static', filename='images/crypto_icon.jpg') }}" 
+         alt="Crypto Update Button" 
+         style="width: 70px; height: 70px; cursor: pointer;">
+  {% elif update_type == 'jupiter' %}
+    <img id="update-button-img-{{ update_type }}" 
+         src="{{ url_for('static', filename='images/jupiter.jpg') }}" 
+         alt="Jupiter Update Button" 
+         style="width: 70px; height: 70px; cursor: pointer;">
+  {% else %}
+    {# For type 'all', start with the crypto icon #}
+    <img id="update-button-img-{{ update_type }}" 
+         src="{{ url_for('static', filename='images/crypto_icon.jpg') }}" 
+         alt="All Update Button" 
+         style="width: 70px; height: 70px; cursor: pointer;">
+  {% endif %}
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const container = document.querySelector('.update-button[data-type="{{ update_type }}"]');
+  if (!container) return;
+  const img = container.querySelector('img');
+  // Define the image URLs
+  const cryptoURL = "{{ url_for('static', filename='images/crypto_icon.jpg') }}";
+  const jupiterURL = "{{ url_for('static', filename='images/jupiter.jpg') }}";
+  
+  container.addEventListener("click", function() {
+    // Add spin class to trigger animation
+    img.classList.add("spin");
+    // Simulate an update delay; replace with actual update callback if needed
+    setTimeout(function() {
+      img.classList.remove("spin");
+      if ("{{ update_type }}" === "all") {
+        // Alternate between crypto and jupiter icons
+        if (img.getAttribute("src") === cryptoURL) {
+          img.setAttribute("src", jupiterURL);
+        } else {
+          img.setAttribute("src", cryptoURL);
+        }
+      }
+      // For crypto or jupiter types, the image remains unchanged
+    }, 1500);
+  });
+});
+</script>
+
+<style>
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.spin {
+  animation: spin 1s linear infinite;
+}
+</style>

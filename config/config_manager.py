@@ -103,8 +103,7 @@ def save_config(config: Dict[str, Any], json_path: str = "sonic_config.json") ->
         logger.error(f"Error saving configuration to '{json_path}': {e}")
 
 
-def update_config(new_config: Dict[str, Any], json_path: str = "sonic_config.json", db_conn: Optional[Any] = None) -> \
-Dict[str, Any]:
+def update_config(new_config: Dict[str, Any], json_path: str = "sonic_config.json", db_conn: Optional[Any] = None) -> Dict[str, Any]:
     """
     Updates the configuration by:
       1) Loading the current configuration (including any DB overrides if provided).
@@ -116,6 +115,9 @@ Dict[str, Any]:
       - new_config: A dictionary of configuration updates.
       - json_path: Path to the JSON config file.
       - db_conn: Optional database connection (if you want to merge in DB overrides).
+
+    Returns:
+      The updated configuration dictionary.
     """
     current_config = load_config(json_path, db_conn)
     updated_config = deep_merge_dicts(current_config, new_config)

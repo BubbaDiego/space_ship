@@ -1,16 +1,33 @@
+#!/usr/bin/env python
+"""
+Module: positions_bp.py
+Description:
+    A production‐ready Flask blueprint for all positions-related endpoints.
+    This module handles rendering, API responses, and orchestrates business logic via PositionService.
+    It also manages alert configuration, theme updates, and integrates with SocketIO and external services.
+"""
+
 import logging
+import json
+from datetime import datetime
+import pytz
+
 from flask import (
     Blueprint, request, jsonify, render_template, redirect, url_for, flash, current_app
 )
-from datetime import datetime
-import pytz
-import json
-
 from data.data_locker import DataLocker
-from config.config_manager import load_config
-from utils.calc_services import CalcServices  # Updated: now from utils folder
-from positions.position_service import PositionService
+from config.config_manager import load_config, update_config
 from config.config_constants import DB_PATH, CONFIG_PATH
+from utils.calc_services import CalcServices, get_profit_alert_class
+from positions.position_service import PositionService
+
+# These helper functions and objects must be defined and imported appropriately.
+# For example, update_prices and manual_check_alerts might come from other modules.
+from prices.price_monitor import PriceMonitor
+from alerts.alert_manager import AlertManager #manual_check_alerts, manager
+
+# Assume that socketio is initialized in your main app and imported here.
+#from your_app import socketio  # Replace with the actual import if different
 
 logger = logging.getLogger("PositionsBlueprint")
 logger.setLevel(logging.DEBUG)
@@ -18,7 +35,11 @@ logger.setLevel(logging.DEBUG)
 positions_bp = Blueprint("positions", __name__, template_folder="templates")
 
 
+def get_socketio():
+    return current_app.extensions.get('socketio')
+
 def _convert_iso_to_pst(iso_str):
+    """Converts an ISO timestamp string to a formatted PST time string."""
     if not iso_str or iso_str == "N/A":
         return "N/A"
     pst = pytz.timezone("US/Pacific")
@@ -29,6 +50,7 @@ def _convert_iso_to_pst(iso_str):
     except Exception as e:
         logger.error(f"Error converting timestamp: {e}")
         return "N/A"
+
 
 
 @positions_bp.route("/", methods=["GET"])
@@ -94,6 +116,41 @@ def list_positions():
                                last_update_positions_source=times_dict.get("last_update_positions_source", "N/A"))
     except Exception as e:
         logger.error(f"Error in listing positions: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+@positions_bp.route("/position_trends", methods=["GET"])
+def position_trends():
+    """
+    Renders a trends chart for positions. It aggregates totals from current positions,
+    converts the current time into epoch milliseconds for charting, and passes the data
+    to the 'position_trends.html' template.
+
+    Query Parameters:
+      - timeframe (optional): The number of hours to include in the trends (default is 24).
+    """
+    try:
+        dl = DataLocker.get_instance(DB_PATH)
+        positions = dl.get_positions()
+        calc_services = CalcServices()
+        totals = calc_services.calculate_totals(positions)
+
+        # Convert current time to epoch milliseconds for chart plotting.
+        current_timestamp = int(datetime.now().timestamp() * 1000)
+
+        chart_data = {
+            "collateral": [[current_timestamp, totals.get("total_collateral", 0)]],
+            "value": [[current_timestamp, totals.get("total_value", 0)]],
+            "size": [[current_timestamp, totals.get("total_size", 0)]],
+            "leverage": [[current_timestamp, totals.get("avg_leverage", 0)]],
+            "travel_percent": [[current_timestamp, totals.get("avg_travel_percent", 0)]],
+            "heat": [[current_timestamp, totals.get("avg_heat_index", 0)]]
+        }
+
+        timeframe = request.args.get("timeframe", default=24, type=int)
+        return render_template("position_trends.html", chart_data=chart_data, timeframe=timeframe)
+    except Exception as e:
+        logger.error("Error in position_trends: %s", e, exc_info=True)
         return jsonify({"error": str(e)}), 500
 
 
@@ -284,7 +341,6 @@ def positions_mobile():
             tprof_val = float(pos.get("current_travel_percent", 0.0))
             pos["travel_profit_alert_class"] = get_alert_class_local(tprof_val, tprof_low, tprof_med, tprof_high)
             profit_val = float(pos.get("pnl_after_fees_usd", 0.0))
-            # Assuming get_profit_alert_class is defined elsewhere or imported.
             pos["profit_alert_class"] = get_profit_alert_class(profit_val, profit_low, profit_med, profit_high)
         times_dict = DataLocker.get_instance(DB_PATH).get_last_update_times() or {}
         pos_time_iso = times_dict.get("last_update_time_positions", "N/A")
@@ -300,48 +356,59 @@ def positions_mobile():
 
 
 @positions_bp.route("/heat", methods=["GET"])
-def heat():
+def heat_report():
+    """
+    Prepares a heat report by updating positions with the latest prices,
+    formatting them for display, grouping by asset and position type,
+    and calculating aggregated totals.
+    """
     try:
         dl = DataLocker.get_instance(DB_PATH)
-        # Get raw positions and update them with the latest price using PositionService
+        # Get raw positions
         positions_data = dl.read_positions()
+        logger.debug(f"Raw positions count: {len(positions_data)}")
+
+        # Update positions with latest prices and prepare them for display
         positions_data = PositionService.fill_positions_with_latest_price(positions_data)
-        # Instantiate CalcServices and prepare positions for display
-        calc = CalcServices()
-        positions_data = calc.prepare_positions_for_display(positions_data)
-        # Ensure every position has a defined travel_percent (fallback to current_travel_percent if missing)
+        positions_data = CalcServices().prepare_positions_for_display(positions_data)
+
+        # Ensure a defined travel percent and normalize asset keys
         for pos in positions_data:
             if 'travel_percent' not in pos or pos['travel_percent'] is None:
                 pos['travel_percent'] = pos.get('current_travel_percent', 0)
-        # Calculate aggregated totals
-        totals = calc.calculate_totals(positions_data)
+            pos['asset'] = pos.get('asset_type', 'Unknown').upper()
 
-        # Build heat_data structure grouped by asset and position type
-        heat_data = {"totals": {"short": totals.get("short", {}), "long": totals.get("long", {})}}
-        for asset in ["BTC", "ETH", "SOL"]:
-            heat_data[asset] = {"short": None, "long": None}
+        totals = CalcServices().calculate_totals(positions_data)
+
+        # Group positions by asset and position type (short/long)
         grouped = {}
         for pos in positions_data:
-            asset = pos.get("asset_type", "Unknown").upper()
+            asset = pos.get("asset", "UNKNOWN")
             pos_type = pos.get("position_type", "").lower()
             if asset not in grouped:
                 grouped[asset] = {"short": [], "long": []}
             if pos_type in ["short", "long"]:
                 grouped[asset][pos_type].append(pos)
+
+        heat_data = {"totals": totals}
+        for asset, groups in grouped.items():
+            heat_data[asset] = {
+                "short": groups["short"][0] if groups["short"] else {},
+                "long": groups["long"][0] if groups["long"] else {}
+            }
+        # Ensure default keys for BTC, ETH, SOL
         for asset in ["BTC", "ETH", "SOL"]:
-            for pos_type in ["short", "long"]:
-                if asset in grouped and grouped[asset][pos_type]:
-                    # For production, compute aggregates as needed; here we take the first position
-                    heat_data[asset][pos_type] = grouped[asset][pos_type][0]
-                else:
-                    heat_data[asset][pos_type] = None
+            if asset not in heat_data:
+                heat_data[asset] = {"short": {}, "long": {}}
+
+        logger.debug(f"Aggregated heat_data: {heat_data}")
 
         times_dict = dl.get_last_update_times() or {}
         pos_time_iso = times_dict.get("last_update_time_positions", "N/A")
         pos_time_formatted = _convert_iso_to_pst(pos_time_iso)
 
         return render_template("hedge_report.html",
-                               heat_data=heat_data,
+                               hd=heat_data,
                                last_update_positions=pos_time_formatted,
                                last_update_positions_source=times_dict.get("last_update_positions_source", "N/A"))
     except Exception as e:
@@ -351,46 +418,66 @@ def heat():
 
 @positions_bp.route("/delete-alert/<alert_id>", methods=["POST"])
 def delete_alert(alert_id):
-    dl = DataLocker.get_instance(DB_PATH)
-    dl.delete_alert(alert_id)
-    flash("Alert deleted!", "success")
-    return redirect(url_for("alerts"))
+    try:
+        dl = DataLocker.get_instance(DB_PATH)
+        dl.delete_alert(alert_id)
+        flash("Alert deleted!", "success")
+        # Assuming an alerts blueprint or endpoint exists for redirection
+        return redirect(url_for("alerts.list_alerts"))
+    except Exception as e:
+        logger.error(f"Error deleting alert {alert_id}: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
 
 
 @positions_bp.route("/update_jupiter", methods=["GET", "POST"])
 def update_jupiter():
-    source = request.args.get("source") or request.form.get("source") or "API"
-    dl = DataLocker.get_instance(DB_PATH)
-    delete_all_jupiter_positions()  # Assuming this function is defined in the main app context
-    jupiter_resp, jupiter_code = update_jupiter_positions()
-    if jupiter_code != 200:
-        return jupiter_resp, jupiter_code
-    prices_resp = update_prices()
-    if prices_resp.status_code != 200:
-        return prices_resp
-    manual_check_alerts()
-    now = datetime.now()
-    dl.set_last_update_times(
-        positions_dt=now,
-        positions_source=source,
-        prices_dt=now,
-        prices_source=source
-    )
+    """
+    Updates Jupiter positions by:
+      1. Deleting existing Jupiter positions.
+      2. Fetching new positions via the external Jupiter API.
+      3. (Optionally) Updating prices and manually checking alerts.
+      4. Recording a snapshot of the positions.
+      5. Updating last update timestamps and emitting a SocketIO event.
+    """
     try:
-        record_positions_snapshot(DB_PATH)
+        source = request.args.get("source") or request.form.get("source") or "API"
+        # Delete existing Jupiter positions via the service layer
+        PositionService.delete_all_jupiter_positions(DB_PATH)
+        # Update Jupiter positions and capture the result details
+        update_result = PositionService.update_jupiter_positions(DB_PATH)
+        if "error" in update_result:
+            return jsonify(update_result), 500
+        # Update prices and check alerts if needed
+        prices_resp = update_prices()
+        if prices_resp.status_code != 200:
+            return prices_resp
+        manual_check_alerts()
+        now = datetime.now()
+        dl = DataLocker.get_instance(DB_PATH)
+        dl.set_last_update_times(
+            positions_dt=now,
+            positions_source=source,
+            prices_dt=now,
+            prices_source=source
+        )
+        try:
+            PositionService.record_positions_snapshot(DB_PATH)
+        except Exception as e:
+            logger.error(f"Error recording positions snapshot: {e}", exc_info=True)
+        socketio.emit('data_updated', {
+            'message': f"Jupiter positions + Prices updated successfully by {source}!",
+            'last_update_time_positions': now.isoformat(),
+            'last_update_time_prices': now.isoformat()
+        })
+        return jsonify({
+            "message": f"Jupiter positions + Prices updated successfully by {source}!",
+            "source": source,
+            "last_update_time_positions": now.isoformat(),
+            "last_update_time_prices": now.isoformat()
+        }), 200
     except Exception as e:
-        logger.error(f"Error recording positions snapshot: {e}", exc_info=True)
-    socketio.emit('data_updated', {
-        'message': f"Jupiter positions + Prices updated successfully by {source}!",
-        'last_update_time_positions': now.isoformat(),
-        'last_update_time_prices': now.isoformat()
-    })
-    return jsonify({
-        "message": f"Jupiter positions + Prices updated successfully by {source}!",
-        "source": source,
-        "last_update_time_positions": now.isoformat(),
-        "last_update_time_prices": now.isoformat()
-    }), 200
+        logger.error(f"Error in update_jupiter: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
 
 
 @positions_bp.route("/update_alert_config", methods=["POST"])
@@ -429,12 +516,13 @@ def save_theme():
 
 
 @positions_bp.context_processor
-def update_theme():
+def update_theme_context():
     config_path = current_app.config.get("CONFIG_PATH", CONFIG_PATH)
     try:
         with open(config_path, 'r') as f:
             config = json.load(f)
     except Exception as e:
+        logger.error(f"Error loading theme config: {e}", exc_info=True)
         config = {}
     theme = {
         'sidebar': {

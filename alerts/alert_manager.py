@@ -93,7 +93,7 @@ class AlertManager:
         logger.info("AlertManager initialized.")
 
     def reload_config(self):
-        from config_manager import load_config
+        from config.config_manager import load_config
         db_conn = self.data_locker.get_db_connection()
         self.config = load_config(self.config_path, db_conn)
         self.cooldown = self.config.get("alert_cooldown_seconds", 900)

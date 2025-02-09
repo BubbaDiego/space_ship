@@ -10,7 +10,8 @@
       <h3 class="card-title text-center">Alert Ranges</h3>
     </div>
     <div class="card-body">
-      <form id="alert-config-form" method="POST" action="{{ url_for('update_alert_config') }}">
+      <!-- Updated form action with blueprint-qualified endpoint -->
+      <form id="alert-config-form" method="POST" action="{{ url_for('alerts_bp.update_alert_config') }}">
         <div class="table-responsive">
           <table class="table table-bordered text-center">
             <thead class="bg-light text-dark">
@@ -106,31 +107,6 @@
       </form>
     </div>
   </div>
-
-  <!-- System Options Section -->
-  <div class="card mb-4">
-    <div class="card-header">
-      <h3 class="card-title text-center">System Options</h3>
-    </div>
-    <div class="card-body">
-      <form id="system-options-form" method="POST" action="{{ url_for('update_system_options') }}">
-        <div class="mb-3 text-center">
-          <label for="alert_cooldown_seconds" class="form-label">Alert Cooldown (seconds)</label>
-          <input type="number" step="1" id="alert_cooldown_seconds" name="alert_cooldown_seconds" class="form-control w-50 mx-auto">
-        </div>
-        <div class="mb-3 text-center">
-          <label for="call_refractory_period" class="form-label">Call Refractory Period (seconds)</label>
-          <input type="number" step="1" id="call_refractory_period" name="call_refractory_period" class="form-control w-50 mx-auto">
-        </div>
-        <div class="text-center mb-3">
-          <button type="button" id="reset-refractory" class="btn btn-warning">Reset Refractory Clock</button>
-        </div>
-        <div class="text-center mt-3">
-          <button type="submit" class="btn btn-primary">Save System Options</button>
-        </div>
-      </form>
-    </div>
-  </div>
 </div>
 {% endblock content %}
 
@@ -144,20 +120,14 @@ $(document).ready(function(){
   // Function to load configuration from the backend
   function loadConfig() {
     $.ajax({
-      url: "{{ url_for('api_get_config') }}",
+      // Use literal URL instead of url_for here
+      url: "/api/get_config",
       type: "GET",
       dataType: "json",
       cache: false,
       data: { "_": new Date().getTime() }, // Cache busting
       success: function(config) {
         console.log("Loaded config:", config);
-        // Populate system options
-        if (typeof config.alert_cooldown_seconds !== "undefined") {
-          $("#alert_cooldown_seconds").val(config.alert_cooldown_seconds);
-        }
-        if (typeof config.call_refractory_period !== "undefined") {
-          $("#call_refractory_period").val(config.call_refractory_period);
-        }
         // Populate alert ranges for each metric
         if (config.alert_ranges) {
           var metrics = [
@@ -208,43 +178,12 @@ $(document).ready(function(){
   // Immediately load the configuration on document ready
   loadConfig();
 
-  // Handle System Options Form submission
-  $("#system-options-form").on("submit", function(e){
-    e.preventDefault();
-    var formData = $(this).serialize();
-    console.log("Submitting system options form:", formData);
-    $.post("{{ url_for('update_system_options') }}", formData)
-      .done(function(data){
-        console.log("System options update response:", data);
-        alert("System options updated successfully!");
-      })
-      .fail(function(jqXHR, textStatus, errorThrown){
-        console.error("Failed to update system options:", textStatus, errorThrown);
-        alert("Failed to update system options.");
-      });
-  });
-
-  // Reset Refractory Clock button
-  $("#reset-refractory").on("click", function(e){
-    e.preventDefault();
-    console.log("Resetting refractory clock...");
-    $.post("{{ url_for('reset_refractory') }}")
-      .done(function(data){
-        console.log("Refractory clock reset response:", data);
-        alert("Refractory clock reset successfully!");
-      })
-      .fail(function(jqXHR, textStatus, errorThrown){
-        console.error("Failed to reset refractory clock:", textStatus, errorThrown);
-        alert("Failed to reset refractory clock.");
-      });
-  });
-
   // Handle Alert Ranges Form submission
   $("#alert-config-form").on("submit", function(e){
     e.preventDefault();
     var formData = $(this).serialize();
     console.log("Submitting alert config form:", formData);
-    $.post("{{ url_for('update_alert_config') }}", formData)
+    $.post("{{ url_for('alerts_bp.update_alert_config') }}", formData)
       .done(function(data){
         console.log("Alert config update response:", data);
         alert("Alert configuration updated successfully!");

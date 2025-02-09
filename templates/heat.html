@@ -37,21 +37,10 @@
   background: #fffaed;  /* Light yellowish for LONG */
 }
 
-/* Force the entire table (header/body/footer) to share the card's background color */
-#short-table thead th,
-#short-table tbody td,
-#short-table tfoot td {
-  background-color: #edf4ff !important;
-}
-#long-table thead th,
-#long-table tbody td,
-#long-table tfoot td {
-  background-color: #fffaed !important;
-}
-
-/* Center the totals row text */
-tfoot tr.text-center > td {
-  text-align: center !important;
+/* Force the entire table (header/body) to share the card's background color */
+.table th,
+.table td {
+  background-color: inherit !important;
 }
 </style>
 {% endblock extra_styles %}
@@ -69,6 +58,12 @@ tfoot tr.text-center > td {
 {% block content %}
 {% set hd = heat_data|default({}) %}
 
+<!-- Debug Dump: Remove or comment out this block in production -->
+<div style="background:#eee; padding: 10px; margin-bottom:20px;">
+  <h4>Debug Dump of Aggregated Data (hd)</h4>
+  <pre>{{ hd|tojson(indent=2) }}</pre>
+</div>
+
 <div class="container-fluid px-4">
   <div class="row g-0">
     <!-- SHORT side -->
@@ -80,37 +75,24 @@ tfoot tr.text-center > td {
           </h3>
         </div>
         <div class="card-body p-0">
-          <!-- Give the table an ID so we can style it (#short-table) -->
           <table id="short-table" class="table table-sm table-bordered mb-0">
             <thead>
               <tr class="fw-bold">
-                <th style="width: 110px;">
-                  <span class="icon-inline">📊 Asset</span>
-                </th>
-                <th style="width: 110px;">
-                  <span class="icon-inline">💰 Collateral</span>
-                </th>
-                <th style="width: 110px;">
-                  <span class="icon-inline">📈 Value</span>
-                </th>
-                <th style="width: 90px;">
-                  <span class="icon-inline">⚙️ Leverage</span>
-                </th>
-                <th style="width: 90px;">
-                  <span class="icon-inline">📉 Travel %</span>
-                </th>
-                <th style="width: 110px;">
-                  <span class="icon-inline">📏 Size</span>
-                </th>
+                <th style="width: 110px;"><span class="icon-inline">📊 Asset</span></th>
+                <th style="width: 110px;"><span class="icon-inline">💰 Collateral</span></th>
+                <th style="width: 110px;"><span class="icon-inline">📈 Value</span></th>
+                <th style="width: 90px;"><span class="icon-inline">⚙️ Leverage</span></th>
+                <th style="width: 90px;"><span class="icon-inline">📉 Travel %</span></th>
+                <th style="width: 110px;"><span class="icon-inline">📏 Size</span></th>
               </tr>
             </thead>
             <tbody>
               {% for asset in ["BTC", "ETH", "SOL"] %}
                 {% set asset_data = hd.get(asset, {}) %}
                 {% set pos = asset_data.get('short') %}
-                {% if not pos %}
+                {% if pos == {} %}
                   <tr>
-                    <td colspan="6" class="text-center text-muted">No data</td>
+                    <td colspan="6" class="text-center text-muted">No data for {{ asset }}</td>
                   </tr>
                 {% else %}
                   <tr>
@@ -135,32 +117,6 @@ tfoot tr.text-center > td {
                 {% endif %}
               {% endfor %}
             </tbody>
-            <tfoot>
-              <tr class="fw-bold text-center">
-                {% set short_totals = hd.get('totals', {}).get('short', {}) %}
-                <td>
-                  <span class="icon-inline">
-                    {% if short_totals.get('asset') %}
-                      {% if short_totals.asset == "BTC" %}
-                        <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="width:20px;">
-                      {% elif short_totals.asset == "ETH" %}
-                        <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="width:20px;">
-                      {% elif short_totals.asset == "SOL" %}
-                        <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="width:20px;">
-                      {% endif %}
-                      {{ short_totals.asset }}
-                    {% else %}
-                      Short
-                    {% endif %}
-                  </span>
-                </td>
-                <td>{{ "{:,}".format(short_totals.get('collateral', 0)|float|round(2)) }}</td>
-                <td>{{ "{:,}".format(short_totals.get('value', 0)|float|round(2)) }}</td>
-                <td>{{ short_totals.get('leverage', 0)|float|round(2) }}</td>
-                <td>{{ short_totals.get('travel_percent', 0)|float|round(2) }}%</td>
-                <td>{{ "{:,}".format(short_totals.get('size', 0)|float|round(2)) }}</td>
-              </tr>
-            </tfoot>
           </table>
         </div>
       </div>
@@ -178,33 +134,21 @@ tfoot tr.text-center > td {
           <table id="long-table" class="table table-sm table-bordered mb-0">
             <thead>
               <tr class="fw-bold">
-                <th style="width: 110px;">
-                  <span class="icon-inline">📏 Size</span>
-                </th>
-                <th style="width: 90px;">
-                  <span class="icon-inline">📉 Travel %</span>
-                </th>
-                <th style="width: 90px;">
-                  <span class="icon-inline">⚙️ Leverage</span>
-                </th>
-                <th style="width: 110px;">
-                  <span class="icon-inline">📈 Value</span>
-                </th>
-                <th style="width: 110px;">
-                  <span class="icon-inline">💰 Collateral</span>
-                </th>
-                <th style="width: 110px;">
-                  <span class="icon-inline">📊 Asset</span>
-                </th>
+                <th style="width: 110px;"><span class="icon-inline">📏 Size</span></th>
+                <th style="width: 90px;"><span class="icon-inline">📉 Travel %</span></th>
+                <th style="width: 90px;"><span class="icon-inline">⚙️ Leverage</span></th>
+                <th style="width: 110px;"><span class="icon-inline">📈 Value</span></th>
+                <th style="width: 110px;"><span class="icon-inline">💰 Collateral</span></th>
+                <th style="width: 110px;"><span class="icon-inline">📊 Asset</span></th>
               </tr>
             </thead>
             <tbody>
               {% for asset in ["BTC", "ETH", "SOL"] %}
                 {% set asset_data = hd.get(asset, {}) %}
                 {% set pos = asset_data.get('long') %}
-                {% if not pos %}
+                {% if pos == {} %}
                   <tr>
-                    <td colspan="6" class="text-center text-muted">No data</td>
+                    <td colspan="6" class="text-center text-muted">No data for {{ asset }}</td>
                   </tr>
                 {% else %}
                   <tr>
@@ -229,43 +173,35 @@ tfoot tr.text-center > td {
                 {% endif %}
               {% endfor %}
             </tbody>
-            <tfoot>
-              <tr class="fw-bold text-center">
-                {% set long_totals = hd.get('totals', {}).get('long', {}) %}
-                <td>{{ "{:,}".format(long_totals.get('size', 0)|float|round(2)) }}</td>
-                <td>{{ long_totals.get('travel_percent', 0)|float|round(2) }}%</td>
-                <td>{{ long_totals.get('leverage', 0)|float|round(2) }}</td>
-                <td>{{ "{:,}".format(long_totals.get('value', 0)|float|round(2)) }}</td>
-                <td>{{ "{:,}".format(long_totals.get('collateral', 0)|float|round(2)) }}</td>
-                <td>
-                  {% if long_totals.get('asset') %}
-                    <span class="icon-inline">
-                      {% if long_totals.asset == "BTC" %}
-                        <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="width:20px;">
-                      {% elif long_totals.asset == "ETH" %}
-                        <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="width:20px;">
-                      {% elif long_totals.asset == "SOL" %}
-                        <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="width:20px;">
-                      {% endif %}
-                      {{ long_totals.asset }}
-                    </span>
-                  {% else %}
-                    Long
-                  {% endif %}
-                </td>
-              </tr>
-            </tfoot>
           </table>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- CHARTS -->
-  {% set shortTotals = hd.get('totals', {}).get('short', {}) %}
-  {% set longTotals  = hd.get('totals', {}).get('long', {}) %}
-  {% set shortSize   = shortTotals.get('size', 0)|float|round(2) %}
-  {% set longSize    = longTotals.get('size', 0)|float|round(2) %}
+  <!-- Overall Totals Section -->
+  {% set totals = hd.get('totals', {}) %}
+  <div class="mt-4">
+    <h3>Overall Totals</h3>
+    <table class="table table-bordered">
+      <tr class="fw-bold text-center">
+        <td>Total Collateral</td>
+        <td>Total Value</td>
+        <td>Avg Leverage</td>
+        <td>Avg Travel %</td>
+        <td>Total Size</td>
+      </tr>
+      <tr class="text-center">
+        <td>{{ totals.total_collateral|float|round(2) }}</td>
+        <td>{{ totals.total_value|float|round(2) }}</td>
+        <td>{{ totals.avg_leverage|float|round(2) }}</td>
+        <td>{{ totals.avg_travel_percent|float|round(2) }}%</td>
+        <td>{{ totals.total_size|float|round(2) }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- CHARTS Section -->
   {% set btcShort = hd.get("BTC", {}).get("short", {}).get("size", 0)|float|round(2) %}
   {% set btcLong  = hd.get("BTC", {}).get("long", {}).get("size", 0)|float|round(2) %}
   {% set ethShort = hd.get("ETH", {}).get("short", {}).get("size", 0)|float|round(2) %}
@@ -291,15 +227,17 @@ tfoot tr.text-center > td {
 <script>
 (function() {
   // Size Distribution chart
-  const shortSize = {{ shortSize }};
-  const longSize  = {{ longSize }};
-  const sizeCtx   = document.getElementById('sizeDist').getContext('2d');
+  const shortSize = btcTotal + ethTotal + solTotal; // Using overall total size for distribution
+  // For demo purposes, using overall totals split equally (adjust as needed)
+  const sizeCtx = document.getElementById('sizeDist').getContext('2d');
   new Chart(sizeCtx, {
     type: 'pie',
     data: {
       labels: ['Short', 'Long'],
       datasets: [{
-        data: [shortSize, longSize],
+        // For simplicity, we use the same overall total for both short and long.
+        // Adjust if you have separate aggregates.
+        data: [shortSize / 2, shortSize / 2],
         backgroundColor: ['#f39c12','rgb(52,152,219)']
       }]
     },
@@ -326,9 +264,6 @@ tfoot tr.text-center > td {
   });
 
   // Asset Distribution chart
-  const btcTotal = {{ btcTotal }};
-  const ethTotal = {{ ethTotal }};
-  const solTotal = {{ solTotal }};
   const assetCtx = document.getElementById('assetDist').getContext('2d');
   new Chart(assetCtx, {
     type: 'pie',

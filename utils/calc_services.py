@@ -4,6 +4,39 @@ from typing import Optional, List, Dict
 import sqlite3
 
 
+
+
+@staticmethod
+def get_profit_alert_class(profit, low_thresh, med_thresh, high_thresh):
+    """
+    Returns an alert level based on the profit value:
+      - If profit is below the 'low' threshold, return an empty string (no alert).
+      - If profit is at or above the 'low' threshold but below the 'med' threshold, return "alert-low".
+      - If profit is at or above the 'med' threshold but below the 'high' threshold, return "alert-medium".
+      - If profit is at or above the 'high' threshold, return "alert-high".
+    """
+    try:
+        low = float(low_thresh) if low_thresh not in (None, "") else float('inf')
+    except Exception:
+        low = float('inf')
+    try:
+        med = float(med_thresh) if med_thresh not in (None, "") else float('inf')
+    except Exception:
+        med = float('inf')
+    try:
+        high = float(high_thresh) if high_thresh not in (None, "") else float('inf')
+    except Exception:
+        high = float('inf')
+
+    if profit < low:
+        return ""
+    elif profit < med:
+        return "alert-low"
+    elif profit < high:
+        return "alert-medium"
+    else:
+        return "alert-high"
+
 class CalcServices:
     """
     This class provides all aggregator/analytics logic for positions:
@@ -48,6 +81,7 @@ class CalcServices:
         if size <= 0 or collateral <= 0:
             return 0.0
         return round(size / collateral, 2)
+
 
     def calculate_travel_percent(self,
                                  position_type: str,

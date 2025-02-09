@@ -93,7 +93,7 @@
               </li>
               <!-- Updated endpoint: Changed from 'positions' to 'position_trends' -->
               <li class="nav-item">
-                <a href="{{ url_for('position_trends') }}" class="nav-link">
+                <a href="{{ url_for('positions.position_trends') }}" class="nav-link">
                   <i class="nav-icon bi bi-briefcase"></i>
                   <p>Positions</p>
                 </a>
@@ -107,19 +107,19 @@
               </li>
               <!-- Updated endpoint: Changed from 'price_chart_view' to 'price_charts_view' -->
               <li class="nav-item">
-                <a href="{{ url_for('price_charts_view') }}" class="nav-link">
+                <a href="{{ url_for('prices.price_charts') }}" class="nav-link">
                   <i class="nav-icon bi bi-currency-dollar"></i>
                   <p>Prices</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ url_for('heat') }}" class="nav-link">
+                <a href="{{ url_for('positions.heat_report') }}" class="nav-link">
                   <i class="nav-icon bi bi-shield-check"></i>
                   <p>Hedge Report</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ url_for('alert_config_page') }}" class="nav-link">
+                <a href="{{ url_for('alerts_bp.alert_config_page') }}" class="nav-link">
                   <i class="nav-icon bi bi-exclamation-triangle-fill"></i>
                   <p>Alerts</p>
                 </a>

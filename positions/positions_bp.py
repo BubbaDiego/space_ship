@@ -691,6 +691,46 @@ def save_theme():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+@positions_bp.route("/top_positions", methods=["GET"])
+@positions_bp.route("/top_positions", methods=["GET"])
+def show_top_positions():
+    try:
+        all_positions = PositionService.get_all_positions(DB_PATH)
+        valid_positions = [pos for pos in all_positions if pos.get("travel_percent") is not None]
+        # Top positions: sort descending by travel_percent (most positive first)
+        top_positions = sorted(valid_positions, key=lambda pos: pos["travel_percent"], reverse=True)[:3]
+        # Bottom positions: sort ascending by travel_percent (most negative first)
+        bottom_positions = sorted(valid_positions, key=lambda pos: pos["travel_percent"])[:3]
+        return render_template("top_positions.html", top_positions=top_positions, bottom_positions=bottom_positions)
+    except Exception as e:
+        # Log error and pass empty lists if needed
+        return render_template("top_positions.html", top_positions=[], bottom_positions=[])
+
+
+@positions_bp.route("/top_bottom", methods=["GET"])
+def top_bottom_positions():
+    try:
+        # Retrieve and enrich all positions
+        positions = PositionService.get_all_positions(DB_PATH)
+
+        # Filter out any positions without a travel percent value
+        valid_positions = [p for p in positions if p.get("travel_percent") is not None]
+
+        # Sort positions for top 3 (most positive travel_percent) and bottom 3 (most negative)
+        top_positions = sorted(valid_positions, key=lambda p: p["travel_percent"], reverse=True)[:3]
+        bottom_positions = sorted(valid_positions, key=lambda p: p["travel_percent"])[:3]
+
+        # Render a template that displays these two groups
+        return render_template(
+            "top_bottom_positions.html",
+            top_positions=top_positions,
+            bottom_positions=bottom_positions
+        )
+    except Exception as e:
+        logger.error(f"Error retrieving top and bottom positions: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
 @positions_bp.context_processor
 def update_theme_context():
     config_path = current_app.config.get("CONFIG_PATH", CONFIG_PATH)

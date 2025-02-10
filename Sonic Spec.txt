@@ -1,5 +1,8 @@
 # Project Specification: Crypto Price Monitoring & Alert System
 
+
+FONT - NUNITO / Nunito  from Google Fonts
+
 ## Overview
 This project is a **crypto price monitoring and alert system** designed to track cryptocurrency prices across multiple sources (CoinGecko, CoinMarketCap, CoinPaprika, Binance), store data, and trigger alerts based on configurable thresholds. The system also integrates with Twilio for SMS notifications and provides a Flask-based web interface for user interaction.
 

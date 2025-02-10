@@ -5,26 +5,24 @@ import logging
 from typing import List, Dict, Optional
 from datetime import datetime
 from uuid import uuid4
-
-# Import the DB_PATH constant from config_constants
 from config.config_constants import DB_PATH
 
 class DataLocker:
     """
     A synchronous DataLocker that manages database interactions using sqlite3.
     Stores:
-      - Multiple rows in the 'prices' table (with 'id' as PK, for historical data).
-      - 'positions' table,
-      - 'alerts' table,
-      - 'system_vars' (for timestamps & sources of last updates),
-      - 'brokers' table,
-      - 'wallets' table.
+      - Prices in the 'prices' table.
+      - Positions in the 'positions' table.
+      - Alerts in the 'alerts' table.
+      - System variables (timestamps and balance vars) in the 'system_vars' table.
+      - Brokers in the 'brokers' table.
+      - Wallets in the 'wallets' table.
+      - Aggregated positions snapshots in the 'positions_totals_history' table.
     """
 
     _instance: Optional['DataLocker'] = None
 
     def __init__(self, db_path: Optional[str] = None):
-        # Use the DB_PATH from config_constants if no path is provided.
         if db_path is None:
             db_path = DB_PATH
         self.db_path = db_path
@@ -44,7 +42,8 @@ class DataLocker:
                     last_update_time_positions DATETIME,
                     last_update_positions_source TEXT,
                     last_update_time_prices DATETIME,
-                    last_update_prices_source TEXT
+                    last_update_prices_source TEXT,
+                    last_update_time_jupiter DATETIME
                 )
             """)
             self.cursor.execute("""
@@ -53,12 +52,13 @@ class DataLocker:
                     last_update_time_positions,
                     last_update_positions_source,
                     last_update_time_prices,
-                    last_update_prices_source
+                    last_update_prices_source,
+                    last_update_time_jupiter
                 )
-                VALUES (1, NULL, NULL, NULL, NULL)
+                VALUES (1, NULL, NULL, NULL, NULL, NULL)
             """)
 
-            # Check and add new columns for Jupiter updates if missing
+            # Add new columns for Jupiter updates if missing
             self.cursor.execute("PRAGMA table_info(system_vars)")
             existing_cols = [row["name"] for row in self.cursor.fetchall()]
             if "last_update_time_jupiter" not in existing_cols:
@@ -74,7 +74,7 @@ class DataLocker:
                 """)
                 self.logger.info("Added 'last_update_jupiter_source' column to 'system_vars' table.")
 
-            # Check and add additional balance columns if missing
+            # Add additional balance columns if missing
             self.cursor.execute("PRAGMA table_info(system_vars)")
             existing_cols = [row["name"] for row in self.cursor.fetchall()]
             for col, sql in [
@@ -166,6 +166,20 @@ class DataLocker:
                 )
             """)
 
+            # Create positions_totals_history table if it doesn't exist
+            self.cursor.execute("""
+                CREATE TABLE IF NOT EXISTS positions_totals_history (
+                    id TEXT PRIMARY KEY,
+                    snapshot_time DATETIME,
+                    total_size REAL,
+                    total_value REAL,
+                    total_collateral REAL,
+                    avg_leverage REAL,
+                    avg_travel_percent REAL,
+                    avg_heat_index REAL
+                )
+            """)
+
             self.conn.commit()
             self.logger.debug("Database initialization complete.")
 
@@ -175,24 +189,15 @@ class DataLocker:
 
     @classmethod
     def get_instance(cls, db_path: Optional[str] = None) -> 'DataLocker':
-        """
-        Returns a singleton-ish instance of DataLocker.
-        """
         if cls._instance is None:
             cls._instance = cls(db_path)
         return cls._instance
 
     def _init_sqlite_if_needed(self):
-        """
-        Ensures self.conn and self.cursor are available.
-        Creates the directory for the database file if it does not exist.
-        """
-        # Ensure the directory for the database exists.
         db_dir = os.path.dirname(self.db_path)
         if db_dir and not os.path.exists(db_dir):
             os.makedirs(db_dir, exist_ok=True)
             self.logger.debug(f"Created directory for DB: {db_dir}")
-
         if self.conn is None:
             self.conn = sqlite3.connect(self.db_path, check_same_thread=False)
             self.conn.row_factory = sqlite3.Row
@@ -200,9 +205,6 @@ class DataLocker:
             self.cursor = self.conn.cursor()
 
     def get_db_connection(self) -> sqlite3.Connection:
-        """
-        Returns the underlying sqlite3 Connection.
-        """
         self._init_sqlite_if_needed()
         return self.conn
 
@@ -242,7 +244,6 @@ class DataLocker:
         now_str = datetime.now().isoformat()
         old_count = row["total_reports"] if row else 0
         self.logger.debug(f"Previous total_reports for {api_name}={old_count}")
-
         if row is None:
             self.cursor.execute("""
                 INSERT INTO api_status_counters (api_name, total_reports, last_updated)
@@ -774,6 +775,35 @@ class DataLocker:
         except Exception as ex:
             self.logger.error(f"Error reading raw positions: {ex}", exc_info=True)
             return []
+
+    def record_positions_totals_snapshot(self, totals: dict):
+        """
+        Inserts a snapshot of aggregated positions totals into the positions_totals_history table.
+        """
+        try:
+            self._init_sqlite_if_needed()
+            snapshot_id = str(uuid4())
+            snapshot_time = datetime.now().isoformat()
+            self.cursor.execute("""
+                INSERT INTO positions_totals_history (
+                    id, snapshot_time, total_size, total_value, total_collateral,
+                    avg_leverage, avg_travel_percent, avg_heat_index
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                snapshot_id,
+                snapshot_time,
+                totals.get("total_size", 0.0),
+                totals.get("total_value", 0.0),
+                totals.get("total_collateral", 0.0),
+                totals.get("avg_leverage", 0.0),
+                totals.get("avg_travel_percent", 0.0),
+                totals.get("avg_heat_index", 0.0)
+            ))
+            self.conn.commit()
+            self.logger.debug(f"Recorded positions totals snapshot with ID={snapshot_id}.")
+        except Exception as e:
+            self.logger.exception(f"Error recording positions totals snapshot: {e}")
+            raise
 
     def update_position_size(self, position_id: str, new_size: float):
         try:

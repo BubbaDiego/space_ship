@@ -4,7 +4,7 @@ import time
 import json
 import logging
 import sqlite3
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from datetime import datetime
 from twilio.rest import Client
 
@@ -21,6 +21,7 @@ file_handler.setFormatter(formatter)
 if not logger.handlers:
     logger.addHandler(console_handler)
     logger.addHandler(file_handler)
+
 
 def trigger_twilio_flow(custom_message: str, twilio_config: dict) -> str:
     account_sid = twilio_config.get("account_sid")
@@ -39,9 +40,11 @@ def trigger_twilio_flow(custom_message: str, twilio_config: dict) -> str:
     logger.info("Twilio alert sent.")
     return execution.sid
 
+
 METRIC_DIRECTIONS = {
     "size": "increasing_bad",
 }
+
 
 def get_alert_class(value: float, low_thresh: float, med_thresh: float, high_thresh: float, metric: str) -> str:
     direction = METRIC_DIRECTIONS.get(metric, "increasing_bad")
@@ -61,6 +64,7 @@ def get_alert_class(value: float, low_thresh: float, med_thresh: float, high_thr
             return "alert-high"
     else:
         return "alert-low"
+
 
 class AlertManager:
     ASSET_FULL_NAMES = {
@@ -294,25 +298,27 @@ class AlertManager:
         except Exception as e:
             logger.error("Error sending call for '%s'.", key, exc_info=True)
 
-def load_json_config(json_path: str) -> dict:
-    try:
-        with open(json_path, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except Exception:
-        return {}
+    def load_json_config(self, json_path: str) -> dict:
+        try:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            return {}
 
-def save_config(config: dict, json_path: str):
-    try:
-        with open(json_path, 'w', encoding='utf-8') as f:
-            json.dump(config, f, indent=2)
-    except Exception:
-        pass
+    def save_config(self, config: dict, json_path: str):
+        try:
+            with open(json_path, 'w', encoding='utf-8') as f:
+                json.dump(config, f, indent=2)
+        except Exception:
+            pass
+
+# Create a global AlertManager instance for use in other modules.
+manager = AlertManager(
+    db_path=os.path.abspath("mother_brain.db"),
+    poll_interval=60,
+    config_path="sonic_config.json"
+)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    manager = AlertManager(
-        db_path=os.path.abspath("mother_brain.db"),
-        poll_interval=60,
-        config_path="sonic_config.json"
-    )
     manager.run()

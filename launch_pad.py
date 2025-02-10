@@ -1,5 +1,24 @@
 #!/usr/bin/env python
+"""
+launch_pad.py
+Description:
+  The main Flask application for the Sonic Dashboard. This file:
+    - Loads configuration and sets up logging.
+    - Initializes the Flask app and SocketIO.
+    - Registers blueprints for positions, alerts, and prices.
+    - Defines global routes for the dashboard (e.g., home, assets, price charts, etc.).
+    - Optionally launches a local monitor (local_monitor.py) in a new console window if
+      the '--monitor' command-line flag is provided.
+
+Usage:
+  To run normally:
+      python launch_pad.py
+  To run with the local monitor:
+      python launch_pad.py --monitor
+"""
+
 import os
+import sys
 import json
 import logging
 import sqlite3
@@ -9,63 +28,60 @@ import requests
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-from flask import (
-    Flask, request, jsonify, render_template, redirect, url_for, flash, current_app
-)
+from flask import Flask, request, jsonify, render_template, redirect, url_for, flash, current_app
 from flask_socketio import SocketIO, emit
-from utils.calc_services import CalcServices
 
 # Import configuration and data modules
-from config.config_manager import load_config, update_config
 from config.config_constants import DB_PATH, CONFIG_PATH, BASE_DIR
+from config.config_manager import load_config, update_config, deep_merge_dicts
 from data.data_locker import DataLocker
+from prices.price_monitor import PriceMonitor
 
-# Import blueprints – positions, alerts, and prices are now handled in their own modules.
+# Import blueprints – ensure your directories have __init__.py and that each blueprint is defined at the module level.
 from positions.positions_bp import positions_bp
 from alerts.alerts_bp import alerts_bp
 from prices.prices_bp import prices_bp
 
-# -----------------------------------------------------------------------------
-# Logging & Configuration
-# -----------------------------------------------------------------------------
+# Setup logging
 logger = logging.getLogger("WebAppLogger")
 logger.setLevel(logging.DEBUG)
+if not logger.handlers:
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('[%(levelname)s] %(asctime)s - %(name)s - %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
 
-# Load configuration file
+# Load configuration
 with open(CONFIG_PATH, "r") as f:
     config = json.load(f)
 
-# -----------------------------------------------------------------------------
-# Initialize Flask App & SocketIO
-# -----------------------------------------------------------------------------
+# Initialize Flask app and SocketIO
 app = Flask(__name__)
 app.debug = False
 app.secret_key = "i-like-lamp"
-
 socketio = SocketIO(app)
 
-# Register Blueprints – each encapsulates domain-specific routes.
+# Register Blueprints
 app.register_blueprint(positions_bp, url_prefix="/positions")
 app.register_blueprint(alerts_bp, url_prefix="/alerts")
 app.register_blueprint(prices_bp, url_prefix="/prices")
 
-# -----------------------------------------------------------------------------
-# Global Application Routes (Generic Routes)
-# -----------------------------------------------------------------------------
+
+# Global Routes
 @app.route("/")
 def index():
-    """Render the main dashboard."""
     theme = config.get("theme_profiles", {})
     return render_template("base.html", theme=theme, title="Sonic Dashboard")
 
+
 @app.route("/theme")
 def theme_options():
-    """Render the theme options page."""
     return render_template("theme.html")
+
 
 @app.route("/add_broker", methods=["POST"])
 def add_broker():
-    """Endpoint for adding a broker."""
     dl = DataLocker.get_instance(DB_PATH)
     broker_dict = {
         "name": request.form.get("name"),
@@ -80,9 +96,9 @@ def add_broker():
         flash(f"Error adding broker: {e}", "danger")
     return redirect(url_for("assets"))
 
+
 @app.route("/delete_wallet/<wallet_name>", methods=["POST"])
 def delete_wallet(wallet_name):
-    """Endpoint for deleting a wallet."""
     dl = DataLocker.get_instance(DB_PATH)
     try:
         wallet = dl.get_wallet_by_name(wallet_name)
@@ -97,9 +113,9 @@ def delete_wallet(wallet_name):
         flash(f"Error deleting wallet: {e}", "danger")
     return redirect(url_for("assets"))
 
+
 @app.route("/add_wallet", methods=["POST"])
 def add_wallet():
-    """Endpoint for adding a wallet."""
     dl = DataLocker.get_instance(DB_PATH)
     balance_str = request.form.get("balance", "0.0")
     if balance_str.strip() == "":
@@ -108,7 +124,6 @@ def add_wallet():
         balance_value = float(balance_str)
     except ValueError:
         balance_value = 0.0
-
     wallet = {
         "name": request.form.get("name"),
         "public_address": request.form.get("public_address"),
@@ -123,9 +138,9 @@ def add_wallet():
         flash(f"Error adding wallet: {e}", "danger")
     return redirect(url_for("assets"))
 
+
 @app.route("/assets")
 def assets():
-    """Renders the assets page with balance info, brokers, and wallets."""
     dl = DataLocker.get_instance(DB_PATH)
     balance_vars = dl.get_balance_vars()
     total_brokerage_balance = balance_vars.get("total_brokerage_balance", 0.0)
@@ -140,16 +155,16 @@ def assets():
                            brokers=brokers,
                            wallets=wallets)
 
+
 @app.route("/exchanges")
 def exchanges():
-    """Render the exchanges page with broker information."""
     dl = DataLocker.get_instance(DB_PATH)
     brokers_data = dl.read_brokers()
     return render_template("exchanges.html", brokers=brokers_data)
 
+
 @app.route("/edit_wallet/<wallet_name>", methods=["GET", "POST"])
 def edit_wallet(wallet_name):
-    """Endpoint for editing an existing wallet."""
     dl = DataLocker.get_instance(DB_PATH)
     if request.method == "POST":
         name = request.form.get("name", "").strip()
@@ -178,9 +193,9 @@ def edit_wallet(wallet_name):
             return redirect(url_for("assets"))
         return render_template("edit_wallet.html", wallet=wallet)
 
+
 @app.route("/database-viewer")
 def database_viewer():
-    """Renders a viewer for the SQLite database tables."""
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
@@ -201,15 +216,15 @@ def database_viewer():
     conn.close()
     return render_template("database_viewer.html", db_data=db_data)
 
+
 @app.route("/console_view")
 def console_view():
-    """Renders a page to view the server console log (for debugging)."""
     log_url = "https://www.pythonanywhere.com/user/BubbaDiego/files/var/log/www.deadlypanda.com.error.log"
     return render_template("console_view.html", log_url=log_url)
 
+
 @app.route("/api/get_config")
 def api_get_config():
-    """API endpoint to retrieve the current configuration."""
     try:
         conf = load_config()
         logger.debug("Loaded config: %s", conf)
@@ -218,9 +233,9 @@ def api_get_config():
         logger.error("Error loading config: %s", e, exc_info=True)
         return jsonify({"error": str(e)}), 500
 
+
 @app.route("/save_theme", methods=["POST"])
 def save_theme_route():
-    """Endpoint to save updated theme settings."""
     try:
         new_theme_data = request.get_json()
         if not new_theme_data:
@@ -238,9 +253,9 @@ def save_theme_route():
         current_app.logger.error("Error saving theme: %s", e, exc_info=True)
         return jsonify({"success": False, "error": str(e)}), 500
 
+
 @app.context_processor
 def update_theme_context():
-    """Injects theme configuration into the template context."""
     config_path = current_app.config.get("CONFIG_PATH", CONFIG_PATH)
     try:
         with open(config_path, 'r') as f:
@@ -259,8 +274,24 @@ def update_theme_context():
     }
     return dict(theme=theme)
 
+
 # -----------------------------------------------------------------------------
 # Run the Application
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":
+    monitor = True
+    if len(sys.argv) > 1 and sys.argv[1] == "--monitor":
+        monitor = True
+
+    if monitor:
+        import subprocess
+
+        try:
+            CREATE_NEW_CONSOLE = 0x00000010  # Windows flag for new console window
+            monitor_script = os.path.join(BASE_DIR, "local_monitor.py")
+            subprocess.Popen(["python", monitor_script], creationflags=CREATE_NEW_CONSOLE)
+            logger.info("Launched local_monitor.py in a new console window.")
+        except Exception as e:
+            logger.error(f"Error launching local_monitor.py: {e}", exc_info=True)
+
     app.run(debug=True, host="0.0.0.0", port=5001)

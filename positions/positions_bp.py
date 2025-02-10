@@ -11,6 +11,8 @@ import logging
 import json
 from datetime import datetime
 import pytz
+from datetime import datetime, timedelta
+import asyncio
 
 from flask import (
     Blueprint, request, jsonify, render_template, redirect, url_for, flash, current_app
@@ -20,6 +22,10 @@ from config.config_manager import load_config, update_config
 from config.config_constants import DB_PATH, CONFIG_PATH
 from utils.calc_services import CalcServices, get_profit_alert_class
 from positions.position_service import PositionService
+
+
+import asyncio  # Ensure asyncio is imported
+from alerts.alert_manager import manager as alert_manager
 
 # These helper functions and objects must be defined and imported appropriately.
 # For example, update_prices and manual_check_alerts might come from other modules.
@@ -122,33 +128,129 @@ def list_positions():
 @positions_bp.route("/position_trends", methods=["GET"])
 def position_trends():
     """
-    Renders a trends chart for positions. It aggregates totals from current positions,
-    converts the current time into epoch milliseconds for charting, and passes the data
-    to the 'position_trends.html' template.
-
-    Query Parameters:
-      - timeframe (optional): The number of hours to include in the trends (default is 24).
+    Renders historical trends for positions totals using data from the positions_totals_history table.
+    The timeframe is determined by the 'hours' query parameter (default 24 hours).
     """
     try:
+        # Use "hours" from query parameters instead of "timeframe"
+        hours = request.args.get("hours", default=24, type=int)
+        threshold = datetime.now() - timedelta(hours=hours)
+        logger.debug(f"Querying snapshots from {threshold.isoformat()} onward (last {hours} hours).")
         dl = DataLocker.get_instance(DB_PATH)
-        positions = dl.get_positions()
-        calc_services = CalcServices()
-        totals = calc_services.calculate_totals(positions)
+        dl._init_sqlite_if_needed()  # Ensure connection is ready.
+        cursor = dl.conn.cursor()
+        cursor.execute("""
+            SELECT *
+              FROM positions_totals_history
+             WHERE snapshot_time >= ?
+             ORDER BY snapshot_time ASC
+        """, (threshold.isoformat(),))
+        rows = cursor.fetchall()
+        cursor.close()
+        logger.debug(f"Found {len(rows)} snapshot rows in the selected timeframe.")
 
-        # Convert current time to epoch milliseconds for chart plotting.
-        current_timestamp = int(datetime.now().timestamp() * 1000)
-
+        # Build chart_data with consistent key names for the front-end.
         chart_data = {
-            "collateral": [[current_timestamp, totals.get("total_collateral", 0)]],
-            "value": [[current_timestamp, totals.get("total_value", 0)]],
-            "size": [[current_timestamp, totals.get("total_size", 0)]],
-            "leverage": [[current_timestamp, totals.get("avg_leverage", 0)]],
-            "travel_percent": [[current_timestamp, totals.get("avg_travel_percent", 0)]],
-            "heat": [[current_timestamp, totals.get("avg_heat_index", 0)]]
+            "collateral": [],
+            "value": [],
+            "size": [],
+            "avg_leverage": [],
+            "avg_travel_percent": [],
+            "avg_heat": []
         }
 
-        timeframe = request.args.get("timeframe", default=24, type=int)
-        return render_template("position_trends.html", chart_data=chart_data, timeframe=timeframe)
+        if not rows:
+            # Fallback: if no snapshot rows exist, use current totals to produce a data point.
+            calc_services = CalcServices()
+            positions = dl.get_positions()
+            totals = calc_services.calculate_totals(positions)
+            current_timestamp = int(datetime.now().timestamp() * 1000)
+            chart_data = {
+                "collateral": [[current_timestamp, totals.get("total_collateral", 0)]],
+                "value": [[current_timestamp, totals.get("total_value", 0)]],
+                "size": [[current_timestamp, totals.get("total_size", 0)]],
+                "avg_leverage": [[current_timestamp, totals.get("avg_leverage", 0)]],
+                "avg_travel_percent": [[current_timestamp, totals.get("avg_travel_percent", 0)]],
+                "avg_heat": [[current_timestamp, totals.get("avg_heat_index", 0)]]
+            }
+            logger.debug("No snapshots found; using fallback current totals.")
+        else:
+            for row in rows:
+                # Since rows are sqlite3.Row objects, use bracket notation.
+                snapshot_time = datetime.fromisoformat(row["snapshot_time"])
+                epoch_ms = int(snapshot_time.timestamp() * 1000)
+                chart_data["collateral"].append([epoch_ms, float(row["total_collateral"] or 0)])
+                chart_data["value"].append([epoch_ms, float(row["total_value"] or 0)])
+                chart_data["size"].append([epoch_ms, float(row["total_size"] or 0)])
+                chart_data["avg_leverage"].append([epoch_ms, float(row["avg_leverage"] or 0)])
+                chart_data["avg_travel_percent"].append([epoch_ms, float(row["avg_travel_percent"] or 0)])
+                chart_data["avg_heat"].append([epoch_ms, float(row["avg_heat_index"] or 0)])
+
+        return render_template("position_trends.html", chart_data=chart_data, timeframe=hours)
+    except Exception as e:
+        logger.error("Error in position_trends: %s", e, exc_info=True)
+        return jsonify({"error": str(e)}), 500@positions_bp.route("/position_trends", methods=["GET"])
+def position_trends():
+    """
+    Renders historical trends for positions totals using data from the positions_totals_history table.
+    The timeframe is determined by the 'hours' query parameter (default 24 hours).
+    """
+    try:
+        # Use "hours" from query parameters instead of "timeframe"
+        hours = request.args.get("hours", default=24, type=int)
+        threshold = datetime.now() - timedelta(hours=hours)
+        logger.debug(f"Querying snapshots from {threshold.isoformat()} onward (last {hours} hours).")
+        dl = DataLocker.get_instance(DB_PATH)
+        dl._init_sqlite_if_needed()  # Ensure connection is ready.
+        cursor = dl.conn.cursor()
+        cursor.execute("""
+            SELECT *
+              FROM positions_totals_history
+             WHERE snapshot_time >= ?
+             ORDER BY snapshot_time ASC
+        """, (threshold.isoformat(),))
+        rows = cursor.fetchall()
+        cursor.close()
+        logger.debug(f"Found {len(rows)} snapshot rows in the selected timeframe.")
+
+        # Build chart_data with consistent key names for the front-end.
+        chart_data = {
+            "collateral": [],
+            "value": [],
+            "size": [],
+            "avg_leverage": [],
+            "avg_travel_percent": [],
+            "avg_heat": []
+        }
+
+        if not rows:
+            # Fallback: if no snapshot rows exist, use current totals to produce a data point.
+            calc_services = CalcServices()
+            positions = dl.get_positions()
+            totals = calc_services.calculate_totals(positions)
+            current_timestamp = int(datetime.now().timestamp() * 1000)
+            chart_data = {
+                "collateral": [[current_timestamp, totals.get("total_collateral", 0)]],
+                "value": [[current_timestamp, totals.get("total_value", 0)]],
+                "size": [[current_timestamp, totals.get("total_size", 0)]],
+                "avg_leverage": [[current_timestamp, totals.get("avg_leverage", 0)]],
+                "avg_travel_percent": [[current_timestamp, totals.get("avg_travel_percent", 0)]],
+                "avg_heat": [[current_timestamp, totals.get("avg_heat_index", 0)]]
+            }
+            logger.debug("No snapshots found; using fallback current totals.")
+        else:
+            for row in rows:
+                # Since rows are sqlite3.Row objects, use bracket notation.
+                snapshot_time = datetime.fromisoformat(row["snapshot_time"])
+                epoch_ms = int(snapshot_time.timestamp() * 1000)
+                chart_data["collateral"].append([epoch_ms, float(row["total_collateral"] or 0)])
+                chart_data["value"].append([epoch_ms, float(row["total_value"] or 0)])
+                chart_data["size"].append([epoch_ms, float(row["total_size"] or 0)])
+                chart_data["avg_leverage"].append([epoch_ms, float(row["avg_leverage"] or 0)])
+                chart_data["avg_travel_percent"].append([epoch_ms, float(row["avg_travel_percent"] or 0)])
+                chart_data["avg_heat"].append([epoch_ms, float(row["avg_heat_index"] or 0)])
+
+        return render_template("position_trends.html", chart_data=chart_data, timeframe=hours)
     except Exception as e:
         logger.error("Error in position_trends: %s", e, exc_info=True)
         return jsonify({"error": str(e)}), 500
@@ -429,30 +531,76 @@ def delete_alert(alert_id):
         return jsonify({"error": str(e)}), 500
 
 
+# Helper function to retrieve the SocketIO instance from the current app
+def get_socketio():
+    return current_app.extensions.get('socketio')
+
+
 @positions_bp.route("/update_jupiter", methods=["GET", "POST"])
 def update_jupiter():
     """
     Updates Jupiter positions by:
       1. Deleting existing Jupiter positions.
       2. Fetching new positions via the external Jupiter API.
-      3. (Optionally) Updating prices and manually checking alerts.
+      3. Optionally updating prices and manually checking alerts.
       4. Recording a snapshot of the positions.
       5. Updating last update timestamps and emitting a SocketIO event.
     """
+    def update_prices_wrapper():
+        """Helper function that wraps the PriceMonitor update_prices call."""
+        try:
+            from prices.price_monitor import PriceMonitor  # Updated import path
+            pm = PriceMonitor(db_path=DB_PATH, config_path=CONFIG_PATH)
+            asyncio.run(pm.update_prices())
+            class DummyResponse:
+                status_code = 200
+                def get_json(self):
+                    return {"message": "Prices updated successfully"}
+            return DummyResponse()
+        except Exception as ex:
+            err_msg = str(ex)
+            logger.error(f"Error in update_prices_wrapper: {err_msg}", exc_info=True)
+            class DummyErrorResponse:
+                status_code = 500
+                def get_json(self):
+                    return {"error": err_msg}
+            return DummyErrorResponse()
+
     try:
+        logger.debug(">>> START update_jupiter route.")
+
+        # Get the source parameter (default to "API")
         source = request.args.get("source") or request.form.get("source") or "API"
-        # Delete existing Jupiter positions via the service layer
+        logger.debug(f">>> Source parameter: {source}")
+
+        # Step 1: Delete existing Jupiter positions.
+        logger.debug(">>> Deleting existing Jupiter positions...")
         PositionService.delete_all_jupiter_positions(DB_PATH)
-        # Update Jupiter positions and capture the result details
+        logger.debug(">>> Deletion of Jupiter positions completed.")
+
+        # Step 2: Update Jupiter positions.
+        logger.debug(">>> Updating Jupiter positions via PositionService...")
         update_result = PositionService.update_jupiter_positions(DB_PATH)
+        logger.debug(f">>> Update result: {update_result}")
         if "error" in update_result:
+            logger.error(">>> Error during Jupiter positions update: " + str(update_result))
             return jsonify(update_result), 500
-        # Update prices and check alerts if needed
-        prices_resp = update_prices()
+
+        # Step 3: Update prices and check alerts.
+        logger.debug(">>> Triggering price update...")
+        prices_resp = update_prices_wrapper()  # Use the helper function.
+        logger.debug(f">>> Prices update response: {prices_resp.status_code} - {prices_resp.get_json()}")
         if prices_resp.status_code != 200:
+            logger.error(f">>> Price update failed with status code: {prices_resp.status_code}")
             return prices_resp
-        manual_check_alerts()
+
+        logger.debug(">>> Performing manual alert check via alert_manager.check_alerts()...")
+        alert_manager.check_alerts()
+        logger.debug(">>> Manual alert check completed.")
+
+        # Step 4: Update last update timestamps.
         now = datetime.now()
+        logger.debug(f">>> Current timestamp: {now.isoformat()}")
         dl = DataLocker.get_instance(DB_PATH)
         dl.set_last_update_times(
             positions_dt=now,
@@ -460,23 +608,51 @@ def update_jupiter():
             prices_dt=now,
             prices_source=source
         )
+        logger.debug(">>> Last update timestamps set successfully.")
+
+        # Step 5: Record positions snapshot.
         try:
-            PositionService.record_positions_snapshot(DB_PATH)
-        except Exception as e:
-            logger.error(f"Error recording positions snapshot: {e}", exc_info=True)
-        socketio.emit('data_updated', {
-            'message': f"Jupiter positions + Prices updated successfully by {source}!",
-            'last_update_time_positions': now.isoformat(),
-            'last_update_time_prices': now.isoformat()
-        })
-        return jsonify({
+            logger.debug(">>> Recording positions snapshot...")
+            try:
+                PositionService.record_positions_snapshot(DB_PATH)
+                logger.debug(">>> Positions snapshot recorded successfully.")
+            except AttributeError as attr_err:
+                logger.warning(f">>> Snapshot method not found: {attr_err}. Skipping snapshot recording.")
+            except Exception as snap_err:
+                logger.error(f">>> Error recording positions snapshot: {snap_err}", exc_info=True)
+        except Exception as snap_err:
+            logger.error(f">>> Error in snapshot recording block: {snap_err}", exc_info=True)
+
+        # Step 6: Emit SocketIO event.
+        logger.debug(">>> Emitting SocketIO event for data update...")
+        socketio_inst = get_socketio()
+        if socketio_inst:
+            socketio_inst.emit('data_updated', {
+                'message': f"Jupiter positions + Prices updated successfully by {source}!",
+                'last_update_time_positions': now.isoformat(),
+                'last_update_time_prices': now.isoformat()
+            })
+            logger.debug(">>> SocketIO event emitted successfully.")
+        else:
+            logger.warning("SocketIO instance not found; skipping event emission.")
+
+        # *** New: Print updated totals with PST timestamp to console ***
+        updated_totals = dl.get_balance_vars()
+        pst_timestamp = _convert_iso_to_pst(now.isoformat())
+        print(f"Jupiter Update Complete: Totals = {updated_totals} at {pst_timestamp}")
+        logger.debug(f">>> Jupiter Update Complete: Totals = {updated_totals} at {pst_timestamp}")
+
+        response_data = {
             "message": f"Jupiter positions + Prices updated successfully by {source}!",
             "source": source,
             "last_update_time_positions": now.isoformat(),
             "last_update_time_prices": now.isoformat()
-        }), 200
+        }
+        logger.debug(">>> update_jupiter route completed successfully.")
+        return jsonify(response_data), 200
+
     except Exception as e:
-        logger.error(f"Error in update_jupiter: {e}", exc_info=True)
+        logger.error(f">>> ERROR in update_jupiter: {e}", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
 

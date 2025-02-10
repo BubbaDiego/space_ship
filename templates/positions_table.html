@@ -3,18 +3,35 @@
 
 {% block extra_styles %}
 <style>
-  /* Ensure the update buttons container displays buttons side-by-side */
+  /* Container for update buttons */
   .update-info-container {
     display: flex;
     justify-content: space-between;
     margin-bottom: 1rem;
+  }
+
+  /* Alert cell background colors */
+  td.alert-low {
+    background-color: #d4edda !important; /* green */
+  }
+  td.alert-medium {
+    background-color: #fff3cd !important; /* yellow */
+  }
+  td.alert-high {
+    background-color: #f8d7da !important; /* red */
+  }
+
+  /* Additional styling for wallet cell */
+  .wallet-name {
+    vertical-align: middle;
+    font-weight: bold;
   }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container my-3">
-  <!-- Update Info Container: two update buttons -->
+  <!-- Update Info Container: Two update buttons -->
   <div class="update-info-container">
     <!-- Left update button for "crypto" -->
     {% set update_type = "crypto" %}
@@ -52,11 +69,11 @@
             <!-- Asset Column -->
             <td>
               {% if pos.asset_type == 'BTC' %}
-                <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="width: 40px; height: 40px;" />
+                <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="width: 40px; height: 40px;">
               {% elif pos.asset_type == 'ETH' %}
-                <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="width: 40px; height: 40px;" />
+                <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="width: 40px; height: 40px;">
               {% elif pos.asset_type == 'SOL' %}
-                <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="width: 40px; height: 40px;" />
+                <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="width: 40px; height: 40px;">
               {% else %}
                 {{ pos.asset_type }}
               {% endif %}
@@ -116,7 +133,7 @@
             </td>
             <!-- Wallet Column -->
             <td>
-              {% if pos.wallet_name %}
+              {% if pos.wallet_name and pos.wallet_name.name %}
                 {% if pos.wallet_name.image_path %}
                   {% set wallet_image = pos.wallet_name.image_path %}
                   {% if '\\' in wallet_image %}
@@ -127,7 +144,7 @@
                     {% set wallet_filename = wallet_image %}
                   {% endif %}
                   {% set wallet_url = url_for('static', filename='images/' ~ wallet_filename) %}
-                  <img src="{{ wallet_url }}" alt="{{ pos.wallet_name.name }}" style="width: 40px; height: 40px; vertical-align: middle; margin-right: 5px;" />
+                  <img src="{{ wallet_url }}" alt="{{ pos.wallet_name.name }}" style="width: 40px; height: 40px; vertical-align: middle; margin-right: 5px;">
                 {% endif %}
                 <span class="wallet-name">{{ pos.wallet_name.name }}</span>
               {% else %}
@@ -139,7 +156,7 @@
         </tbody>
         <tfoot>
           {% set total_profit = positions|sum(attribute='pnl_after_fees_usd') %}
-          <tr style="font-weight: bold; background-color: {{ theme.sidebar.bg or 'bg-primary' }}; text-align: center !important;">
+          <tr style="font-weight: bold; background-color: {{ theme.sidebar.bg or 'bg-primary' }}; text-align: center;">
             <td>TOTALS</td>
             <td></td>
             <td id="footProfit">{{ "{:,.2f}".format(total_profit) }}</td>
@@ -163,8 +180,8 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   console.log("Positions table extra_scripts loaded");
+
   // Define a function to trigger update for positions.
-  // This function uses the correct URL for the update route in the positions blueprint.
   const updatePositions = () => {
     fetch("/positions/update_jupiter?source=user", { method: "POST" })
       .then(response => response.json())
@@ -175,7 +192,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .catch(err => console.error("Error updating positions:", err));
   };
 
-  // The update buttons are now included via update_button.html.
+  // You could also bind updatePositions() to some UI elements if needed.
 });
 </script>
 {% endblock %}

@@ -10,22 +10,18 @@
     <div class="btn-group" role="group" aria-label="Timeframe selection">
       <input type="radio" class="btn-check" name="hours" id="hours1" value="1" autocomplete="off" {% if timeframe == 1 %}checked{% endif %} onchange="this.form.submit();">
       <label class="btn btn-outline-primary" for="hours1">1</label>
-
       <input type="radio" class="btn-check" name="hours" id="hours3" value="3" autocomplete="off" {% if timeframe == 3 %}checked{% endif %} onchange="this.form.submit();">
       <label class="btn btn-outline-primary" for="hours3">3</label>
-
       <input type="radio" class="btn-check" name="hours" id="hours6" value="6" autocomplete="off" {% if timeframe == 6 %}checked{% endif %} onchange="this.form.submit();">
       <label class="btn btn-outline-primary" for="hours6">6</label>
-
       <input type="radio" class="btn-check" name="hours" id="hours12" value="12" autocomplete="off" {% if timeframe == 12 %}checked{% endif %} onchange="this.form.submit();">
       <label class="btn btn-outline-primary" for="hours12">12</label>
-
       <input type="radio" class="btn-check" name="hours" id="hours24" value="24" autocomplete="off" {% if timeframe == 24 %}checked{% endif %} onchange="this.form.submit();">
       <label class="btn btn-outline-primary" for="hours24">24</label>
     </div>
   </form>
 
-  <!-- Charts: two rows of three charts each -->
+  <!-- Charts Grid -->
   <div class="row">
     <!-- Collateral Chart -->
     <div class="col-md-4 mb-4">
@@ -104,7 +100,9 @@
 <!-- Include ApexCharts from CDN -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
+  // Debug: Log the chartData object to inspect its structure.
   var chartData = {{ chart_data | tojson }};
+  console.log("Chart Data:", chartData);
   var currentTimeframe = {{ timeframe }};
 
   function formatNumber(val) {
@@ -159,6 +157,7 @@
         style: { fontSize: '16px', fontWeight: 'bold' }
       },
       tooltip: {
+        x: { format: 'dd MMM HH:mm' },
         y: {
           formatter: function(val) {
             return formatNumber(val);
@@ -168,7 +167,7 @@
     };
   }
 
-  // Render charts for each metric
+  // Render charts for each metric using consistent keys
   var collateralChart = new ApexCharts(document.querySelector("#chart-collateral"), createChartOptions("Collateral", chartData.collateral));
   var valueChart = new ApexCharts(document.querySelector("#chart-value"), createChartOptions("Value", chartData.value));
   var sizeChart = new ApexCharts(document.querySelector("#chart-size"), createChartOptions("Size", chartData.size));

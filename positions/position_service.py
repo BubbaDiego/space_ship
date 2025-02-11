@@ -40,13 +40,16 @@ class PositionService:
     def get_all_positions(db_path: str = DB_PATH) -> List[Dict[str, Any]]:
         """
         Retrieve all positions from the database and enrich each one with calculated data.
+        Converts sqlite3.Row objects to dicts for easier processing.
         """
         try:
             dl = DataLocker.get_instance(db_path)
             raw_positions = dl.read_positions()
             positions = []
             for pos in raw_positions:
-                enriched = PositionService.enrich_position(pos)
+                # Explicitly convert sqlite3.Row to a dict using its keys.
+                pos_dict = { key: pos[key] for key in pos.keys() }
+                enriched = PositionService.enrich_position(pos_dict)
                 positions.append(enriched)
             return positions
         except Exception as e:

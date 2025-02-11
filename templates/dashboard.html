@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+  <li class="breadcrumb-item active">Dashboard</li>
+{% endblock %}
+
+{% block content %}
+  <div class="container-fluid">
+    <!-- Top Positions Section -->
+    <div class="row">
+      <div class="col-12">
+        {% include "top_positions.html" %}
+      </div>
+    </div>
+    <!-- Comparison Charts Section (All 3 charts side by side) -->
+    <div class="row mt-4">
+      {% include "comparison_chart.html" %}
+    </div>
+  </div>
+{% endblock %}

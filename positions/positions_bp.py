@@ -696,14 +696,28 @@ def save_theme():
 def show_top_positions():
     try:
         all_positions = PositionService.get_all_positions(DB_PATH)
-        valid_positions = [pos for pos in all_positions if pos.get("travel_percent") is not None]
-        # Top positions: sort descending by travel_percent (most positive first)
-        top_positions = sorted(valid_positions, key=lambda pos: pos["travel_percent"], reverse=True)[:3]
-        # Bottom positions: sort ascending by travel_percent (most negative first)
-        bottom_positions = sorted(valid_positions, key=lambda pos: pos["travel_percent"])[:3]
+        # Filter positions with a valid current_travel_percent
+        valid_positions = [pos for pos in all_positions if pos.get("current_travel_percent") is not None]
+
+        # Sort positions for top and bottom lists
+        top_positions = sorted(valid_positions, key=lambda pos: pos["current_travel_percent"], reverse=True)[:3]
+        bottom_positions = sorted(valid_positions, key=lambda pos: pos["current_travel_percent"])[:3]
+
+        # Print alert state for each top position
+        print("DEBUG: Alert States for Top Positions:")
+        for pos in top_positions:
+            print("Top Position - ID: {}, Alert State: {}".format(pos.get("id", "unknown"),
+                                                                  pos.get("alert_state", "N/A")))
+
+        # Print alert state for each bottom position
+        print("DEBUG: Alert States for Bottom Positions:")
+        for pos in bottom_positions:
+            print("Bottom Position - ID: {}, Alert State: {}".format(pos.get("id", "unknown"),
+                                                                     pos.get("alert_state", "N/A")))
+
         return render_template("top_positions.html", top_positions=top_positions, bottom_positions=bottom_positions)
     except Exception as e:
-        # Log error and pass empty lists if needed
+        print("Error retrieving top positions: {}".format(e))
         return render_template("top_positions.html", top_positions=[], bottom_positions=[])
 
 

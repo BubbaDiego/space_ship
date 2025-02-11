@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Portfolio - Sonic Admin{% endblock %}
+
+{% block page_title %}Portfolio{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.dashboard') }}">Home</a></li>
+<li class="breadcrumb-item active">Portfolio</li>
+{% endblock %}
+
+{% block content %}
+
+<!-- Portfolio Performance Chart -->
+<div class="card mb-3">
+  <div class="card-header">
+    <h3 class="card-title">Portfolio Performance</h3>
+    <div class="card-tools">
+       <a href="{{ url_for('portfolio.add_entry') }}" class="btn btn-sm btn-primary">Add New Entry</a>
+    </div>
+  </div>
+  <div class="card-body">
+    <canvas id="portfolioChart" style="width: 100%; height: 300px;"></canvas>
+  </div>
+</div>
+
+<!-- Debug Section: Display raw portfolio data -->
+<div class="card mb-3">
+  <div class="card-header">
+    <h3 class="card-title">Debug: Portfolio Data</h3>
+  </div>
+  <div class="card-body">
+    <pre>{{ portfolio_data | tojson(indent=2) }}</pre>
+  </div>
+</div>
+
+<!-- Portfolio Entries Table with Inline Edit/Delete -->
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Portfolio Entries</h3>
+  </div>
+  <div class="card-body">
+    {% if portfolio_data %}
+    <table class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Snapshot Time</th>
+          <th>Total Value</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in portfolio_data %}
+        <tr>
+          <td>{{ entry.id }}</td>
+          <td>{{ entry.snapshot_time }}</td>
+          <td>{{ entry.total_value }}</td>
+          <td>
+            <!-- Edit button toggles an inline collapse for editing -->
+            <button class="btn btn-sm btn-warning" type="button" data-bs-toggle="collapse" data-bs-target="#editForm{{ entry.id }}" aria-expanded="false" aria-controls="editForm{{ entry.id }}">Edit</button>
+            <form method="post" action="{{ url_for('portfolio.delete_entry', entry_id=entry.id) }}" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to delete this entry?');">
+              <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+        <!-- Inline Edit Form (collapsed by default) -->
+        <tr class="collapse" id="editForm{{ entry.id }}">
+          <td colspan="4">
+            <form method="post" action="{{ url_for('portfolio.edit_entry', entry_id=entry.id) }}">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label for="edit_total_value_{{ entry.id }}" class="form-label">Total Value</label>
+                  <input type="number" step="0.01" class="form-control" id="edit_total_value_{{ entry.id }}" name="total_value" value="{{ entry.total_value }}" required>
+                </div>
+                <div class="col-md-4 align-self-end">
+                  <button type="submit" class="btn btn-primary">Save</button>
+                  <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#editForm{{ entry.id }}">Cancel</button>
+                </div>
+              </div>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>No portfolio entries found.</p>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Include Chart.js and adapter for time scales -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+<script>
+  // Build the chart using portfolio_data passed from the Flask view
+  const portfolioData = {{ portfolio_data | tojson }};
+  const labels = portfolioData.map(item => item.snapshot_time);
+  const data = portfolioData.map(item => item.total_value);
+
+  const ctx = document.getElementById('portfolioChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Total Portfolio Value',
+        data: data,
+        borderColor: 'rgba(75, 192, 192, 1)',
+        fill: false
+      }]
+    },
+    options: {
+      scales: {
+        x: {
+          type: 'time',
+          time: {
+            unit: 'day'
+          }
+        },
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>
+{% endblock %}

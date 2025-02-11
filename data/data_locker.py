@@ -166,6 +166,15 @@ class DataLocker:
                 )
             """)
 
+            # Create portfolio_entries table if it doesn't exist
+            self.cursor.execute("""
+                            CREATE TABLE IF NOT EXISTS portfolio_entries (
+                                id TEXT PRIMARY KEY,
+                                snapshot_time DATETIME,
+                                total_value REAL NOT NULL
+                            )
+                        """)
+
             # Create positions_totals_history table if it doesn't exist
             self.cursor.execute("""
                 CREATE TABLE IF NOT EXISTS positions_totals_history (
@@ -362,11 +371,12 @@ class DataLocker:
             self.logger.exception(f"Unexpected error in get_prices: {e}")
             return []
 
-    def read_positions(self) -> List[dict]:
-        self._init_sqlite_if_needed()
-        self.cursor.execute("SELECT * FROM positions")
-        rows = self.cursor.fetchall()
-        return [dict(r) for r in rows]
+    def read_positions(self):
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT * FROM positions")
+        rows = cursor.fetchall()
+        cursor.close()
+        return rows
 
     def read_prices(self) -> List[dict]:
         self._init_sqlite_if_needed()
@@ -405,6 +415,55 @@ class DataLocker:
         except Exception as ex:
             self.logger.exception(f"Unexpected error in delete_price: {ex}")
             raise
+
+    def get_portfolio_history(self) -> List[dict]:
+        """
+        Retrieves the portfolio snapshots from the positions_totals_history table,
+        ordered by snapshot_time in ascending order.
+        This history can be used to graph portfolio performance over time.
+        """
+        self._init_sqlite_if_needed()
+        self.cursor.execute("""
+            SELECT *
+              FROM positions_totals_history
+             ORDER BY snapshot_time ASC
+        """)
+        rows = self.cursor.fetchall()
+        portfolio_history = [dict(row) for row in rows]
+        self.logger.debug(f"Fetched {len(portfolio_history)} portfolio snapshots.")
+        return portfolio_history
+
+    def get_latest_portfolio_snapshot(self) -> Optional[dict]:
+        """
+        Retrieves the most recent portfolio snapshot from the positions_totals_history table.
+        """
+        self._init_sqlite_if_needed()
+        self.cursor.execute("""
+            SELECT *
+              FROM positions_totals_history
+             ORDER BY snapshot_time DESC
+             LIMIT 1
+        """)
+        row = self.cursor.fetchone()
+        latest_snapshot = dict(row) if row else None
+        self.logger.debug("Retrieved latest portfolio snapshot." if latest_snapshot else "No portfolio snapshot found.")
+        return latest_snapshot
+
+    def record_portfolio_snapshot(self, totals: dict):
+        """
+        Alias for record_positions_totals_snapshot, for clarity in the portfolio context.
+        Inserts a snapshot of aggregated portfolio totals into the positions_totals_history table.
+        Expected keys in 'totals' dict:
+          - total_size
+          - total_value
+          - total_collateral
+          - avg_leverage
+          - avg_travel_percent
+          - avg_heat_index
+        """
+        # You can simply call your existing method here.
+        self.record_positions_totals_snapshot(totals)
+        self.logger.debug("Recorded portfolio snapshot via record_portfolio_snapshot.")
 
     # ----------------------------------------------------------------
     # ALERTS
@@ -821,6 +880,87 @@ class DataLocker:
         except Exception as ex:
             self.logger.exception(f"Error update_position_size: {ex}")
             raise
+
+        # ----------------------------------------------------------------
+        # PORTFOLIO ENTRIES CRUD
+        # ----------------------------------------------------------------
+
+    def add_portfolio_entry(self, entry: dict):
+        """
+        Inserts a new portfolio entry into the portfolio_entries table.
+        Expected keys in 'entry' dict:
+          - id (optional; if not provided, will be generated)
+          - snapshot_time (optional; defaults to current timestamp)
+          - total_value (required)
+        """
+        self._init_sqlite_if_needed()
+        if "id" not in entry:
+            entry["id"] = str(uuid4())
+        if "snapshot_time" not in entry:
+            entry["snapshot_time"] = datetime.now().isoformat()
+        if "total_value" not in entry:
+            raise ValueError("total_value is required for a portfolio entry")
+        self.cursor.execute("""
+             INSERT INTO portfolio_entries (id, snapshot_time, total_value)
+             VALUES (:id, :snapshot_time, :total_value)
+         """, entry)
+        self.conn.commit()
+        self.logger.debug(f"Inserted portfolio entry with ID={entry['id']}")
+
+    def get_portfolio_entries(self) -> List[dict]:
+        """
+        Retrieves all portfolio entries from the portfolio_entries table,
+        ordered by snapshot_time in ascending order.
+        """
+        self._init_sqlite_if_needed()
+        self.cursor.execute("""
+             SELECT * FROM portfolio_entries
+             ORDER BY snapshot_time ASC
+         """)
+        rows = self.cursor.fetchall()
+        entries = [dict(row) for row in rows]
+        self.logger.debug(f"Retrieved {len(entries)} portfolio entries.")
+        return entries
+
+    def get_portfolio_entry_by_id(self, entry_id: str) -> Optional[dict]:
+        """
+        Retrieves a portfolio entry by its id.
+        """
+        self._init_sqlite_if_needed()
+        self.cursor.execute("""
+             SELECT * FROM portfolio_entries
+             WHERE id = ?
+             LIMIT 1
+         """, (entry_id,))
+        row = self.cursor.fetchone()
+        return dict(row) if row else None
+
+    def update_portfolio_entry(self, entry_id: str, updated_fields: dict):
+        """
+        Updates an existing portfolio entry identified by entry_id with the provided fields.
+        """
+        self._init_sqlite_if_needed()
+        set_clause = ", ".join([f"{key}=:{key}" for key in updated_fields.keys()])
+        updated_fields["id"] = entry_id
+        self.cursor.execute(f"""
+             UPDATE portfolio_entries
+                SET {set_clause}
+              WHERE id=:id
+         """, updated_fields)
+        self.conn.commit()
+        self.logger.debug(f"Updated portfolio entry {entry_id} with fields {updated_fields}")
+
+    def delete_portfolio_entry(self, entry_id: str):
+        """
+        Deletes the portfolio entry with the given id.
+        """
+        self._init_sqlite_if_needed()
+        self.cursor.execute("""
+             DELETE FROM portfolio_entries
+             WHERE id = ?
+         """, (entry_id,))
+        self.conn.commit()
+        self.logger.debug(f"Deleted portfolio entry with ID={entry_id}")
 
     def get_wallet_by_name(self, wallet_name: str) -> Optional[dict]:
         self._init_sqlite_if_needed()

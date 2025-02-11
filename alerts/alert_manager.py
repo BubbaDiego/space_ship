@@ -193,27 +193,27 @@ class AlertManager:
             logger.error("%s %s (ID: %s): Error converting profit.", asset_full, position_type, position_id)
             return ""
 
-        if profit_val == 0.0:
-            try:
-                computed_profit = float(pos.get("value", 0)) - float(pos.get("collateral", 0))
-                profit_val = computed_profit
-            except Exception:
-                logger.error("%s %s (ID: %s): Error computing fallback profit.", asset_full, position_type, position_id)
-                return ""
+        # If profit is less than or equal to 0, do not trigger any alert.
+        if profit_val <= 0:
+            return ""
 
         profit_config = self.config.get("alert_ranges", {}).get("profit_ranges", {})
         if not profit_config.get("enabled", False):
             return ""
 
         try:
-            low_thresh = float(profit_config.get("low", 0.0))
-            med_thresh = float(profit_config.get("medium", 0.0))
-            high_thresh = float(profit_config.get("high", 0.0))
+            # For profit, we use thresholds: low=25, medium=50, high=75.
+            low_thresh = float(profit_config.get("low", 25))
+            med_thresh = float(profit_config.get("medium", 50))
+            high_thresh = float(profit_config.get("high", 75))
         except Exception:
             logger.error("%s %s (ID: %s): Error parsing profit thresholds.", asset_full, position_type, position_id)
             return ""
 
-        logger.debug("Profit check: value=%.2f, limits: low=%.2f, medium=%.2f, high=%.2f", profit_val, low_thresh, med_thresh, high_thresh)
+        logger.debug("Profit check: value=%.2f, thresholds: low=%.2f, med=%.2f, high=%.2f", profit_val, low_thresh,
+                     med_thresh, high_thresh)
+
+        # Only trigger an alert if profit is at least low_thresh.
         if profit_val < low_thresh:
             return ""
         elif profit_val < med_thresh:
@@ -226,7 +226,7 @@ class AlertManager:
         profit_key = f"profit-{asset_full}-{position_type}-{position_id}"
         last_level = self.last_profit.get(profit_key, "none")
         level_order = {"none": 0, "low": 1, "medium": 2, "high": 3}
-        if level_order[current_level] <= level_order[last_level]:
+        if level_order[current_level] <= level_order.get(last_level, 0):
             self.last_profit[profit_key] = current_level
             return ""
         now = time.time()

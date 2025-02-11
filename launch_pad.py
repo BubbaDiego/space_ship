@@ -5,8 +5,8 @@ Description:
   The main Flask application for the Sonic Dashboard. This file:
     - Loads configuration and sets up logging.
     - Initializes the Flask app and SocketIO.
-    - Registers blueprints for positions, alerts, and prices.
-    - Defines global routes for the dashboard (e.g., home, assets, price charts, etc.).
+    - Registers blueprints for positions, alerts, prices, dashboard, **and portfolio**.
+    - Defines global routes for non-dashboard-specific functionality (e.g., assets, exchanges, etc.).
     - Optionally launches a local monitor (local_monitor.py) in a new console window if
       the '--monitor' command-line flag is provided.
 
@@ -35,12 +35,17 @@ from flask_socketio import SocketIO, emit
 from config.config_constants import DB_PATH, CONFIG_PATH, BASE_DIR
 from config.config_manager import load_config, update_config, deep_merge_dicts
 from data.data_locker import DataLocker
+from positions.position_service import PositionService
 from prices.price_monitor import PriceMonitor
 
-# Import blueprints – ensure your directories have __init__.py and that each blueprint is defined at the module level.
+# Import blueprints – ensure your directories have an __init__.py file
 from positions.positions_bp import positions_bp
 from alerts.alerts_bp import alerts_bp
 from prices.prices_bp import prices_bp
+from dashboard.dashboard_bp import dashboard_bp  # Dashboard-specific routes and API endpoints
+
+# *** NEW: Import the portfolio blueprint ***
+from portfolio.portfolio_bp import portfolio_bp
 
 # Setup logging
 logger = logging.getLogger("WebAppLogger")
@@ -66,19 +71,22 @@ socketio = SocketIO(app)
 app.register_blueprint(positions_bp, url_prefix="/positions")
 app.register_blueprint(alerts_bp, url_prefix="/alerts")
 app.register_blueprint(prices_bp, url_prefix="/prices")
+app.register_blueprint(dashboard_bp)  # Dashboard-specific routes and API endpoints
 
+# *** NEW: Register the portfolio blueprint ***
+app.register_blueprint(portfolio_bp, url_prefix="/portfolio")
 
-# Global Routes
+# --- Alias endpoints if needed ---
+# For example, if your base.html uses url_for('dashboard') we can alias it:
+if "dashboard.index" in app.view_functions:
+    app.add_url_rule("/dashboard", endpoint="dashboard", view_func=app.view_functions["dashboard.index"])
+
+# Global Routes for non-dashboard-specific functionality
+
 @app.route("/")
 def index():
     theme = config.get("theme_profiles", {})
     return render_template("base.html", theme=theme, title="Sonic Dashboard")
-
-
-@app.route("/theme")
-def theme_options():
-    return render_template("theme.html")
-
 
 @app.route("/add_broker", methods=["POST"])
 def add_broker():
@@ -96,7 +104,6 @@ def add_broker():
         flash(f"Error adding broker: {e}", "danger")
     return redirect(url_for("assets"))
 
-
 @app.route("/delete_wallet/<wallet_name>", methods=["POST"])
 def delete_wallet(wallet_name):
     dl = DataLocker.get_instance(DB_PATH)
@@ -112,7 +119,6 @@ def delete_wallet(wallet_name):
     except Exception as e:
         flash(f"Error deleting wallet: {e}", "danger")
     return redirect(url_for("assets"))
-
 
 @app.route("/add_wallet", methods=["POST"])
 def add_wallet():
@@ -138,7 +144,6 @@ def add_wallet():
         flash(f"Error adding wallet: {e}", "danger")
     return redirect(url_for("assets"))
 
-
 @app.route("/assets")
 def assets():
     dl = DataLocker.get_instance(DB_PATH)
@@ -155,13 +160,11 @@ def assets():
                            brokers=brokers,
                            wallets=wallets)
 
-
 @app.route("/exchanges")
 def exchanges():
     dl = DataLocker.get_instance(DB_PATH)
     brokers_data = dl.read_brokers()
     return render_template("exchanges.html", brokers=brokers_data)
-
 
 @app.route("/edit_wallet/<wallet_name>", methods=["GET", "POST"])
 def edit_wallet(wallet_name):
@@ -193,7 +196,6 @@ def edit_wallet(wallet_name):
             return redirect(url_for("assets"))
         return render_template("edit_wallet.html", wallet=wallet)
 
-
 @app.route("/database-viewer")
 def database_viewer():
     conn = sqlite3.connect(DB_PATH)
@@ -216,12 +218,10 @@ def database_viewer():
     conn.close()
     return render_template("database_viewer.html", db_data=db_data)
 
-
 @app.route("/console_view")
 def console_view():
     log_url = "https://www.pythonanywhere.com/user/BubbaDiego/files/var/log/www.deadlypanda.com.error.log"
     return render_template("console_view.html", log_url=log_url)
-
 
 @app.route("/api/get_config")
 def api_get_config():
@@ -232,7 +232,6 @@ def api_get_config():
     except Exception as e:
         logger.error("Error loading config: %s", e, exc_info=True)
         return jsonify({"error": str(e)}), 500
-
 
 @app.route("/save_theme", methods=["POST"])
 def save_theme_route():
@@ -253,7 +252,9 @@ def save_theme_route():
         current_app.logger.error("Error saving theme: %s", e, exc_info=True)
         return jsonify({"success": False, "error": str(e)}), 500
 
-
+# ---------------------------------------------------------------------------
+# Context Processor
+# ---------------------------------------------------------------------------
 @app.context_processor
 def update_theme_context():
     config_path = current_app.config.get("CONFIG_PATH", CONFIG_PATH)
@@ -274,10 +275,9 @@ def update_theme_context():
     }
     return dict(theme=theme)
 
-
-# -----------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 # Run the Application
-# -----------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 if __name__ == "__main__":
     monitor = True
     if len(sys.argv) > 1 and sys.argv[1] == "--monitor":
@@ -285,7 +285,6 @@ if __name__ == "__main__":
 
     if monitor:
         import subprocess
-
         try:
             CREATE_NEW_CONSOLE = 0x00000010  # Windows flag for new console window
             monitor_script = os.path.join(BASE_DIR, "local_monitor.py")

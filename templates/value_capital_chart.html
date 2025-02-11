@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Dashboard with Comparison Charts</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Unified Chart Modules Demo for Size, Value, and Collateral" />
+    <meta name="keywords" content="charts, apexcharts, unified, comparison" />
+    <meta name="author" content="Your Name" />
+
+    <!-- Include ApexCharts library -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <!-- Optional CSS -->
+    <style>
+      body { font-family: Arial, sans-serif; margin: 20px; }
+      .card {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 20px;
+      }
+      .card-header {
+        background-color: #f5f5f5;
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .card-title { margin: 0; font-size: 1.25rem; }
+      .card-body { padding: 10px; }
+      .card-tools button { cursor: pointer; margin-left: 5px; }
+      .dark { background-color: #333; color: #fff; }
+    </style>
+  </head>
+  <body>
+    <script>
+      console.log("Comparison Chart Script loaded!");
+    </script>
+
+    <!-- Container for all charts -->
+    <div id="charts-container"></div>
+
+    <script>
+      // Unified ChartModule class.
+      class ChartModule {
+        /**
+         * @param {object} config - Configuration for this chart.
+         * Expected properties:
+         *   - type: string identifier ("size", "value", "collateral")
+         *   - title: The card title.
+         *   - labels: Array of two strings for chart labels.
+         *   - apiEndpoint: URL of the API endpoint returning JSON { series: [...] }.
+         *   - fallbackSeries: Fallback data, e.g., [0, 0].
+         *   - colors: Object with 'light' and 'dark' arrays of colors.
+         *   - containerId: ID for the inner chart container.
+         *   - boxId: ID for the outer container (for theme toggling).
+         *   - cardId: ID for the entire card.
+         */
+        constructor(config) {
+          this.type = config.type;
+          this.title = config.title;
+          this.labels = config.labels;
+          this.apiEndpoint = config.apiEndpoint;
+          this.fallbackSeries = config.fallbackSeries || [0, 0];
+          this.colors = config.colors;
+          this.containerId = config.containerId;
+          this.boxId = config.boxId;
+          this.cardId = config.cardId || `card-${this.type}`;
+          this.currentTheme = 'light';
+          this.isDonut = false;
+          this.chart = null;
+        }
+
+        // Render the HTML card.
+        renderCard(parentSelector) {
+          const parent = document.querySelector(parentSelector);
+          if (!parent) {
+            console.error("Parent container not found:", parentSelector);
+            return;
+          }
+          const cardHTML = `
+            <div class="card card-lightblue" id="${this.cardId}">
+              <div class="card-header">
+                <h3 class="card-title">${this.title}</h3>
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <button type="button" class="btn btn-tool" data-card-widget="remove">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div id="${this.boxId}">
+                  <div id="${this.containerId}"></div>
+                </div>
+              </div>
+            </div>
+          `;
+          parent.insertAdjacentHTML('beforeend', cardHTML);
+        }
+
+        // Initialize the chart and set up events.
+        initChart() {
+          const chartOptions = {
+            series: this.fallbackSeries,
+            chart: {
+              type: 'pie',
+              height: 350,
+              background: 'transparent'
+            },
+            labels: this.labels,
+            theme: { mode: this.currentTheme },
+            dataLabels: { enabled: true, style: { fontSize: '1.4rem' } },
+            stroke: { width: 2, colors: ['#ffffff'] },
+            colors: this.currentTheme === 'light' ? this.colors.light : this.colors.dark,
+            legend: { position: 'bottom' }
+          };
+
+          console.log(`${this.type} Chart options:`, chartOptions);
+          const chartElement = document.querySelector(`#${this.containerId}`);
+          if (!chartElement) {
+            console.error(`${this.type} Chart container (#${this.containerId}) not found`);
+            return;
+          }
+          this.chart = new ApexCharts(chartElement, chartOptions);
+          this.chart.render().then(() => {
+            console.log(`${this.type} Chart rendered successfully`);
+            // Fetch dynamic data.
+            fetch(this.apiEndpoint)
+              .then(response => {
+                console.log(`${this.type} API response status:`, response.status);
+                return response.json();
+              })
+              .then(data => {
+                console.log(`${this.type} API raw data:`, data);
+                if (data && Array.isArray(data.series)) {
+                  this.chart.updateOptions({ series: data.series });
+                  console.log(`Updated ${this.type} Chart data:`, data.series);
+                } else {
+                  console.warn(`${this.type} API returned unexpected format`, data);
+                }
+              })
+              .catch(error => {
+                console.error(`Error fetching ${this.type} data from API:`, error);
+              });
+          }).catch(error => {
+            console.error(`Error rendering ${this.type} Chart:`, error);
+          });
+
+          // Toggle between pie and donut on click.
+          chartElement.addEventListener("click", (event) => {
+            this.isDonut = !this.isDonut;
+            this.chart.updateOptions({ chart: { type: this.isDonut ? 'donut' : 'pie' } });
+            console.log(`Toggled ${this.type} Chart type to:`, this.isDonut ? 'donut' : 'pie');
+            event.stopPropagation();
+          });
+
+          // Toggle light/dark theme on the outer container.
+          const chartBox = document.querySelector(`#${this.boxId}`);
+          if (!chartBox) {
+            console.error(`${this.type} Chart Box (#${this.boxId}) not found`);
+            return;
+          }
+          chartBox.addEventListener("click", () => {
+            this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+            if (this.currentTheme === 'dark') {
+              chartBox.classList.add('dark');
+            } else {
+              chartBox.classList.remove('dark');
+            }
+            this.chart.updateOptions({
+              theme: { mode: this.currentTheme },
+              colors: this.currentTheme === 'light' ? this.colors.light : this.colors.dark
+            });
+            console.log(`${this.type} Chart theme toggled to:`, this.currentTheme);
+          });
+        }
+
+        // Convenience method.
+        init(parentSelector) {
+          this.renderCard(parentSelector);
+          // If the DOM is already loaded:
+          if (document.readyState !== 'loading') {
+            this.initChart();
+          } else {
+            document.addEventListener('DOMContentLoaded', () => {
+              this.initChart();
+            });
+          }
+        }
+      }
+
+      // When DOM is ready, create three instances.
+      document.addEventListener('DOMContentLoaded', () => {
+        console.log("DOM content loaded - initializing comparison charts");
+
+        // Instance for "Size" Composition
+        const sizeChart = new ChartModule({
+          type: 'size',
+          title: 'Size Composition',
+          labels: ['Long Positions', 'Short Positions'],
+          apiEndpoint: '/api/size_composition',
+          fallbackSeries: [0, 0],
+          colors: {
+            light: ['#0d6efd', '#dc3545'],
+            dark: ['#66b0ff', '#ff6b81']
+          },
+          containerId: 'positions-chart',
+          boxId: 'size-chart-box',
+          cardId: 'card-size'
+        });
+        sizeChart.init('#charts-container');
+
+        // Instance for "Value" Composition
+        const valueChart = new ChartModule({
+          type: 'value_capital',
+          title: 'Value Composition',
+          labels: ['Total Value', 'Total Capital'],
+          apiEndpoint: '/api/value_composition',
+          fallbackSeries: [0, 0],
+          colors: {
+            light: ['#6f42c1', '#20c997'],
+            dark: ['#9b59b6', '#1abc9c']
+          },
+          containerId: 'value-chart',
+          boxId: 'value-chart-box',
+          cardId: 'card-value'
+        });
+        valueChart.init('#charts-container');
+
+        // Instance for "Collateral" Composition
+        const collateralChart = new ChartModule({
+          type: 'collateral',
+          title: 'Collateral Composition',
+          labels: ['Long Collateral', 'Short Collateral'],
+          apiEndpoint: '/api/collateral_composition',
+          fallbackSeries: [0, 0],
+          colors: {
+            light: ['#28a745', '#ffc107'],   // e.g., green vs. yellow/orange
+            dark: ['#5cb85c', '#f0ad4e']
+          },
+          containerId: 'collateral-chart',
+          boxId: 'collateral-chart-box',
+          cardId: 'card-collateral'
+        });
+        collateralChart.init('#charts-container');
+      });
+    </script>
+  </body>
+</html>

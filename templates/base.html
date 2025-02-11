@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>{{ title if title else "AdminLTE 4 | Dashboard" }}</title>
+    <title>{% block title %}AdminLTE 4 | Dashboard{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="AdminLTE is a Free Bootstrap 5 Admin Dashboard, 30 example pages using Vanilla JS." />
     <meta name="keywords" content="bootstrap 5, admin dashboard, charts, adminlte" />
@@ -33,9 +33,7 @@
                 <i class="bi bi-list"></i>
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('index') }}">Home</a>
-            </li>
+            {# Extra Dashboard link removed from header #}
           </ul>
           <ul class="navbar-nav ms-auto">
             <!-- Color Mode Toggler -->
@@ -77,7 +75,7 @@
       <!-- Sidebar -->
       <aside class="app-sidebar shadow {% if theme.sidebar.bg %}{{ theme.sidebar.bg }}{% else %}bg-body-secondary{% endif %}" data-bs-theme="{{ theme.sidebar.color_mode }}">
         <div class="sidebar-brand">
-          <a href="{{ url_for('index') }}" class="brand-link">
+          <a href="{{ url_for('dashboard.dashboard') }}" class="brand-link">
             <img src="{{ url_for('static', filename='images/corner_logo_owl.jpg') }}" alt="Sonic Logo" class="brand-image rounded-circle shadow" />
             <span class="brand-text fw-light">Sonic Admin</span>
           </a>
@@ -86,33 +84,29 @@
           <nav class="mt-2">
             <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
               <li class="nav-item">
-                <a href="{{ url_for('index') }}" class="nav-link">
+                <a href="{{ url_for('dashboard.dashboard') }}" class="nav-link">
                   <i class="nav-icon bi bi-speedometer"></i>
                   <p>Dashboard</p>
                 </a>
               </li>
-              <!-- Updated endpoint: Changed from 'positions' to 'position_trends' -->
               <li class="nav-item">
                 <a href="{{ url_for('positions.position_trends') }}" class="nav-link">
                   <i class="nav-icon bi bi-briefcase"></i>
                   <p>Positions</p>
                 </a>
               </li>
-              <!-- New nav item for Top Positions -->
               <li class="nav-item">
                 <a href="{{ url_for('positions.show_top_positions') }}" class="nav-link">
                   <i class="nav-icon bi bi-star-fill"></i>
                   <p>Top Positions</p>
                 </a>
               </li>
-              <!-- New nav item for Positions Table -->
               <li class="nav-item">
                 <a href="{{ url_for('positions.positions_table') }}" class="nav-link">
                   <i class="nav-icon bi bi-table"></i>
                   <p>Positions Table</p>
                 </a>
               </li>
-              <!-- Updated endpoint: Changed from 'price_chart_view' to 'price_charts_view' -->
               <li class="nav-item">
                 <a href="{{ url_for('prices.price_charts') }}" class="nav-link">
                   <i class="nav-icon bi bi-currency-dollar"></i>
@@ -131,6 +125,13 @@
                   <p>Alerts</p>
                 </a>
               </li>
+              <!-- New Portfolio Nav Item -->
+              <li class="nav-item">
+                <a href="{{ url_for('portfolio.index') }}" class="nav-link">
+                  <i class="nav-icon bi bi-wallet2"></i>
+                  <p>Portfolio</p>
+                </a>
+              </li>
               <li class="nav-item">
                 <a href="{{ url_for('database_viewer') }}" class="nav-link">
                   <i class="nav-icon bi bi-database"></i>
@@ -138,7 +139,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ url_for('theme_options') }}" class="nav-link">
+                <a href="{{ url_for('dashboard.theme_options') }}" class="nav-link">
                   <i class="nav-icon bi bi-palette-fill"></i>
                   <p>Theme</p>
                 </a>
@@ -157,18 +158,12 @@
 
       <!-- Main Content -->
       <main class="app-main">
-        <!-- App Content Header -->
+        <!-- App Content Header (Breadcrumb removed) -->
         <div class="app-content-header">
           <div class="container-fluid">
             <div class="row">
-              <div class="col-sm-6">
+              <div class="col-12">
                 <h3 class="mb-0">{% block page_title %}{% endblock %}</h3>
-              </div>
-              <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-end">
-                  <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
-                  {% block breadcrumb %}{% endblock %}
-                </ol>
               </div>
             </div>
           </div>
@@ -179,11 +174,7 @@
         <div class="app-content">
           <div class="container-fluid">
             {% block content %}{% endblock %}
-            <!-- Auto-update info panel (smaller box with 12-hr PST times) -->
-            <div id="updateInfo" class="alert alert-info mt-3" role="alert" style="font-size: 0.8rem; padding: 5px;">
-              <p class="mb-1">Positions last updated: <span id="last_update_time_positions">--</span></p>
-              <p class="mb-0">Prices last updated: <span id="last_update_time_prices">--</span></p>
-            </div>
+            {# Update info panel removed #}
           </div>
         </div>
         <!-- End App Content -->
@@ -260,43 +251,6 @@
           }
         }
       });
-    </script>
-
-    <!-- AJAX Polling Script for Auto-Updating Data with 12-hr PST Formatting -->
-    <script>
-      // Function to format an ISO datetime string to a 12-hr clock in PST (America/Los_Angeles)
-      function formatToPST(isoString) {
-        if (!isoString) return '--';
-        const date = new Date(isoString);
-        const options = {
-          hour: 'numeric',
-          minute: 'numeric',
-          second: 'numeric',
-          hour12: true,
-          timeZone: 'America/Los_Angeles'
-        };
-        return new Intl.DateTimeFormat('en-US', options).format(date);
-      }
-
-      async function fetchLatestUpdate() {
-        try {
-          const response = await fetch('/latest_update_info');
-          if (!response.ok) {
-            console.error("Error fetching update info:", response.status);
-            return;
-          }
-          const data = await response.json();
-          document.getElementById('last_update_time_positions').textContent = formatToPST(data.last_update_time_positions);
-          document.getElementById('last_update_time_prices').textContent = formatToPST(data.last_update_time_prices);
-        } catch (error) {
-          console.error("Error fetching update info:", error);
-        }
-      }
-
-      // Poll every 5 seconds
-      setInterval(fetchLatestUpdate, 5000);
-      // Initial fetch on page load
-      fetchLatestUpdate();
     </script>
 
     {% block extra_scripts %}{% endblock %}

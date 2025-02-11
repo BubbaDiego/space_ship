@@ -52,7 +52,7 @@
         top: 0;
         bottom: 0;
         width: 3px;
-        background-color: rgba(0, 0, 0, 0.7);
+        background-color: rgba(0,0,0,0.7);
         z-index: 5;
       }
       .liquidation-fill {
@@ -63,11 +63,11 @@
       .liquidation-fill.striped {
         background-image: linear-gradient(
           45deg,
-          rgba(255, 255, 255, 0.15) 25%,
+          rgba(255,255,255,0.15) 25%,
           transparent 25%,
           transparent 50%,
-          rgba(255, 255, 255, 0.15) 50%,
-          rgba(255, 255, 255, 0.15) 75%,
+          rgba(255,255,255,0.15) 50%,
+          rgba(255,255,255,0.15) 75%,
           transparent 75%,
           transparent
         );
@@ -83,6 +83,13 @@
         border-radius: 50%;
         border: 1px solid #ccc;
         z-index: 10;
+      }
+      /* Travel percent text styling centered relative to the fill */
+      .progress-text {
+        position: absolute;
+        font-weight: bold;
+        color: white;
+        z-index: 20;
       }
     </style>
   </head>
@@ -110,22 +117,38 @@
                 <div class="liquidation-fill striped bg-success"
                      style="right: 50%; width: calc(({{ travel }} / 100) * 50%);">
                 </div>
-                {# Calculate left edge of the fill for positive values:
-                   left_edge = 50% - ((travel/100)*50%) #}
+                <!-- For positive travel, the fill's left boundary is at:
+                     calc(50% - ((travel/100)*50%))
+                     The center of the fill is:
+                     calc(50% - ((travel/100)*25%))
+                     Position the asset icon so that it overlaps that edge -->
                 <img class="asset-icon"
-                     src="{{ url_for('static', filename='images/' ~ pos.asset ~ '_logo.png') }}"
-                     alt="{{ pos.asset }} logo"
-                     style="left: calc(50% - ({{ travel / 100 * 50 }}%) - 15px);">
+                     src="{{ url_for('static', filename='images/' ~ (pos.asset_type|default('btc')|lower) ~ '_logo.png') }}"
+                     alt="{{ pos.asset_type|default('btc')|lower }} logo"
+                     style="left: calc(50% - ({{ travel }} / 100 * 50%) - 15px); {% if (pos.asset_type|default('btc')|lower) == 'eth' %}background-color: white;{% endif %}">
+                {% if travel > 25 %}
+                  <span class="progress-text" style="left: calc(50% - ({{ travel }} / 100 * 25%)); top: 50%; transform: translate(-50%, -50%);">
+                    {{ travel }}%
+                  </span>
+                {% endif %}
               {% else %}
                 <div class="liquidation-fill striped bg-danger"
                      style="left: 50%; width: calc(({{ travel | abs }} / 100) * 50%);">
                 </div>
-                {# Calculate right edge of the fill for negative values:
-                   right_edge = 50% + ((abs(travel)/100)*50%) #}
+                <!-- For negative travel, the fill's right boundary is at:
+                     calc(50% + ((|travel|/100)*50%))
+                     The center of the fill is:
+                     calc(50% + ((|travel|/100)*25%))
+                     Position the asset icon so that it overlaps that edge -->
                 <img class="asset-icon"
-                     src="{{ url_for('static', filename='images/' ~ pos.asset ~ '_logo.png') }}"
-                     alt="{{ pos.asset }} logo"
-                     style="left: calc(50% + ({{ (travel | abs) / 100 * 50 }}%) + 2px);">
+                     src="{{ url_for('static', filename='images/' ~ (pos.asset_type|default('btc')|lower) ~ '_logo.png') }}"
+                     alt="{{ pos.asset_type|default('btc')|lower }} logo"
+                     style="left: calc(50% + ({{ travel | abs }} / 100 * 50%) - 15px); {% if (pos.asset_type|default('btc')|lower) == 'eth' %}background-color: white;{% endif %}">
+                {% if travel < -25 %}
+                  <span class="progress-text" style="left: calc(50% + ({{ travel | abs }} / 100 * 25%)); top: 50%; transform: translate(-50%, -50%);">
+                    {{ travel }}%
+                  </span>
+                {% endif %}
               {% endif %}
             </div>
           {% endfor %}

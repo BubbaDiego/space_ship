@@ -1,6 +1,29 @@
 {% extends "base.html" %}
 
-{% block page_title %}Dashboard{% endblock %}
+{% block page_title %}
+<div class="d-flex align-items-center">
+  <!-- Jupiter Update Button -->
+  <div class="update-button me-2" data-type="{{ update_type | default('jupiter') }}">
+    {% if update_type == 'crypto' %}
+      <img id="update-button-img-{{ update_type }}"
+           src="{{ url_for('static', filename='images/crypto_icon.jpg') }}"
+           alt="Crypto Update Button"
+           style="width: 70px; height: 70px; cursor: pointer;">
+    {% elif update_type == 'jupiter' %}
+      <img id="update-button-img-{{ update_type }}"
+           src="{{ url_for('static', filename='images/jupiter.jpg') }}"
+           alt="Jupiter Update Button"
+           style="width: 70px; height: 70px; cursor: pointer;">
+    {% else %}
+      <img id="update-button-img-{{ update_type }}"
+           src="{{ url_for('static', filename='images/crypto_icon.jpg') }}"
+           alt="All Update Button"
+           style="width: 70px; height: 70px; cursor: pointer;">
+    {% endif %}
+  </div>
+  Dashboard
+</div>
+{% endblock %}
 
 {% block breadcrumb %}
   <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
@@ -9,6 +32,12 @@
 
 {% block content %}
   <div class="container-fluid">
+    <!-- Liquidation Bar Section -->
+    <div class="row">
+      <div class="col-12">
+        {% include "liquidation_bar.html" %}
+      </div>
+    </div>
     <!-- Top Positions Section -->
     <div class="row">
       <div class="col-12">
@@ -20,4 +49,54 @@
       {% include "comparison_chart.html" %}
     </div>
   </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const container = document.querySelector('.update-button[data-type="{{ update_type | default("jupiter") }}"]');
+  if (!container) return;
+  const img = container.querySelector('img');
+
+  // Define the image URLs
+  const cryptoURL = "{{ url_for('static', filename='images/crypto_icon.jpg') }}";
+  const jupiterURL = "{{ url_for('static', filename='images/jupiter.jpg') }}";
+
+  container.addEventListener("click", function() {
+    console.log("Update button (type {{ update_type | default('jupiter') }}) clicked.");
+    // Add spin class to trigger animation
+    img.classList.add("spin");
+
+    // Trigger update via fetch to the update route
+    fetch("/positions/update_jupiter?source={{ update_type | default('jupiter') }}", { method: "POST" })
+      .then(response => response.json())
+      .then(data => {
+          console.log("Update response:", data);
+          // Remove spin animation after update
+          img.classList.remove("spin");
+          // If type 'all', alternate the displayed image
+          if ("{{ update_type | default('jupiter') }}" === "all") {
+              if (img.getAttribute("src") === cryptoURL) {
+                  img.setAttribute("src", jupiterURL);
+              } else {
+                  img.setAttribute("src", cryptoURL);
+              }
+          }
+      })
+      .catch(err => {
+          console.error("Error updating positions:", err);
+          img.classList.remove("spin");
+      });
+  });
+});
+</script>
+<style>
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.spin {
+  animation: spin 1s linear infinite;
+}
+</style>
 {% endblock %}

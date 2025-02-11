@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <title>Dashboard with Comparison Charts</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Unified Chart Modules Demo for Size, Value, and Collateral" />
+    <meta name="description" content="Unified Chart Modules Demo for Size and Collateral" />
     <meta name="keywords" content="charts, apexcharts, unified, comparison" />
     <meta name="author" content="Your Name" />
 
@@ -53,29 +53,30 @@
       console.log("Comparison Chart Script loaded!");
     </script>
 
-    <!-- Row container for the three charts -->
+    <!-- Row container for the two charts: Size and Collateral -->
     <div class="row" id="charts-container">
-      <div class="col-md-4" id="col-size"></div>
-      <div class="col-md-4" id="col-value"></div>
-      <div class="col-md-4" id="col-collateral"></div>
+      <div class="col-md-6" id="col-size"></div>
+      <div class="col-md-6" id="col-collateral"></div>
     </div>
 
+    <!-- Optional Debug Section -->
+    <div class="card" style="margin-top: 20px;">
+      <div class="card-header">
+        <h3 class="card-title">Dashboard Debug Info</h3>
+      </div>
+      <div class="card-body">
+        <p>View raw chart data from the API endpoints:</p>
+        <ul>
+          <li><a href="{{ url_for('dashboard.api_size_composition') }}" target="_blank">Size Composition Data</a></li>
+          <li><a href="{{ url_for('dashboard.api_collateral_composition') }}" target="_blank">Collateral Composition Data</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Include Scripts -->
     <script>
       // Unified ChartModule class.
       class ChartModule {
-        /**
-         * @param {object} config - Configuration for this chart.
-         * Expected properties:
-         *   - type: string identifier ("size", "value", "collateral")
-         *   - title: The card title.
-         *   - labels: Array of two strings for chart labels.
-         *   - apiEndpoint: URL of the API endpoint returning JSON { series: [...] }.
-         *   - fallbackSeries: Fallback data, e.g., [0, 0].
-         *   - colors: Object with 'light' and 'dark' arrays of colors.
-         *   - containerId: ID for the inner chart container.
-         *   - boxId: ID for the outer container (for theme toggling).
-         *   - cardId: ID for the entire card.
-         */
         constructor(config) {
           this.type = config.type;
           this.title = config.title;
@@ -91,16 +92,14 @@
           this.chart = null;
         }
 
-        // Render the HTML card and insert it into the specified parent element.
         renderCard(parentSelector) {
           const parent = document.querySelector(parentSelector);
           if (!parent) {
             console.error("Parent container not found:", parentSelector);
             return;
           }
-          // Added a dedicated theme toggle button (data-theme-toggle)
           const cardHTML = `
-            <div class="card card-lightblue" id="${this.cardId}">
+            <div class="card" id="${this.cardId}">
               <div class="card-header">
                 <h3 class="card-title">${this.title}</h3>
                 <div class="card-tools">
@@ -125,7 +124,6 @@
           parent.insertAdjacentHTML('beforeend', cardHTML);
         }
 
-        // Initialize the ApexCharts instance and set up events.
         initChart() {
           const chartOptions = {
             series: this.fallbackSeries,
@@ -151,7 +149,6 @@
           this.chart = new ApexCharts(chartElement, chartOptions);
           this.chart.render().then(() => {
             console.log(`${this.type} Chart rendered successfully`);
-            // Fetch dynamic data from API.
             fetch(this.apiEndpoint)
               .then(response => {
                 console.log(`${this.type} API response status:`, response.status);
@@ -173,21 +170,19 @@
             console.error(`Error rendering ${this.type} Chart:`, error);
           });
 
-          // Toggle between pie and donut on clicking the chart element.
-          chartElement.addEventListener("click", (event) => {
+          const chartElementDom = document.querySelector(`#${this.containerId}`);
+          chartElementDom.addEventListener("click", (event) => {
             this.isDonut = !this.isDonut;
             this.chart.updateOptions({ chart: { type: this.isDonut ? 'donut' : 'pie' } });
             console.log(`Toggled ${this.type} Chart type to:`, this.isDonut ? 'donut' : 'pie');
             event.stopPropagation();
           });
 
-          // Attach event listener to the dedicated theme toggle button.
           const themeToggleButton = document.querySelector(`#${this.cardId} [data-theme-toggle]`);
           if (themeToggleButton) {
             themeToggleButton.addEventListener("click", (event) => {
-              event.stopPropagation(); // Prevent propagation to other click handlers.
+              event.stopPropagation();
               this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
-              // Optionally toggle a class on the outer container.
               const chartBox = document.querySelector(`#${this.boxId}`);
               if (chartBox) {
                 if (this.currentTheme === 'dark') {
@@ -207,7 +202,6 @@
           }
         }
 
-        // Convenience method.
         init(parentSelector) {
           this.renderCard(parentSelector);
           if (document.readyState !== 'loading') {
@@ -220,7 +214,6 @@
         }
       }
 
-      // Initialize the three chart instances when DOM is ready.
       document.addEventListener('DOMContentLoaded', () => {
         console.log("DOM content loaded - initializing comparison charts");
 
@@ -232,7 +225,7 @@
           apiEndpoint: '/api/size_composition',
           fallbackSeries: [0, 0],
           colors: {
-            light: ['#0d6efd', '#dc3545'],
+            light: ['#0d6efd', '#5dcc8e'],
             dark: ['#66b0ff', '#ff6b81']
           },
           containerId: 'positions-chart',
@@ -241,22 +234,7 @@
         });
         sizeChart.init("#col-size");
 
-        // Instance for "Value" Composition.
-        const valueChart = new ChartModule({
-          type: 'value_capital',
-          title: 'Value Composition',
-          labels: ['Total Value', 'Total Capital'],
-          apiEndpoint: '/api/value_composition',
-          fallbackSeries: [0, 0],
-          colors: {
-            light: ['#6f42c1', '#20c997'],
-            dark: ['#9b59b6', '#1abc9c']
-          },
-          containerId: 'value-chart',
-          boxId: 'value-chart-box',
-          cardId: 'card-value'
-        });
-        valueChart.init("#col-value");
+        // Value Composition Chart has been disabled/removed.
 
         // Instance for "Collateral" Composition.
         const collateralChart = new ChartModule({

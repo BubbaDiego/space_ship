@@ -2,7 +2,74 @@
 
 {% block title %}Portfolio - Sonic Admin{% endblock %}
 
-{% block page_title %}Portfolio{% endblock %}
+{% block page_title %}
+<div class="d-flex align-items-center">
+  <!-- Jupiter Update Button, placed directly to the left -->
+  <div id="jupiter-update-button" style="margin-right: 10px;">
+    {% set update_type = update_type | default('jupiter') %}
+    <div class="update-button" data-type="{{ update_type }}">
+      {% if update_type == 'crypto' %}
+        <img id="update-button-img-{{ update_type }}"
+             src="{{ url_for('static', filename='images/crypto_icon.jpg') }}"
+             alt="Crypto Update Button"
+             style="width: 70px; height: 70px; cursor: pointer;">
+      {% elif update_type == 'jupiter' %}
+        <img id="update-button-img-{{ update_type }}"
+             src="{{ url_for('static', filename='images/jupiter.jpg') }}"
+             alt="Jupiter Update Button"
+             style="width: 70px; height: 70px; cursor: pointer;">
+      {% else %}
+        <img id="update-button-img-{{ update_type }}"
+             src="{{ url_for('static', filename='images/crypto_icon.jpg') }}"
+             alt="All Update Button"
+             style="width: 70px; height: 70px; cursor: pointer;">
+      {% endif %}
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        const container = document.querySelector('.update-button[data-type="{{ update_type }}"]');
+        if (!container) return;
+        const img = container.querySelector('img');
+        const cryptoURL = "{{ url_for('static', filename='images/crypto_icon.jpg') }}";
+        const jupiterURL = "{{ url_for('static', filename='images/jupiter.jpg') }}";
+        container.addEventListener("click", function() {
+          console.log("Update button (type {{ update_type }}) clicked.");
+          img.classList.add("spin");
+          // Trigger update via a POST request to the update route.
+          fetch("/positions/update_jupiter?source={{ update_type }}", { method: "POST" })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Update response:", data);
+                img.classList.remove("spin");
+                // If type is 'all', alternate the displayed image.
+                if ("{{ update_type }}" === "all") {
+                    if (img.getAttribute("src") === cryptoURL) {
+                        img.setAttribute("src", jupiterURL);
+                    } else {
+                        img.setAttribute("src", cryptoURL);
+                    }
+                }
+            })
+            .catch(err => {
+                console.error("Error updating positions:", err);
+                img.classList.remove("spin");
+            });
+        });
+      });
+    </script>
+    <style>
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+      }
+      .spin {
+        animation: spin 1s linear infinite;
+      }
+    </style>
+  </div>
+  <h3 class="mb-0">Portfolio</h3>
+</div>
+{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{{ url_for('dashboard.dashboard') }}">Home</a></li>
@@ -15,9 +82,6 @@
 <div class="card mb-3">
   <div class="card-header">
     <h3 class="card-title">Portfolio Performance</h3>
-    <div class="card-tools">
-       <a href="{{ url_for('portfolio.add_entry') }}" class="btn btn-sm btn-primary">Add New Entry</a>
-    </div>
   </div>
   <div class="card-body">
     <canvas id="portfolioChart" style="width: 100%; height: 300px;"></canvas>
@@ -101,7 +165,6 @@
   const portfolioData = {{ portfolio_data | tojson }};
   const labels = portfolioData.map(item => item.snapshot_time);
   const data = portfolioData.map(item => item.total_value);
-
   const ctx = document.getElementById('portfolioChart').getContext('2d');
   new Chart(ctx, {
     type: 'line',
@@ -118,13 +181,9 @@
       scales: {
         x: {
           type: 'time',
-          time: {
-            unit: 'day'
-          }
+          time: { unit: 'day' }
         },
-        y: {
-          beginAtZero: true
-        }
+        y: { beginAtZero: true }
       }
     }
   });

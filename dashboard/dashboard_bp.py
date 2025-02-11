@@ -141,6 +141,7 @@ def dashboard():
         valid_positions = [pos for pos in all_positions if pos.get("current_travel_percent") is not None]
         top_positions = sorted(valid_positions, key=lambda pos: pos["current_travel_percent"], reverse=True)[:3]
         bottom_positions = sorted(valid_positions, key=lambda pos: pos["current_travel_percent"])[:3]
+        liquidation_positions = valid_positions  # Use all valid positions for the liquidation bar
         print("Dashboard: Found {} valid positions.".format(len(valid_positions)))
         for pos in top_positions:
             print("Top Position - ID: {}, current_travel_percent: {}, alert_state: {}".format(
@@ -150,10 +151,13 @@ def dashboard():
             print("Bottom Position - ID: {}, current_travel_percent: {}, alert_state: {}".format(
                 pos.get("id", "unknown"), pos.get("current_travel_percent"), pos.get("alert_state", "N/A")
             ))
-        return render_template("dashboard.html", top_positions=top_positions, bottom_positions=bottom_positions)
+        return render_template("dashboard.html",
+                               top_positions=top_positions,
+                               bottom_positions=bottom_positions,
+                               liquidation_positions=liquidation_positions)
     except Exception as e:
         print("Error retrieving dashboard data:", e)
-        return render_template("dashboard.html", top_positions=[], bottom_positions=[])
+        return render_template("dashboard.html", top_positions=[], bottom_positions=[], liquidation_positions=[])
 
 @dashboard_bp.route("/theme")
 def theme_options():

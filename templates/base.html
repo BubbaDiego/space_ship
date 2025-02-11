@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>{% block title %}AdminLTE 4 | Dashboard{% endblock %}</title>
+    <title>{% block title %}Sonic Dashboard{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="AdminLTE is a Free Bootstrap 5 Admin Dashboard, 30 example pages using Vanilla JS." />
     <meta name="keywords" content="bootstrap 5, admin dashboard, charts, adminlte" />
@@ -76,8 +76,8 @@
       <aside class="app-sidebar shadow {% if theme.sidebar.bg %}{{ theme.sidebar.bg }}{% else %}bg-body-secondary{% endif %}" data-bs-theme="{{ theme.sidebar.color_mode }}">
         <div class="sidebar-brand">
           <a href="{{ url_for('dashboard.dashboard') }}" class="brand-link">
-            <img src="{{ url_for('static', filename='images/corner_logo_owl.jpg') }}" alt="Sonic Logo" class="brand-image rounded-circle shadow" />
-            <span class="brand-text fw-light">Sonic Admin</span>
+            <img src="{{ url_for('static', filename='images/corner_logo_owl.jpg') }}" alt="Admin Logo" class="brand-image rounded-circle shadow" />
+            <span class="brand-text fw-light">AdminLTE 4</span>
           </a>
         </div>
         <div class="sidebar-wrapper">
@@ -174,7 +174,6 @@
         <div class="app-content">
           <div class="container-fluid">
             {% block content %}{% endblock %}
-            {# Update info panel removed #}
           </div>
         </div>
         <!-- End App Content -->
@@ -254,5 +253,12 @@
     </script>
 
     {% block extra_scripts %}{% endblock %}
+
+    {# If this is the index endpoint, redirect to dashboard #}
+    {% if request.endpoint == 'index' %}
+    <script>
+      window.location.href = "{{ url_for('dashboard.dashboard') }}";
+    </script>
+    {% endif %}
   </body>
 </html>

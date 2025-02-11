@@ -149,6 +149,7 @@
           this.chart = new ApexCharts(chartElement, chartOptions);
           this.chart.render().then(() => {
             console.log(`${this.type} Chart rendered successfully`);
+            // Fetch real data and update the chart series
             fetch(this.apiEndpoint)
               .then(response => {
                 console.log(`${this.type} API response status:`, response.status);
@@ -157,8 +158,9 @@
               .then(data => {
                 console.log(`${this.type} API raw data:`, data);
                 if (data && Array.isArray(data.series)) {
-                  this.chart.updateOptions({ series: data.series });
-                  console.log(`Updated ${this.type} Chart data:`, data.series);
+                  // Use updateSeries to update just the series data
+                  this.chart.updateSeries(data.series);
+                  console.log(`Updated ${this.type} Chart series:`, data.series);
                 } else {
                   console.warn(`${this.type} API returned unexpected format`, data);
                 }
@@ -233,8 +235,6 @@
           cardId: 'card-size'
         });
         sizeChart.init("#col-size");
-
-        // Value Composition Chart has been disabled/removed.
 
         // Instance for "Collateral" Composition.
         const collateralChart = new ChartModule({

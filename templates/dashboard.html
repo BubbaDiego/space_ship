@@ -44,8 +44,23 @@
       </div>
       <div class="col-md-6">
         <div class="card mb-3">
-          <div class="card-header">
-            <h3 class="card-title">Portfolio Performance</h3>
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0">
+              Portfolio Performance
+              {% if timeframe %}
+                <small class="text-muted">(Last {{ timeframe }} Hours)</small>
+              {% endif %}
+            </h3>
+            <!-- Subtle Time Range Selector -->
+            <div id="portfolioTimeframeControls">
+              <div class="btn-group btn-group-sm" role="group" aria-label="Portfolio Timeframe">
+                <button type="button" class="btn btn-outline-secondary {% if timeframe == 1 %}active{% endif %}" onclick="setPortfolioTimeframe(1)">1h</button>
+                <button type="button" class="btn btn-outline-secondary {% if timeframe == 3 %}active{% endif %}" onclick="setPortfolioTimeframe(3)">3h</button>
+                <button type="button" class="btn btn-outline-secondary {% if timeframe == 6 %}active{% endif %}" onclick="setPortfolioTimeframe(6)">6h</button>
+                <button type="button" class="btn btn-outline-secondary {% if timeframe == 12 %}active{% endif %}" onclick="setPortfolioTimeframe(12)">12h</button>
+                <button type="button" class="btn btn-outline-secondary {% if timeframe == 24 %}active{% endif %}" onclick="setPortfolioTimeframe(24)">24h</button>
+              </div>
+            </div>
           </div>
           <div class="card-body">
             <canvas id="portfolioChart" style="width: 100%; height: 300px;"></canvas>
@@ -113,7 +128,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   // Assume portfolio_data is provided by the dashboard route similar to portfolio.html
- const portfolioData = {{ portfolio_data | default([]) | tojson }};
+  const portfolioData = {{ portfolio_data | default([]) | tojson }};
   if (!portfolioData || portfolioData.length === 0) {
     console.warn("No portfolio data available for chart rendering.");
     return;
@@ -143,5 +158,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
+
+// Function to update the timeframe by modifying the URL query parameter.
+function setPortfolioTimeframe(hours) {
+  const urlParams = new URLSearchParams(window.location.search);
+  urlParams.set('hours', hours);
+  // Reload the page with the new timeframe
+  window.location.search = urlParams.toString();
+}
 </script>
 {% endblock %}

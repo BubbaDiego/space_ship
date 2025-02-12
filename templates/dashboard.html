@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head_extra %}
-  <!-- Include ApexCharts library -->
+  <!-- Include ApexCharts library (for other charts) -->
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 {% endblock %}
 
@@ -37,13 +37,20 @@
 
 {% block content %}
   <div class="container-fluid">
-    <!-- Row: Left column = Liquidation Bar, Right column = Size Composition Chart -->
+    <!-- Row: Left column = Liquidation Bar, Right column = Portfolio Chart Card -->
     <div class="row">
       <div class="col-md-6">
         {% include "liquidation_bar.html" %}
       </div>
-      <div class="col-md-6" id="col-size">
-        <!-- The size composition chart card will be rendered here -->
+      <div class="col-md-6">
+        <div class="card mb-3">
+          <div class="card-header">
+            <h3 class="card-title">Portfolio Performance</h3>
+          </div>
+          <div class="card-body">
+            <canvas id="portfolioChart" style="width: 100%; height: 300px;"></canvas>
+          </div>
+        </div>
       </div>
     </div>
     <!-- Top Positions Section -->
@@ -100,166 +107,41 @@ document.addEventListener("DOMContentLoaded", function() {
 }
 </style>
 
+<!-- Include Chart.js and adapter for time scales for the portfolio chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 <script>
-// Unified ChartModule class.
-class ChartModule {
-  constructor(config) {
-    this.type = config.type;
-    this.title = config.title;
-    this.labels = config.labels;
-    this.apiEndpoint = config.apiEndpoint;
-    this.fallbackSeries = config.fallbackSeries || [0, 0];
-    this.colors = config.colors;
-    this.containerId = config.containerId;
-    this.boxId = config.boxId;
-    this.cardId = config.cardId || `card-${this.type}`;
-    this.currentTheme = 'light';
-    this.isDonut = false;
-    this.chart = null;
+document.addEventListener('DOMContentLoaded', function() {
+  // Assume portfolio_data is provided by the dashboard route similar to portfolio.html
+ const portfolioData = {{ portfolio_data | default([]) | tojson }};
+  if (!portfolioData || portfolioData.length === 0) {
+    console.warn("No portfolio data available for chart rendering.");
+    return;
   }
-
-  renderCard(parentSelector) {
-    const parent = document.querySelector(parentSelector);
-    if (!parent) {
-      console.error("Parent container not found:", parentSelector);
-      return;
-    }
-    const cardHTML = `
-      <div class="card" id="${this.cardId}">
-        <div class="card-header">
-          <h3 class="card-title">${this.title}</h3>
-          <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-theme-toggle>
-              <i class="fas fa-adjust"></i>
-            </button>
-            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-              <i class="fas fa-minus"></i>
-            </button>
-            <button type="button" class="btn btn-tool" data-card-widget="remove">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-        </div>
-        <div class="card-body">
-          <div id="${this.boxId}">
-            <div id="${this.containerId}"></div>
-          </div>
-        </div>
-      </div>
-    `;
-    parent.insertAdjacentHTML('beforeend', cardHTML);
-  }
-
-  initChart() {
-    const chartOptions = {
-      series: this.fallbackSeries,
-      chart: {
-        type: 'pie',
-        height: 350,
-        background: 'transparent'
-      },
-      labels: this.labels,
-      theme: { mode: this.currentTheme },
-      dataLabels: { enabled: true, style: { fontSize: '1.4rem' } },
-      stroke: { width: 2, colors: ['#ffffff'] },
-      colors: this.currentTheme === 'light' ? this.colors.light : this.colors.dark,
-      legend: { position: 'bottom' }
-    };
-
-    console.log(`${this.type} Chart options:`, chartOptions);
-    const chartElement = document.querySelector(`#${this.containerId}`);
-    if (!chartElement) {
-      console.error(`${this.type} Chart container (#${this.containerId}) not found`);
-      return;
-    }
-    this.chart = new ApexCharts(chartElement, chartOptions);
-    this.chart.render().then(() => {
-      console.log(`${this.type} Chart rendered successfully`);
-      fetch(this.apiEndpoint)
-        .then(response => {
-          console.log(`${this.type} API response status:`, response.status);
-          return response.json();
-        })
-        .then(data => {
-          console.log(`${this.type} API raw data:`, data);
-          if (data && Array.isArray(data.series)) {
-            // Update the chart using updateOptions with the new series.
-            this.chart.updateOptions({ series: data.series });
-            console.log(`Updated ${this.type} Chart data:`, data.series);
-          } else {
-            console.warn(`${this.type} API returned unexpected format`, data);
-          }
-        })
-        .catch(error => {
-          console.error(`Error fetching ${this.type} data from API:`, error);
-        });
-    }).catch(error => {
-      console.error(`Error rendering ${this.type} Chart:`, error);
-    });
-
-    const chartElementDom = document.querySelector(`#${this.containerId}`);
-    chartElementDom.addEventListener("click", (event) => {
-      this.isDonut = !this.isDonut;
-      this.chart.updateOptions({ chart: { type: this.isDonut ? 'donut' : 'pie' } });
-      console.log(`Toggled ${this.type} Chart type to:`, this.isDonut ? 'donut' : 'pie');
-      event.stopPropagation();
-    });
-
-    const themeToggleButton = document.querySelector(`#${this.cardId} [data-theme-toggle]`);
-    if (themeToggleButton) {
-      themeToggleButton.addEventListener("click", (event) => {
-        event.stopPropagation();
-        this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
-        const chartBox = document.querySelector(`#${this.boxId}`);
-        if (chartBox) {
-          if (this.currentTheme === 'dark') {
-            chartBox.classList.add('dark');
-          } else {
-            chartBox.classList.remove('dark');
-          }
-        }
-        this.chart.updateOptions({
-          theme: { mode: this.currentTheme },
-          colors: this.currentTheme === 'light' ? this.colors.light : this.colors.dark
-        });
-        console.log(`${this.type} Chart theme toggled to:`, this.currentTheme);
-      });
-    } else {
-      console.error(`Theme toggle button not found for ${this.type}`);
-    }
-  }
-
-  init(parentSelector) {
-    this.renderCard(parentSelector);
-    if (document.readyState !== 'loading') {
-      this.initChart();
-    } else {
-      document.addEventListener('DOMContentLoaded', () => {
-        this.initChart();
-      });
-    }
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  console.log("DOM content loaded - initializing size composition chart");
-
-  // Instance for "Size" Composition.
-  const sizeChart = new ChartModule({
-    type: 'size',
-    title: 'Size Composition',
-    labels: ['Long Positions', 'Short Positions'],
-    apiEndpoint: '/api/size_composition',
-    fallbackSeries: [0, 0],
-    colors: {
-      light: ['#0d6efd', '#5dcc8e'],
-      dark: ['#66b0ff', '#ff6b81']
+  const labels = portfolioData.map(item => item.snapshot_time);
+  const data = portfolioData.map(item => item.total_value);
+  const ctx = document.getElementById('portfolioChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Total Portfolio Value',
+        data: data,
+        borderColor: 'rgba(75, 192, 192, 1)',
+        fill: false
+      }]
     },
-    containerId: 'positions-chart',
-    boxId: 'size-chart-box',
-    cardId: 'card-size'
+    options: {
+      scales: {
+        x: {
+          type: 'time',
+          time: { unit: 'day' }
+        },
+        y: { beginAtZero: true }
+      }
+    }
   });
-  sizeChart.init("#col-size");
 });
 </script>
 {% endblock %}

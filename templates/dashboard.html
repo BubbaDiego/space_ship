@@ -3,10 +3,108 @@
 {% block head_extra %}
   <!-- Include ApexCharts library (for other charts) -->
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <style>
+    /* Override default spacing for the invisible container and left card */
+    .invisible-container .card,
+    .invisible-container .liquidation-wrapper {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+    }
+    /* Force the left column (liquidation bar) to align at the top */
+    .invisible-container .col-md-6.d-flex.align-items-start {
+      align-items: flex-start !important;
+      padding-top: 0 !important;
+      margin-top: 0 !important;
+    }
+    /* Additional override for the liquidation wrapper content */
+    .liquidation-wrapper {
+      margin: 0 !important;
+      padding: 0 !important;
+      text-align: left !important;
+    }
+
+    /* Light and dark mode backgrounds for the body */
+    body.light-mode {
+      background-color: #f8f9fa;  /* Light background */
+      color: #212529;
+    }
+    body.dark-mode {
+      background-color: #212529;  /* Dark background */
+      color: #f8f9fa;
+    }
+
+    /* Toggle Switch Styling */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    /* New container for Top Positions to allow unlimited rows */
+    .top-positions-container {
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      width: 100% !important;
+      height: auto !important;
+      overflow: visible !important;
+      margin-top: 10px;
+      border: 1px dotted red; /* Debug border */
+      padding: 10px;
+    }
+    /* Make individual info-box panels thinner */
+    .top-positions-container .info-box {
+      max-width: 300px !important;  /* Adjust as needed for desired thinness */
+      width: 100% !important;
+      margin: 5px auto;
+      padding: 2px !important;
+    }
+  </style>
 {% endblock %}
 
 {% block page_title %}
 <div class="d-flex align-items-center">
+  <!-- Light/Dark Mode Toggle Switch -->
+  <div class="me-3">
+    <label class="toggle-switch">
+      <input type="checkbox" id="themeToggle">
+      <span class="slider"></span>
+    </label>
+  </div>
   <!-- Jupiter Update Button with extra margin -->
   <div class="update-button me-2" data-type="{{ update_type | default('jupiter') }}">
     {% if update_type == 'crypto' %}
@@ -37,42 +135,50 @@
 
 {% block content %}
   <div class="container-fluid">
-    <!-- Row: Left column = Liquidation Bar, Right column = Portfolio Chart Card -->
+    <!-- Invisible Container Grouping Liquidation Bar & Portfolio Performance Cards -->
     <div class="row">
-      <div class="col-md-6">
-        {% include "liquidation_bar.html" %}
-      </div>
-      <div class="col-md-6">
-        <div class="card mb-3">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="card-title mb-0">
-              Portfolio Performance
-              {% if timeframe %}
-                <small class="text-muted">(Last {{ timeframe }} Hours)</small>
-              {% endif %}
-            </h3>
-            <!-- Subtle Time Range Selector -->
-            <div id="portfolioTimeframeControls">
-              <div class="btn-group btn-group-sm" role="group" aria-label="Portfolio Timeframe">
-                <button type="button" class="btn btn-outline-secondary {% if timeframe == 1 %}active{% endif %}" onclick="setPortfolioTimeframe(1)">1h</button>
-                <button type="button" class="btn btn-outline-secondary {% if timeframe == 3 %}active{% endif %}" onclick="setPortfolioTimeframe(3)">3h</button>
-                <button type="button" class="btn btn-outline-secondary {% if timeframe == 6 %}active{% endif %}" onclick="setPortfolioTimeframe(6)">6h</button>
-                <button type="button" class="btn btn-outline-secondary {% if timeframe == 12 %}active{% endif %}" onclick="setPortfolioTimeframe(12)">12h</button>
-                <button type="button" class="btn btn-outline-secondary {% if timeframe == 24 %}active{% endif %}" onclick="setPortfolioTimeframe(24)">24h</button>
+      <div class="col-12">
+        <div class="invisible-container" style="border: 1px dotted red; padding: 10px;">
+          <div class="row align-items-start">
+            <!-- Liquidation Bar Card Column -->
+            <div class="col-md-6 d-flex align-items-start">
+              <div class="w-100 liquidation-wrapper">
+                {% include "liquidation_bar.html" %}
               </div>
             </div>
-          </div>
-          <div class="card-body">
-            <canvas id="portfolioChart" style="width: 100%; height: 300px;"></canvas>
+            <!-- Portfolio Performance Card Column -->
+            <div class="col-md-6 d-flex align-items-start">
+              <div class="card mb-3 w-100">
+                <div class="card-header d-flex justify-content-between align-items-center" style="padding-top: 0.5rem;">
+                  <h3 class="card-title mb-0" style="margin-top: 0;">
+                    Portfolio Performance
+                    {% if timeframe %}
+                      <small class="text-muted">(Last {{ timeframe }} Hours)</small>
+                    {% endif %}
+                  </h3>
+                  <!-- Subtle Time Range Selector -->
+                  <div id="portfolioTimeframeControls">
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Portfolio Timeframe">
+                      <button type="button" class="btn btn-outline-secondary {% if timeframe == 1 %}active{% endif %}" onclick="setPortfolioTimeframe(1)">1h</button>
+                      <button type="button" class="btn btn-outline-secondary {% if timeframe == 3 %}active{% endif %}" onclick="setPortfolioTimeframe(3)">3h</button>
+                      <button type="button" class="btn btn-outline-secondary {% if timeframe == 6 %}active{% endif %}" onclick="setPortfolioTimeframe(6)">6h</button>
+                      <button type="button" class="btn btn-outline-secondary {% if timeframe == 12 %}active{% endif %}" onclick="setPortfolioTimeframe(12)">12h</button>
+                      <button type="button" class="btn btn-outline-secondary {% if timeframe == 24 %}active{% endif %}" onclick="setPortfolioTimeframe(24)">24h</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <canvas id="portfolioChart" style="width: 100%; height: 300px;"></canvas>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <!-- Top Positions Section -->
-    <div class="row">
-      <div class="col-12">
-        {% include "top_positions.html" %}
-      </div>
+    <div class="top-positions-container">
+      {% include "top_positions.html" %}
     </div>
   </div>
 {% endblock %}
@@ -127,7 +233,6 @@ document.addEventListener("DOMContentLoaded", function() {
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Assume portfolio_data is provided by the dashboard route similar to portfolio.html
   const portfolioData = {{ portfolio_data | default([]) | tojson }};
   if (!portfolioData || portfolioData.length === 0) {
     console.warn("No portfolio data available for chart rendering.");
@@ -143,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
       datasets: [{
         label: 'Total Portfolio Value',
         data: data,
-        borderColor: 'rgba(75, 192, 192, 1)',
+        borderColor: 'rgb(153,140,234)',
         fill: false
       }]
     },
@@ -159,12 +264,30 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-// Function to update the timeframe by modifying the URL query parameter.
 function setPortfolioTimeframe(hours) {
   const urlParams = new URLSearchParams(window.location.search);
   urlParams.set('hours', hours);
-  // Reload the page with the new timeframe
   window.location.search = urlParams.toString();
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  const currentTheme = localStorage.getItem('theme') || 'light';
+  document.body.classList.add(currentTheme + '-mode');
+
+  const themeToggle = document.getElementById('themeToggle');
+  themeToggle.checked = currentTheme === 'dark';
+
+  themeToggle.addEventListener('change', function() {
+    if (this.checked) {
+      document.body.classList.remove('light-mode');
+      document.body.classList.add('dark-mode');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.classList.remove('dark-mode');
+      document.body.classList.add('light-mode');
+      localStorage.setItem('theme', 'light');
+    }
+  });
+});
 </script>
 {% endblock %}

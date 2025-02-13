@@ -2,70 +2,134 @@
 
 {% block title %}Portfolio - Sonic Admin{% endblock %}
 
+{% block head_extra %}
+  <!-- Include ApexCharts library (for other charts) -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <style>
+    /* Override default spacing for the invisible container and left card */
+    .invisible-container .card,
+    .invisible-container .liquidation-wrapper {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+    }
+    /* Force the left column (liquidation bar) to align at the top */
+    .invisible-container .col-md-6.d-flex.align-items-start {
+      align-items: flex-start !important;
+      padding-top: 0 !important;
+      margin-top: 0 !important;
+    }
+    /* Override for the liquidation wrapper to remove all padding and margins */
+    .invisible-container .liquidation-wrapper {
+      margin: 0 !important;
+      padding: 0 !important;
+      text-align: left !important;
+    }
+    /* Also force the card containing the liquidation bar to have no extra spacing */
+    .invisible-container .card {
+      margin-bottom: 0 !important;
+      padding: 0 !important;
+    }
+
+    /* Light and dark mode backgrounds for the body */
+    body.light-mode {
+      background-color: #f8f9fa;  /* Light background */
+      color: #212529;
+    }
+    body.dark-mode {
+      background-color: #212529;  /* Dark background */
+      color: #f8f9fa;
+    }
+
+    /* Toggle Switch Styling */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    /* Container for Top Positions (unchanged from before) */
+    .top-positions-container {
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      width: 100% !important;
+      height: auto !important;
+      overflow: visible !important;
+      margin-top: 10px;
+      border: 1px dotted red; /* Debug border */
+      padding: 10px;
+    }
+    /* Make individual info-box panels thinner */
+    .top-positions-container .info-box {
+      max-width: 300px !important;
+      width: 100% !important;
+      margin: 5px auto;
+      padding: 2px !important;
+    }
+  </style>
+{% endblock %}
+
 {% block page_title %}
 <div class="d-flex align-items-center">
-  <!-- Jupiter Update Button, placed directly to the left -->
-  <div id="jupiter-update-button" style="margin-right: 10px;">
-    {% set update_type = update_type | default('jupiter') %}
-    <div class="update-button" data-type="{{ update_type }}">
-      {% if update_type == 'crypto' %}
-        <img id="update-button-img-{{ update_type }}"
-             src="{{ url_for('static', filename='images/crypto_icon.jpg') }}"
-             alt="Crypto Update Button"
-             style="width: 70px; height: 70px; cursor: pointer;">
-      {% elif update_type == 'jupiter' %}
-        <img id="update-button-img-{{ update_type }}"
-             src="{{ url_for('static', filename='images/jupiter.jpg') }}"
-             alt="Jupiter Update Button"
-             style="width: 70px; height: 70px; cursor: pointer;">
-      {% else %}
-        <img id="update-button-img-{{ update_type }}"
-             src="{{ url_for('static', filename='images/crypto_icon.jpg') }}"
-             alt="All Update Button"
-             style="width: 70px; height: 70px; cursor: pointer;">
-      {% endif %}
-    </div>
-    <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        const container = document.querySelector('.update-button[data-type="{{ update_type }}"]');
-        if (!container) return;
-        const img = container.querySelector('img');
-        const cryptoURL = "{{ url_for('static', filename='images/crypto_icon.jpg') }}";
-        const jupiterURL = "{{ url_for('static', filename='images/jupiter.jpg') }}";
-        container.addEventListener("click", function() {
-          console.log("Update button (type {{ update_type }}) clicked.");
-          img.classList.add("spin");
-          // Trigger update via a POST request to the update route.
-          fetch("/positions/update_jupiter?source={{ update_type }}", { method: "POST" })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Update response:", data);
-                img.classList.remove("spin");
-                // If type is 'all', alternate the displayed image.
-                if ("{{ update_type }}" === "all") {
-                    if (img.getAttribute("src") === cryptoURL) {
-                        img.setAttribute("src", jupiterURL);
-                    } else {
-                        img.setAttribute("src", cryptoURL);
-                    }
-                }
-            })
-            .catch(err => {
-                console.error("Error updating positions:", err);
-                img.classList.remove("spin");
-            });
-        });
-      });
-    </script>
-    <style>
-      @keyframes spin {
-        from { transform: rotate(0deg); }
-        to   { transform: rotate(360deg); }
-      }
-      .spin {
-        animation: spin 1s linear infinite;
-      }
-    </style>
+  <!-- Light/Dark Mode Toggle Switch -->
+  <div class="me-3">
+    <label class="toggle-switch">
+      <input type="checkbox" id="themeToggle">
+      <span class="slider"></span>
+    </label>
+  </div>
+  <!-- Jupiter Update Button with extra margin -->
+  <div class="update-button me-2" data-type="{{ update_type | default('jupiter') }}">
+    {% if update_type == 'crypto' %}
+      <img id="update-button-img-{{ update_type }}"
+           src="{{ url_for('static', filename='images/crypto_icon.jpg') }}"
+           alt="Crypto Update Button"
+           style="width: 70px; height: 70px; cursor: pointer;">
+    {% elif update_type == 'jupiter' %}
+      <img id="update-button-img-{{ update_type }}"
+           src="{{ url_for('static', filename='images/jupiter.jpg') }}"
+           alt="Jupiter Update Button"
+           style="width: 70px; height: 70px; cursor: pointer;">
+    {% else %}
+      <img id="update-button-img-{{ update_type }}"
+           src="{{ url_for('static', filename='images/crypto_icon.jpg') }}"
+           alt="All Update Button"
+           style="width: 70px; height: 70px; cursor: pointer;">
+    {% endif %}
   </div>
   <h3 class="mb-0">Portfolio</h3>
 </div>
@@ -82,6 +146,16 @@
 <div class="card mb-3">
   <div class="card-header">
     <h3 class="card-title">Portfolio Performance</h3>
+    <!-- Time Range Selector -->
+    <div id="portfolioTimeframeControls">
+      <div class="btn-group btn-group-sm" role="group" aria-label="Portfolio Timeframe">
+        <button type="button" class="btn btn-outline-secondary" onclick="setPortfolioTimeframe(1)">1h</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="setPortfolioTimeframe(3)">3h</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="setPortfolioTimeframe(6)">6h</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="setPortfolioTimeframe(12)">12h</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="setPortfolioTimeframe(24)">24h</button>
+      </div>
+    </div>
   </div>
   <div class="card-body">
     <canvas id="portfolioChart" style="width: 100%; height: 300px;"></canvas>
@@ -121,14 +195,12 @@
           <td>{{ entry.snapshot_time }}</td>
           <td>{{ entry.total_value }}</td>
           <td>
-            <!-- Edit button toggles an inline collapse for editing -->
             <button class="btn btn-sm btn-warning" type="button" data-bs-toggle="collapse" data-bs-target="#editForm{{ entry.id }}" aria-expanded="false" aria-controls="editForm{{ entry.id }}">Edit</button>
             <form method="post" action="{{ url_for('portfolio.delete_entry', entry_id=entry.id) }}" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to delete this entry?');">
               <button type="submit" class="btn btn-sm btn-danger">Delete</button>
             </form>
           </td>
         </tr>
-        <!-- Inline Edit Form (collapsed by default) -->
         <tr class="collapse" id="editForm{{ entry.id }}">
           <td colspan="4">
             <form method="post" action="{{ url_for('portfolio.edit_entry', entry_id=entry.id) }}">
@@ -154,6 +226,11 @@
   </div>
 </div>
 
+<!-- Top Positions Section -->
+<div class="top-positions-container">
+  {% include "top_positions.html" %}
+</div>
+
 {% endblock %}
 
 {% block extra_scripts %}
@@ -161,31 +238,115 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 <script>
-  // Build the chart using portfolio_data passed from the Flask view
+  // Global portfolioData and chart variable
   const portfolioData = {{ portfolio_data | tojson }};
-  const labels = portfolioData.map(item => item.snapshot_time);
-  const data = portfolioData.map(item => item.total_value);
-  const ctx = document.getElementById('portfolioChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Total Portfolio Value',
-        data: data,
-        borderColor: 'rgba(75, 192, 192, 1)',
-        fill: false
-      }]
-    },
-    options: {
-      scales: {
-        x: {
-          type: 'time',
-          time: { unit: 'day' }
-        },
-        y: { beginAtZero: true }
-      }
+  let portfolioChart;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    if (!portfolioData || portfolioData.length === 0) {
+      console.warn("No portfolio data available for chart rendering.");
+      return;
     }
+    // Build chart using all portfolioData
+    const labels = portfolioData.map(item => item.snapshot_time);
+    const data = portfolioData.map(item => item.total_value);
+    const ctx = document.getElementById('portfolioChart').getContext('2d');
+    portfolioChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Total Portfolio Value',
+          data: data,
+          borderColor: 'rgba(75, 192, 192, 1)',
+          fill: false
+        }]
+      },
+      options: {
+        scales: {
+          x: {
+            type: 'time',
+            time: { unit: 'day' }
+          },
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  });
+
+  function setPortfolioTimeframe(hours) {
+  if (!portfolioData || portfolioData.length === 0) return;
+  // Use the actual system current time
+  const currentTime = new Date();
+  const cutoff = new Date(currentTime.getTime() - hours * 3600000);
+  console.log("Using system current time:", currentTime, "Cutoff:", cutoff);
+  const filteredData = portfolioData.filter(item => new Date(item.snapshot_time) >= cutoff);
+  console.log("Filtered data count:", filteredData.length);
+  const newLabels = filteredData.map(item => item.snapshot_time);
+  const newData = filteredData.map(item => item.total_value);
+  portfolioChart.data.labels = newLabels;
+  portfolioChart.data.datasets[0].data = newData;
+  portfolioChart.update();
+}
+
+
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const container = document.querySelector('.update-button[data-type="{{ update_type | default("jupiter") }}"]');
+    if (!container) return;
+    const img = container.querySelector('img');
+    const cryptoURL = "{{ url_for('static', filename='images/crypto_icon.jpg') }}";
+    const jupiterURL = "{{ url_for('static', filename='images/jupiter.jpg') }}";
+    container.addEventListener("click", function() {
+      console.log("Update button (type {{ update_type | default('jupiter') }}) clicked.");
+      img.classList.add("spin");
+      fetch("/positions/update_jupiter?source={{ update_type | default('jupiter') }}", { method: "POST" })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Update response:", data);
+            img.classList.remove("spin");
+            if ("{{ update_type | default('jupiter') }}" === "all") {
+                if (img.getAttribute("src") === cryptoURL) {
+                    img.setAttribute("src", jupiterURL);
+                } else {
+                    img.setAttribute("src", cryptoURL);
+                }
+            }
+        })
+        .catch(err => {
+            console.error("Error updating positions:", err);
+            img.classList.remove("spin");
+        });
+    });
+  });
+</script>
+<style>
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  .spin {
+    animation: spin 1s linear infinite;
+  }
+</style>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    document.body.classList.add(currentTheme + '-mode');
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.checked = currentTheme === 'dark';
+    themeToggle.addEventListener('change', function() {
+      if (this.checked) {
+        document.body.classList.remove('light-mode');
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.body.classList.remove('dark-mode');
+        document.body.classList.add('light-mode');
+        localStorage.setItem('theme', 'light');
+      }
+    });
   });
 </script>
 {% endblock %}

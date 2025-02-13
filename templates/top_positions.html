@@ -1,225 +1,237 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>AdminLTE 4 | Top &amp; Bottom Positions with Wallet &amp; Asset Info</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Google Font: Nunito for that friendly, slightly bubbly vibe -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap"
-      rel="stylesheet"
-    >
-    <!-- Local AdminLTE CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/adminlte.css') }}" />
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
-    <style>
-      /* Container styling */
-      body {
-        font-family: 'Nunito', sans-serif;
-      }
-      .container {
-        max-width: 1200px;
-      }
-      /* Info Box styling with a slightly darker grey background */
-      .info-box {
-        display: flex;
-        align-items: center;
-        background-color: #e0e0e0; /* slightly darker grey */
-        padding: 15px;
-        border-radius: 4px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-      }
-      /* Wallet area */
-      .info-box-wallet {
-        margin-left: auto;
-        display: flex;
-        align-items: center;
-      }
-      .info-box-wallet img {
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-      }
-      /* Asset info container */
-      .info-box-asset {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-      }
-      /* Extra info styling */
-      .info-box-extra {
-        display: inline-flex;
-        align-items: center;
-        font-size: 0.7rem; /* smaller font */
-        margin: 0;
-      }
-      .info-box-extra img {
-        vertical-align: middle;
-        width: 36px;
-        height: 36px;
-      }
-      .info-box-extra span {
-        margin-left: 8px;
-      }
-      .info-box-extra span:last-child {
-        font-size: 0.8rem;
-        font-weight: bold;
-      }
-      /* Fixed dimensions for the colored box */
-      .info-box-icon {
-        width: 60px;
-        height: 55px; /* height slightly reduced */
-        line-height: 55px; /* match the new height */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 10px;
-        margin-right: 15px;
-      }
-      /* Dynamic background classes for alert state */
-      .text-bg-blue {
-        background-color: #007bff !important;
-      }
-      .text-bg-success {
-        background-color: #28a745 !important;
-      }
-      .text-bg-warning {
-        background-color: #ffc107 !important;
-      }
-      .text-bg-danger {
-        background-color: #dc3545 !important;
-      }
-      /* Inner percentage text: white, slightly larger, bold */
-      .small-percentage {
-        font-size: 1.1rem !important;
-        font-weight: bold !important;
-        font-family: 'Nunito', sans-serif;
-        color: white !important;
-        margin-right: 0 !important;
-      }
-      /* Details for value, size and collateral */
-      .info-box-details {
-        display: flex;
-        gap: 15px;
-        font-size: 0.9rem;
-        align-items: center;
-        margin-left: 10px;
-      }
-    </style>
-  </head>
-  <body class="bg-body-tertiary">
-    <div class="container mt-4">
-      <div class="row">
-        <!-- Top Positions Column -->
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">Top Positions</h3>
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body">
-              {% if top_positions %}
-                {% for pos in top_positions %}
-                  {# Determine the colored box class based on alert_state #}
-                  {% set box_class = "text-bg-blue" %}
-                  {% if pos.alert_state == "alert-low" %}
-                    {% set box_class = "text-bg-success" %}
-                  {% elif pos.alert_state == "alert-medium" %}
-                    {% set box_class = "text-bg-warning" %}
-                  {% elif pos.alert_state == "alert-high" %}
-                    {% set box_class = "text-bg-danger" %}
-                  {% endif %}
-                <div class="info-box">
-                  <span class="info-box-icon {{ box_class }} text-white">
-                    <span class="small-percentage">{{ pos.current_travel_percent | round(0, 'floor') | int }}%</span>
-                  </span>
-                  <div class="info-box-content">
-                    <div class="info-box-asset">
-                      <span class="info-box-extra">
-                        <img src="{{ url_for('static', filename='images/' ~ pos.asset_type|lower ~ '_logo.png') }}"
-                             alt="{{ pos.asset_type }} Logo"
-                             onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/default_logo.png') }}';">
-                        <span>{{ pos.position_type }}</span>
-                      </span>
-                      <div class="info-box-details">
-                        <span>Value: <strong>${{ pos.value }}</strong></span>
-                        <span>Size: <strong>{{ pos.size }}</strong></span>
-                        <span>Collateral: <strong>${{ pos.collateral }}</strong></span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="info-box-wallet">
-                    <img src="{{ pos.wallet_image or url_for('static', filename='images/landovault.jpg') }}"
-                         alt="Wallet Logo"
-                         onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/landovault.jpg') }}';">
-                  </div>
-                </div>
-                {% endfor %}
-              {% else %}
-                <p class="text-center">No top positions available.</p>
-              {% endif %}
-            </div>
-          </div>
-        </div>
-        <!-- Bottom Positions Column -->
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">Bottom Positions</h3>
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body">
-              {% if bottom_positions %}
-                {% for pos in bottom_positions %}
-                  {% set box_class = "text-bg-blue" %}
-                  {% if pos.alert_state == "alert-low" %}
-                    {% set box_class = "text-bg-success" %}
-                  {% elif pos.alert_state == "alert-medium" %}
-                    {% set box_class = "text-bg-warning" %}
-                  {% elif pos.alert_state == "alert-high" %}
-                    {% set box_class = "text-bg-danger" %}
-                  {% endif %}
-                <div class="info-box">
-                  <span class="info-box-icon {{ box_class }} text-white">
-                    <span class="small-percentage">{{ pos.current_travel_percent | round(0, 'floor') | int }}%</span>
-                  </span>
-                  <div class="info-box-content">
-                    <div class="info-box-asset">
-                      <span class="info-box-extra">
-                        <img src="{{ url_for('static', filename='images/' ~ pos.asset_type|lower ~ '_logo.png') }}"
-                             alt="{{ pos.asset_type }} Logo"
-                             onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/default_logo.png') }}';">
-                        <span>{{ pos.position_type }}</span>
-                      </span>
-                      <div class="info-box-details">
-                        <span>Value: <strong>${{ pos.value }}</strong></span>
-                        <span>Size: <strong>{{ pos.size }}</strong></span>
-                        <span>Collateral: <strong>${{ pos.collateral }}</strong></span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="info-box-wallet">
-                    <img src="{{ pos.wallet_image or url_for('static', filename='images/landovault.jpg') }}"
-                         alt="Wallet Logo"
-                         onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/landovault.jpg') }}';">
-                  </div>
-                </div>
-                {% endfor %}
-              {% else %}
-                <p class="text-center">No bottom positions available.</p>
-              {% endif %}
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- /.row -->
+<style>
+  /* Override Bootstrap for the card body in our debug container */
+  .invisible-container .card-body {
+    display: block !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* New Top Positions Styles (Thinner & Full Width) */
+  .info-box {
+    display: flex;
+    align-items: center;
+    background-color: #e0e0e0;
+    padding: 2px !important;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2px !important;
+    width: 100% !important;
+  }
+  .info-box-wallet {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+  }
+  .info-box-wallet img {
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+  }
+  .info-box-asset {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .info-box-extra {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.6rem;
+    margin: 0;
+  }
+  .info-box-extra img {
+    vertical-align: middle;
+    width: 20px;
+    height: 20px;
+  }
+  .info-box-extra span {
+    margin-left: 2px;
+  }
+  .info-box-extra span:last-child {
+    font-size: 0.65rem;
+    font-weight: bold;
+  }
+  .info-box-icon {
+    width: 30px;
+    height: 25px;
+    line-height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    margin-right: 2px;
+  }
+  .text-bg-blue { background-color: #007bff !important; }
+  .text-bg-success { background-color: #28a745 !important; }
+  .text-bg-warning { background-color: #ffc107 !important; }
+  .text-bg-danger { background-color: #dc3545 !important; }
+  .small-percentage {
+    font-size: 0.75rem !important;
+    font-weight: bold !important;
+    font-family: 'Nunito', sans-serif;
+    color: white !important;
+    margin-right: 0 !important;
+  }
+  .info-box-details {
+    display: flex;
+    gap: 3px;
+    font-size: 0.75rem;
+    align-items: center;
+    margin-left: 2px;
+  }
+</style>
+
+<div class="invisible-container" style="border: 1px dotted red; padding: 10px;">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Top Positions</h3>
     </div>
-    <!-- Required Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js"></script>
-    <script src="{{ url_for('static', filename='dist/js/adminlte.js') }}"></script>
-  </body>
-</html>
+    <div class="card-body">
+      {% if top_positions %}
+        {% for pos in top_positions %}
+          {% set box_class = "text-bg-blue" %}
+          {% if pos.alert_state == "alert-low" %}
+            {% set box_class = "text-bg-success" %}
+          {% elif pos.alert_state == "alert-medium" %}
+            {% set box_class = "text-bg-warning" %}
+          {% elif pos.alert_state == "alert-high" %}
+            {% set box_class = "text-bg-danger" %}
+          {% endif %}
+          <div class="info-box">
+            <span class="info-box-icon {{ box_class }} text-white">
+              <span class="small-percentage">
+                {{ pos.current_travel_percent | round(0, 'floor') | int }}%
+              </span>
+            </span>
+            <div class="info-box-content">
+              <div class="info-box-asset">
+                <span class="info-box-extra">
+                  <img src="{{ url_for('static', filename='images/' ~ pos.asset_type|lower ~ '_logo.png') }}"
+                       alt="{{ pos.asset_type }} Logo"
+                       onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/default_logo.png') }}';">
+                  <span>{{ pos.position_type }}</span>
+                </span>
+                <div class="info-box-details">
+                  <span>Value: <strong>${{ pos.value }}</strong></span>
+                  <span>Size: <strong>{{ pos.size }}</strong></span>
+                  <span>Collateral: <strong>${{ pos.collateral }}</strong></span>
+                </div>
+              </div>
+            </div>
+            <div class="info-box-wallet">
+              <img src="{{ pos.wallet_image or url_for('static', filename='images/landovault.jpg') }}"
+                   alt="Wallet Logo"
+                   onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/landovault.jpg') }}';">
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <!-- Sample data for testing (5 positions) -->
+        <div class="info-box">
+          <span class="info-box-icon text-bg-blue text-white">
+            <span class="small-percentage">75%</span>
+          </span>
+          <div class="info-box-content">
+            <div class="info-box-asset">
+              <span class="info-box-extra">
+                <img src="https://via.placeholder.com/20" alt="BTC Logo">
+                <span>Long BTC</span>
+              </span>
+              <div class="info-box-details">
+                <span>Value: <strong>$10,000</strong></span>
+                <span>Size: <strong>1.5</strong></span>
+                <span>Collateral: <strong>$5,000</strong></span>
+              </div>
+            </div>
+          </div>
+          <div class="info-box-wallet">
+            <img src="https://via.placeholder.com/30" alt="Wallet Logo">
+          </div>
+        </div>
+        <div class="info-box">
+          <span class="info-box-icon text-bg-success text-white">
+            <span class="small-percentage">60%</span>
+          </span>
+          <div class="info-box-content">
+            <div class="info-box-asset">
+              <span class="info-box-extra">
+                <img src="https://via.placeholder.com/20" alt="ETH Logo">
+                <span>Short ETH</span>
+              </span>
+              <div class="info-box-details">
+                <span>Value: <strong>$8,000</strong></span>
+                <span>Size: <strong>2.0</strong></span>
+                <span>Collateral: <strong>$4,000</strong></span>
+              </div>
+            </div>
+          </div>
+          <div class="info-box-wallet">
+            <img src="https://via.placeholder.com/30" alt="Wallet Logo">
+          </div>
+        </div>
+        <div class="info-box">
+          <span class="info-box-icon text-bg-warning text-white">
+            <span class="small-percentage">85%</span>
+          </span>
+          <div class="info-box-content">
+            <div class="info-box-asset">
+              <span class="info-box-extra">
+                <img src="https://via.placeholder.com/20" alt="LTC Logo">
+                <span>Long LTC</span>
+              </span>
+              <div class="info-box-details">
+                <span>Value: <strong>$5,000</strong></span>
+                <span>Size: <strong>10</strong></span>
+                <span>Collateral: <strong>$2,500</strong></span>
+              </div>
+            </div>
+          </div>
+          <div class="info-box-wallet">
+            <img src="https://via.placeholder.com/30" alt="Wallet Logo">
+          </div>
+        </div>
+        <div class="info-box">
+          <span class="info-box-icon text-bg-danger text-white">
+            <span class="small-percentage">95%</span>
+          </span>
+          <div class="info-box-content">
+            <div class="info-box-asset">
+              <span class="info-box-extra">
+                <img src="https://via.placeholder.com/20" alt="XRP Logo">
+                <span>Short XRP</span>
+              </span>
+              <div class="info-box-details">
+                <span>Value: <strong>$3,000</strong></span>
+                <span>Size: <strong>500</strong></span>
+                <span>Collateral: <strong>$1,500</strong></span>
+              </div>
+            </div>
+          </div>
+          <div class="info-box-wallet">
+            <img src="https://via.placeholder.com/30" alt="Wallet Logo">
+          </div>
+        </div>
+        <div class="info-box">
+          <span class="info-box-icon text-bg-blue text-white">
+            <span class="small-percentage">70%</span>
+          </span>
+          <div class="info-box-content">
+            <div class="info-box-asset">
+              <span class="info-box-extra">
+                <img src="https://via.placeholder.com/20" alt="ADA Logo">
+                <span>Long ADA</span>
+              </span>
+              <div class="info-box-details">
+                <span>Value: <strong>$4,000</strong></span>
+                <span>Size: <strong>2000</strong></span>
+                <span>Collateral: <strong>$2,000</strong></span>
+              </div>
+            </div>
+          </div>
+          <div class="info-box-wallet">
+            <img src="https://via.placeholder.com/30" alt="Wallet Logo">
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>

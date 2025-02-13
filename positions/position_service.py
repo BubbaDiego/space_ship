@@ -101,14 +101,14 @@ class PositionService:
             raise
 
     @staticmethod
-    def fill_positions_with_latest_price(positions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """
-        For each position in the provided list, retrieve the latest price for its asset type
-        using DataLocker and update the position's 'current_price' field accordingly.
-        """
+    def fill_positions_with_latest_price(positions: List[Any]) -> List[Dict[str, Any]]:
         try:
             dl = DataLocker.get_instance()
-            for pos in positions:
+            for i, pos in enumerate(positions):
+                # Convert sqlite3.Row to a dict if necessary.
+                if not isinstance(pos, dict):
+                    pos = dict(pos)
+                    positions[i] = pos
                 asset_type = pos.get('asset_type')
                 if asset_type:
                     latest_price_data = dl.get_latest_price(asset_type)

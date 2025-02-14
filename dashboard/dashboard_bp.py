@@ -140,7 +140,7 @@ def dashboard():
         # Retrieve positions data
         all_positions = PositionService.get_all_positions(DB_PATH)
         valid_positions = [pos for pos in all_positions if pos.get("current_travel_percent") is not None]
-        top_positions = sorted(valid_positions, key=lambda pos: pos["current_travel_percent"], reverse=True)[:3]
+        top_positions = sorted(valid_positions, key=lambda pos: pos["current_travel_percent"], reverse=True)
         bottom_positions = sorted(valid_positions, key=lambda pos: pos["current_travel_percent"])[:3]
         liquidation_positions = valid_positions  # Use all valid positions for the liquidation bar
 

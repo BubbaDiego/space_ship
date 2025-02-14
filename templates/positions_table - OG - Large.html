@@ -1,0 +1,193 @@
+{# positions_table.html #}
+{% extends "base.html" %}
+
+{% block extra_styles %}
+<style>
+  /* Container for update buttons */
+  .update-info-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  /* Alert cell background colors */
+  td.alert-low {
+    background-color: #d4edda !important; /* green */
+  }
+  td.alert-medium {
+    background-color: #fff3cd !important; /* yellow */
+  }
+  td.alert-high {
+    background-color: #f8d7da !important; /* red */
+  }
+
+  /* Styling for wallet image */
+  .wallet-img {
+    width: 40px;
+    height: 40px;
+    vertical-align: middle;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-3">
+  <!-- Update Info Container: Two update buttons -->
+  <div class="update-info-container">
+    <!-- Left update button for "crypto" -->
+    {% set update_type = "crypto" %}
+    {% include "update_button.html" %}
+    <!-- Right update button for "jupiter" -->
+    {% set update_type = "jupiter" %}
+    {% include "update_button.html" %}
+  </div>
+
+  <!-- Positions Table Card -->
+  <div class="card">
+    <div class="card-header {{ theme.sidebar.bg or 'bg-primary' }}">
+      <h3 class="card-title">POSITIONS</h3>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Asset</th>
+            <th>Type</th>
+            <th>Profit</th>
+            <th>Collateral</th>
+            <th>Value</th>
+            <th>Size</th>
+            <th>Leverage</th>
+            <th>Travel %</th>
+            <th>Heat Index</th>
+            <th>Liq Distance</th>
+            <th>Wallet</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pos in positions|sort(attribute='size', reverse=True) %}
+          <tr>
+            <!-- Asset Column -->
+            <td>
+              {% if pos.asset_type == 'BTC' %}
+                <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="width: 40px; height: 40px;">
+              {% elif pos.asset_type == 'ETH' %}
+                <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="width: 40px; height: 40px;">
+              {% elif pos.asset_type == 'SOL' %}
+                <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="width: 40px; height: 40px;">
+              {% else %}
+                {{ pos.asset_type }}
+              {% endif %}
+            </td>
+            <!-- Position Type Column -->
+            <td><b>{{ pos.position_type }}</b></td>
+            <!-- Profit Column -->
+            <td class="{{ pos.profit_alert_class }}">
+              {% if pos.pnl_after_fees_usd is defined and pos.pnl_after_fees_usd is not none %}
+                {{ "{:,.2f}".format(pos.pnl_after_fees_usd) }}
+                {% if pos.profit_alert_class in ['alert-medium', 'alert-high'] %}
+                  <span class="fw-bold">$</span>
+                {% endif %}
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+            <!-- Collateral Column -->
+            <td class="{{ pos.collateral_alert_class }}">
+              {{ "{:,.2f}".format(pos.collateral) }}
+            </td>
+            <!-- Value Column -->
+            <td class="{{ pos.value_alert_class }}">
+              {{ "{:,.2f}".format(pos.value) }}
+            </td>
+            <!-- Size Column -->
+            <td class="{{ pos.size_alert_class }}">
+              {{ "{:,.2f}".format(pos.size) }}
+            </td>
+            <!-- Leverage Column -->
+            <td class="{{ pos.leverage_alert_class }}">
+              {{ "{:,.2f}".format(pos.leverage) }}
+            </td>
+            <!-- Travel % Column -->
+            <td class="{{ pos.travel_liquid_alert_class }}">
+              {% if pos.current_travel_percent is not none %}
+                {{ "{:,.2f}".format(pos.current_travel_percent) }}%
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+            <!-- Heat Index Column -->
+            <td class="{{ pos.heat_alert_class }}">
+              {% if pos.heat_index is not none %}
+                {{ "{:,.2f}".format(pos.heat_index) }}
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+            <!-- Liquidation Distance Column -->
+            <td class="{{ pos.liqdist_alert_class }}">
+              {% if pos.liquidation_distance is not none %}
+                {{ "{:,.2f}".format(pos.liquidation_distance) }}
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+            <!-- Wallet Column -->
+            <td>
+              {% if pos.wallet_name %}
+                {% if pos.wallet_name is mapping %}
+                  {# Use image_path if available, otherwise use name #}
+                  {% set wallet_file = pos.wallet_name.image_path if pos.wallet_name.image_path else pos.wallet_name.name %}
+                {% else %}
+                  {% set wallet_file = pos.wallet_name %}
+                {% endif %}
+                <img src="{{ url_for('static', filename='images/' ~ wallet_file) }}" alt="Wallet Image" class="wallet-img">
+              {% else %}
+                <span class="wallet-name">Unknown</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          {% set total_profit = positions|sum(attribute='pnl_after_fees_usd') %}
+          <tr style="font-weight: bold; background-color: {{ theme.sidebar.bg or 'bg-primary' }}; text-align: center;">
+            <td>TOTALS</td>
+            <td></td>
+            <td id="footProfit">{{ "{:,.2f}".format(total_profit) }}</td>
+            <td id="footCollateral">{{ "{:,.2f}".format(totals.get("total_collateral", 0)) }}</td>
+            <td id="footValue">{{ "{:,.2f}".format(totals.get("total_value", 0)) }}</td>
+            <td id="footSize">{{ "{:,.2f}".format(totals.get("total_size", 0)) }}</td>
+            <td id="footLeverage">{{ "{:,.2f}".format(totals.get("avg_leverage", 0)) }}</td>
+            <td id="footTravelPercent">{{ "{:,.2f}".format(totals.get("avg_travel_percent", 0)) }}%</td>
+            <td id="footHeatIndex">{{ "{:,.2f}".format(totals.get("avg_heat_index", 0)) }}</td>
+            <td id="footLiqDistance"></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  console.log("Positions table extra_scripts loaded");
+
+  // Define a function to trigger update for positions.
+  const updatePositions = () => {
+    fetch("/positions/update_jupiter?source=user", { method: "POST" })
+      .then(response => response.json())
+      .then(data => {
+        console.log("Update response:", data);
+        window.location.reload();
+      })
+      .catch(err => console.error("Error updating positions:", err));
+  };
+
+  // You could also bind updatePositions() to some UI elements if needed.
+});
+</script>
+{% endblock %}

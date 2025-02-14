@@ -10,21 +10,55 @@
     margin-bottom: 1rem;
   }
 
-  /* Alert cell background colors */
-  td.alert-low {
-    background-color: #d4edda !important; /* green */
+  /* General shrink styles for positions table */
+  .table-responsive {
+    font-size: 0.8rem; /* increased font size by one notch */
   }
-  td.alert-medium {
-    background-color: #fff3cd !important; /* yellow */
+  .table-responsive table {
+    width: 100%;
   }
-  td.alert-high {
-    background-color: #f8d7da !important; /* red */
+  .table-responsive th,
+  .table-responsive td {
+    padding: 0.2rem 0.4rem;
+    line-height: 1.1;
+    max-width: 80px;
+    word-wrap: break-word;
+  }
+  /* Add pointer cursor for sortable headers */
+  th.sortable {
+    cursor: pointer;
   }
 
-  /* Additional styling for wallet cell */
-  .wallet-name {
+  /* Smaller asset icon styles */
+  .asset-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  /* Styling for wallet image */
+  .wallet-img {
+    width: 30px;
+    height: 30px;
     vertical-align: middle;
-    font-weight: bold;
+  }
+
+  /* Optional: further shrink the card header for smaller screens */
+  @media (max-width: 576px) {
+    .card-header h3 {
+      font-size: 0.9rem;
+      padding: 0.3rem;
+    }
+  }
+
+  /* Alert cell background colors */
+  td.alert-low {
+    background-color: #d4edda !important;
+  }
+  td.alert-medium {
+    background-color: #fff3cd !important;
+  }
+  td.alert-high {
+    background-color: #f8d7da !important;
   }
 </style>
 {% endblock %}
@@ -33,10 +67,8 @@
 <div class="container my-3">
   <!-- Update Info Container: Two update buttons -->
   <div class="update-info-container">
-    <!-- Left update button for "crypto" -->
     {% set update_type = "crypto" %}
     {% include "update_button.html" %}
-    <!-- Right update button for "jupiter" -->
     {% set update_type = "jupiter" %}
     {% include "update_button.html" %}
   </div>
@@ -47,130 +79,130 @@
       <h3 class="card-title">POSITIONS</h3>
     </div>
     <div class="card-body">
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>Asset</th>
-            <th>Type</th>
-            <th>Profit</th>
-            <th>Collateral</th>
-            <th>Value</th>
-            <th>Size</th>
-            <th>Leverage</th>
-            <th>Travel %</th>
-            <th>Heat Index</th>
-            <th>Liq Distance</th>
-            <th>Wallet</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for pos in positions|sort(attribute='size', reverse=True) %}
-          <tr>
-            <!-- Asset Column -->
-            <td>
-              {% if pos.asset_type == 'BTC' %}
-                <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="width: 40px; height: 40px;">
-              {% elif pos.asset_type == 'ETH' %}
-                <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="width: 40px; height: 40px;">
-              {% elif pos.asset_type == 'SOL' %}
-                <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="width: 40px; height: 40px;">
-              {% else %}
-                {{ pos.asset_type }}
-              {% endif %}
-            </td>
-            <!-- Position Type Column -->
-            <td><b>{{ pos.position_type }}</b></td>
-            <!-- Profit Column -->
-            <td class="{{ pos.profit_alert_class }}">
-              {% if pos.pnl_after_fees_usd is defined and pos.pnl_after_fees_usd is not none %}
-                {{ "{:,.2f}".format(pos.pnl_after_fees_usd) }}
-                {% if pos.profit_alert_class in ['alert-medium', 'alert-high'] %}
-                  <span class="fw-bold">$</span>
+      <div class="table-responsive">
+        <table class="table table-bordered" id="positionsTable">
+          <thead>
+            <tr>
+              <th class="sortable" data-col-index="0">Asset</th>
+              <th class="sortable" data-col-index="1">Type</th>
+              <th class="sortable" data-col-index="2">Profit</th>
+              <th class="sortable" data-col-index="3">Collateral</th>
+              <th class="sortable" data-col-index="4">Value</th>
+              <th class="sortable" data-col-index="5">Size</th>
+              <th class="sortable" data-col-index="6">Leverage</th>
+              <th class="sortable" data-col-index="7">Travel %</th>
+              <th class="sortable" data-col-index="8">Heat Index</th>
+              <th class="sortable" data-col-index="9">Liq Distance</th>
+              <th class="sortable" data-col-index="10">Wallet</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pos in positions|sort(attribute='size', reverse=True) %}
+            <tr>
+              <!-- Asset Column -->
+              <td>
+                {% if pos.asset_type == 'BTC' %}
+                  <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" class="asset-icon">
+                {% elif pos.asset_type == 'ETH' %}
+                  <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" class="asset-icon">
+                {% elif pos.asset_type == 'SOL' %}
+                  <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" class="asset-icon">
+                {% else %}
+                  {{ pos.asset_type }}
                 {% endif %}
-              {% else %}
-                N/A
-              {% endif %}
-            </td>
-            <!-- Collateral Column -->
-            <td class="{{ pos.collateral_alert_class }}">
-              {{ "{:,.2f}".format(pos.collateral) }}
-            </td>
-            <!-- Value Column -->
-            <td class="{{ pos.value_alert_class }}">
-              {{ "{:,.2f}".format(pos.value) }}
-            </td>
-            <!-- Size Column -->
-            <td class="{{ pos.size_alert_class }}">
-              {{ "{:,.2f}".format(pos.size) }}
-            </td>
-            <!-- Leverage Column -->
-            <td class="{{ pos.leverage_alert_class }}">
-              {{ "{:,.2f}".format(pos.leverage) }}
-            </td>
-            <!-- Travel % Column -->
-            <td class="{{ pos.travel_liquid_alert_class }}">
-              {% if pos.current_travel_percent is not none %}
-                {{ "{:,.2f}".format(pos.current_travel_percent) }}%
-              {% else %}
-                N/A
-              {% endif %}
-            </td>
-            <!-- Heat Index Column -->
-            <td class="{{ pos.heat_alert_class }}">
-              {% if pos.heat_index is not none %}
-                {{ "{:,.2f}".format(pos.heat_index) }}
-              {% else %}
-                N/A
-              {% endif %}
-            </td>
-            <!-- Liquidation Distance Column -->
-            <td class="{{ pos.liqdist_alert_class }}">
-              {% if pos.liquidation_distance is not none %}
-                {{ "{:,.2f}".format(pos.liquidation_distance) }}
-              {% else %}
-                N/A
-              {% endif %}
-            </td>
-            <!-- Wallet Column -->
-            <td>
-              {% if pos.wallet_name and pos.wallet_name.name %}
-                {% if pos.wallet_name.image_path %}
-                  {% set wallet_image = pos.wallet_name.image_path %}
-                  {% if '\\' in wallet_image %}
-                    {% set wallet_filename = wallet_image.split('\\')[-1] %}
-                  {% elif '/' in wallet_image %}
-                    {% set wallet_filename = wallet_image.split('/')[-1] %}
-                  {% else %}
-                    {% set wallet_filename = wallet_image %}
+              </td>
+              <!-- Position Type Column -->
+              <td><b>{{ pos.position_type }}</b></td>
+              <!-- Profit Column -->
+              <td class="{{ pos.profit_alert_class }}">
+                {% if pos.pnl_after_fees_usd is defined and pos.pnl_after_fees_usd is not none %}
+                  {{ "{:,.2f}".format(pos.pnl_after_fees_usd) }}
+                  {% if pos.profit_alert_class in ['alert-medium', 'alert-high'] %}
+                    <span class="fw-bold">$</span>
                   {% endif %}
-                  {% set wallet_url = url_for('static', filename='images/' ~ wallet_filename) %}
-                  <img src="{{ wallet_url }}" alt="{{ pos.wallet_name.name }}" style="width: 40px; height: 40px; vertical-align: middle; margin-right: 5px;">
+                {% else %}
+                  N/A
                 {% endif %}
-                <span class="wallet-name">{{ pos.wallet_name.name }}</span>
-              {% else %}
-                N/A
-              {% endif %}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-        <tfoot>
-          {% set total_profit = positions|sum(attribute='pnl_after_fees_usd') %}
-          <tr style="font-weight: bold; background-color: {{ theme.sidebar.bg or 'bg-primary' }}; text-align: center;">
-            <td>TOTALS</td>
-            <td></td>
-            <td id="footProfit">{{ "{:,.2f}".format(total_profit) }}</td>
-            <td id="footCollateral">{{ "{:,.2f}".format(totals.get("total_collateral", 0)) }}</td>
-            <td id="footValue">{{ "{:,.2f}".format(totals.get("total_value", 0)) }}</td>
-            <td id="footSize">{{ "{:,.2f}".format(totals.get("total_size", 0)) }}</td>
-            <td id="footLeverage">{{ "{:,.2f}".format(totals.get("avg_leverage", 0)) }}</td>
-            <td id="footTravelPercent">{{ "{:,.2f}".format(totals.get("avg_travel_percent", 0)) }}%</td>
-            <td id="footHeatIndex">{{ "{:,.2f}".format(totals.get("avg_heat_index", 0)) }}</td>
-            <td id="footLiqDistance"></td>
-            <td></td>
-          </tr>
-        </tfoot>
-      </table>
+              </td>
+              <!-- Collateral Column -->
+              <td class="{{ pos.collateral_alert_class }}">
+                {{ "{:,.2f}".format(pos.collateral) }}
+              </td>
+              <!-- Value Column -->
+              <td class="{{ pos.value_alert_class }}">
+                {{ "{:,.2f}".format(pos.value) }}
+              </td>
+              <!-- Size Column -->
+              <td class="{{ pos.size_alert_class }}">
+                {{ "{:,.2f}".format(pos.size) }}
+              </td>
+              <!-- Leverage Column -->
+              <td class="{{ pos.leverage_alert_class }}">
+                {{ "{:,.2f}".format(pos.leverage) }}
+              </td>
+              <!-- Travel % Column -->
+              <td class="{{ pos.travel_liquid_alert_class }}">
+                {% if pos.current_travel_percent is not none %}
+                  {{ "{:,.2f}".format(pos.current_travel_percent) }}%
+                {% else %}
+                  N/A
+                {% endif %}
+              </td>
+              <!-- Heat Index Column -->
+              <td class="{{ pos.heat_alert_class }}">
+                {% if pos.heat_index is not none %}
+                  {{ "{:,.2f}".format(pos.heat_index) }}
+                {% else %}
+                  N/A
+                {% endif %}
+              </td>
+              <!-- Liq Distance Column -->
+              <td class="{{ pos.liqdist_alert_class }}">
+                {% if pos.liquidation_distance is not none %}
+                  {{ "{:,.2f}".format(pos.liquidation_distance) }}
+                {% else %}
+                  N/A
+                {% endif %}
+              </td>
+              <!-- Wallet Column -->
+              <td>
+                {% set wallet_file = None %}
+                {% if pos.wallet_image %}
+                  {% set wallet_file = pos.wallet_image %}
+                {% elif pos.wallet_name %}
+                  {% if pos.wallet_name is mapping %}
+                    {% set wallet_file = pos.wallet_name.image_path if pos.wallet_name.image_path else pos.wallet_name.name %}
+                  {% else %}
+                    {% set wallet_file = pos.wallet_name %}
+                  {% endif %}
+                {% endif %}
+                {% if wallet_file %}
+                  <img src="{{ url_for('static', filename='images/' ~ wallet_file) }}" alt="Wallet Image" class="wallet-img">
+                {% else %}
+                  <span class="wallet-name">Unknown</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            {% set total_profit = positions|sum(attribute='pnl_after_fees_usd') %}
+            <tr style="font-weight: bold; background-color: {{ theme.sidebar.bg or 'bg-primary' }}; text-align: center;">
+              <td>TOTALS</td>
+              <td></td>
+              <td id="footProfit">{{ "{:,.2f}".format(total_profit) }}</td>
+              <td id="footCollateral">{{ "{:,.2f}".format(totals.get("total_collateral", 0)) }}</td>
+              <td id="footValue">{{ "{:,.2f}".format(totals.get("total_value", 0)) }}</td>
+              <td id="footSize">{{ "{:,.2f}".format(totals.get("total_size", 0)) }}</td>
+              <td id="footLeverage">{{ "{:,.2f}".format(totals.get("avg_leverage", 0)) }}</td>
+              <td id="footTravelPercent">{{ "{:,.2f}".format(totals.get("avg_travel_percent", 0)) }}%</td>
+              <td id="footHeatIndex">{{ "{:,.2f}".format(totals.get("avg_heat_index", 0)) }}</td>
+              <td id="footLiqDistance"></td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
     </div>
   </div>
 </div>
@@ -181,18 +213,48 @@
 document.addEventListener("DOMContentLoaded", function () {
   console.log("Positions table extra_scripts loaded");
 
-  // Define a function to trigger update for positions.
-  const updatePositions = () => {
-    fetch("/positions/update_jupiter?source=user", { method: "POST" })
-      .then(response => response.json())
-      .then(data => {
-        console.log("Update response:", data);
-        window.location.reload();
-      })
-      .catch(err => console.error("Error updating positions:", err));
-  };
+  // Get the table and all sortable headers
+  var table = document.getElementById("positionsTable");
+  var headers = table.querySelectorAll("th.sortable");
 
-  // You could also bind updatePositions() to some UI elements if needed.
+  headers.forEach(function(header) {
+    header.addEventListener("click", function () {
+      var colIndex = parseInt(header.getAttribute("data-col-index"));
+      var tbody = table.getElementsByTagName("tbody")[0];
+      var rows = Array.from(tbody.getElementsByTagName("tr"));
+
+      // Sort rows in descending order based on the clicked column
+      rows.sort(function (a, b) {
+        var aCell = a.getElementsByTagName("td")[colIndex];
+        var bCell = b.getElementsByTagName("td")[colIndex];
+
+        // Attempt to get text content, if empty, check for image alt attribute
+        var aText = aCell.innerText.trim();
+        var bText = bCell.innerText.trim();
+        if(aText === "" && aCell.querySelector("img")){
+           aText = aCell.querySelector("img").getAttribute("alt") || "";
+        }
+        if(bText === "" && bCell.querySelector("img")){
+           bText = bCell.querySelector("img").getAttribute("alt") || "";
+        }
+        // Remove commas, currency symbols, etc., and try to parse as number
+        var aNum = parseFloat(aText.replace(/[^0-9.-]+/g, ""));
+        var bNum = parseFloat(bText.replace(/[^0-9.-]+/g, ""));
+
+        // If both values are valid numbers, sort numerically; otherwise, sort as strings.
+        if (!isNaN(aNum) && !isNaN(bNum)) {
+          return bNum - aNum; // descending
+        } else {
+          return bText.localeCompare(aText);
+        }
+      });
+
+      // Re-append sorted rows
+      rows.forEach(function (row) {
+        tbody.appendChild(row);
+      });
+    });
+  });
 });
 </script>
 {% endblock %}

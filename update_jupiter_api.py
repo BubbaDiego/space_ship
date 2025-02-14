@@ -12,7 +12,9 @@ def main():
         return
 
     # Make the request using the CA bundle
-    r = requests.post("https://www.deadlypanda.com/update_jupiter", verify=ca_bundle)
+    r = requests.post("https://www.deadlypanda.com/positions/update_jupiter", verify=False)#ca_bundle)
+
+    #r = requests.post("https://www.deadlypanda.com/update_jupiter", verify=ca_bundle)
     print(r.status_code, r.text)
 
 

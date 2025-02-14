@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Load ApexCharts library -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <style>
+    /* Override Bootstrap for the card body in our debug container */
+    .invisible-container .card-body {
+      display: block !important;
+      overflow: visible !important;
+      height: auto !important;
+    }
+
+    /* New Top Positions Styles (Thinner & Full Width) */
+    .info-box {
+      display: flex;
+      align-items: center;
+      background-color: #e0e0e0;
+      padding: 2px !important;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2px !important;
+      width: 100% !important;
+    }
+    .info-box-wallet {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+    }
+    .info-box-wallet img {
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+    }
+    .info-box-asset {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .info-box-extra {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.6rem;
+      margin: 0;
+    }
+    .info-box-extra img {
+      vertical-align: middle;
+      width: 20px;
+      height: 20px;
+    }
+    .info-box-extra span {
+      margin-left: 2px;
+    }
+    .info-box-extra span:last-child {
+      font-size: 0.65rem;
+      font-weight: bold;
+    }
+    .info-box-icon {
+      width: 30px;
+      height: 25px;
+      line-height: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      margin-right: 2px;
+    }
+    .text-bg-blue { background-color: #007bff !important; }
+    .text-bg-success { background-color: #28a745 !important; }
+    .text-bg-warning { background-color: #ffc107 !important; }
+    .text-bg-danger { background-color: #dc3545 !important; }
+    .small-percentage {
+      font-size: 0.75rem !important;
+      font-weight: bold !important;
+      font-family: 'Nunito', sans-serif;
+      color: white !important;
+      margin-right: 0 !important;
+    }
+    .info-box-details {
+      display: flex;
+      gap: 3px;
+      font-size: 0.75rem;
+      align-items: center;
+      margin-left: 2px;
+    }
+
+    /* Container and Grid */
+    .container {
+      width: 90%;
+      margin: 0 auto;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .col-left {
+      flex: 2; /* left column takes more space */
+    }
+    .col-right {
+      flex: 1; /* right column takes less space */
+    }
+
+    /* Chart Wrapper */
+    .chart-wrapper {
+      min-height: 350px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>Dashboard</h1>
+  <div class="container">
+    <div class="row">
+      <!-- Left column: Top Positions Card -->
+      <div class="col-left">
+        <div class="invisible-container" style="border: 1px dotted red; padding: 10px;">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Top Positions</h3>
+            </div>
+            <div class="card-body">
+              {% if top_positions %}
+                {% for pos in top_positions %}
+                  {% set box_class = "text-bg-blue" %}
+                  {% if pos.alert_state == "alert-low" %}
+                    {% set box_class = "text-bg-success" %}
+                  {% elif pos.alert_state == "alert-medium" %}
+                    {% set box_class = "text-bg-warning" %}
+                  {% elif pos.alert_state == "alert-high" %}
+                    {% set box_class = "text-bg-danger" %}
+                  {% endif %}
+                  <div class="info-box">
+                    <span class="info-box-icon {{ box_class }} text-white">
+                      <span class="small-percentage">
+                        {{ pos.current_travel_percent | round(0, 'floor') | int }}%
+                      </span>
+                    </span>
+                    <div class="info-box-content">
+                      <div class="info-box-asset">
+                        <span class="info-box-extra">
+                          <img src="{{ url_for('static', filename='images/' ~ pos.asset_type|lower ~ '_logo.png') }}"
+                               alt="{{ pos.asset_type }} Logo"
+                               onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/default_logo.png') }}';">
+                          <span>{{ pos.position_type }}</span>
+                        </span>
+                        <div class="info-box-details">
+                          <span>Value: <strong>${{ pos.value }}</strong></span>
+                          <span>Size: <strong>{{ pos.size }}</strong></span>
+                          <span>Collateral: <strong>${{ pos.collateral }}</strong></span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="info-box-wallet">
+                      <img src="{{ pos.wallet_image or url_for('static', filename='images/landovault.jpg') }}"
+                           alt="Wallet Logo"
+                           onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/landovault.jpg') }}';">
+                    </div>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <!-- Sample data for testing (5 positions) -->
+                <div class="info-box">
+                  <span class="info-box-icon text-bg-blue text-white">
+                    <span class="small-percentage">75%</span>
+                  </span>
+                  <div class="info-box-content">
+                    <div class="info-box-asset">
+                      <span class="info-box-extra">
+                        <img src="https://via.placeholder.com/20" alt="BTC Logo">
+                        <span>Long BTC</span>
+                      </span>
+                      <div class="info-box-details">
+                        <span>Value: <strong>$10,000</strong></span>
+                        <span>Size: <strong>1.5</strong></span>
+                        <span>Collateral: <strong>$5,000</strong></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-box-wallet">
+                    <img src="https://via.placeholder.com/30" alt="Wallet Logo">
+                  </div>
+                </div>
+                <div class="info-box">
+                  <span class="info-box-icon text-bg-success text-white">
+                    <span class="small-percentage">60%</span>
+                  </span>
+                  <div class="info-box-content">
+                    <div class="info-box-asset">
+                      <span class="info-box-extra">
+                        <img src="https://via.placeholder.com/20" alt="ETH Logo">
+                        <span>Short ETH</span>
+                      </span>
+                      <div class="info-box-details">
+                        <span>Value: <strong>$8,000</strong></span>
+                        <span>Size: <strong>2.0</strong></span>
+                        <span>Collateral: <strong>$4,000</strong></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-box-wallet">
+                    <img src="https://via.placeholder.com/30" alt="Wallet Logo">
+                  </div>
+                </div>
+                <div class="info-box">
+                  <span class="info-box-icon text-bg-warning text-white">
+                    <span class="small-percentage">85%</span>
+                  </span>
+                  <div class="info-box-content">
+                    <div class="info-box-asset">
+                      <span class="info-box-extra">
+                        <img src="https://via.placeholder.com/20" alt="LTC Logo">
+                        <span>Long LTC</span>
+                      </span>
+                      <div class="info-box-details">
+                        <span>Value: <strong>$5,000</strong></span>
+                        <span>Size: <strong>10</strong></span>
+                        <span>Collateral: <strong>$2,500</strong></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-box-wallet">
+                    <img src="https://via.placeholder.com/30" alt="Wallet Logo">
+                  </div>
+                </div>
+                <div class="info-box">
+                  <span class="info-box-icon text-bg-danger text-white">
+                    <span class="small-percentage">95%</span>
+                  </span>
+                  <div class="info-box-content">
+                    <div class="info-box-asset">
+                      <span class="info-box-extra">
+                        <img src="https://via.placeholder.com/20" alt="XRP Logo">
+                        <span>Short XRP</span>
+                      </span>
+                      <div class="info-box-details">
+                        <span>Value: <strong>$3,000</strong></span>
+                        <span>Size: <strong>500</strong></span>
+                        <span>Collateral: <strong>$1,500</strong></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-box-wallet">
+                    <img src="https://via.placeholder.com/30" alt="Wallet Logo">
+                  </div>
+                </div>
+                <div class="info-box">
+                  <span class="info-box-icon text-bg-blue text-white">
+                    <span class="small-percentage">70%</span>
+                  </span>
+                  <div class="info-box-content">
+                    <div class="info-box-asset">
+                      <span class="info-box-extra">
+                        <img src="https://via.placeholder.com/20" alt="ADA Logo">
+                        <span>Long ADA</span>
+                      </span>
+                      <div class="info-box-details">
+                        <span>Value: <strong>$4,000</strong></span>
+                        <span>Size: <strong>2000</strong></span>
+                        <span>Collateral: <strong>$2,000</strong></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info-box-wallet">
+                    <img src="https://via.placeholder.com/30" alt="Wallet Logo">
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Right column: Size Comparison Chart -->
+      <div class="col-right">
+        <div class="chart-wrapper" id="positions-chart"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.onload = function() {
+      console.log("Window loaded, starting chart initialization");
+
+      // Ensure ApexCharts is loaded
+      if (typeof ApexCharts === 'undefined') {
+        console.error("ApexCharts library not loaded!");
+        return;
+      }
+
+      // Get the chart container
+      var chartContainer = document.getElementById("positions-chart");
+      if (!chartContainer) {
+        console.error("positions-chart container not found");
+        return;
+      }
+      console.log("Found positions-chart container:", chartContainer);
+
+      // Define chart instance variable
+      var chartInstance = null;
+
+      // Chart options configuration
+      var options = {
+        series: [65, 35],
+        chart: {
+          type: 'pie',
+          height: 350,
+          events: {
+            click: function(event, chartContext, config) {
+              // Toggle between 'pie' and 'donut'
+              var currentType = chartInstance.w.config.chart.type;
+              var newType = currentType === 'pie' ? 'donut' : 'pie';
+              chartInstance.updateOptions({ chart: { type: newType } });
+              console.log("Chart type toggled to:", newType);
+            }
+          }
+        },
+        labels: ['Long Positions', 'Short Positions'],
+        colors: ['#0d6efd', '#5dcc8e'],
+        legend: {
+          position: 'bottom'
+        },
+        dataLabels: {
+          enabled: true,
+          style: {
+            fontSize: '1.2rem'
+          }
+        }
+      };
+
+      // Create and render the chart
+      chartInstance = new ApexCharts(chartContainer, options);
+      chartInstance.render()
+        .then(function() {
+          console.log("Chart rendered successfully");
+        })
+        .catch(function(err) {
+          console.error("Chart render error:", err);
+        });
+    };
+  </script>
+</body>
+</html>

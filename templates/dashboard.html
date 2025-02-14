@@ -99,15 +99,15 @@
     }
   }
 
-  /* -------------------- Top Positions -------------------- */
+  /* -------------------- Top Positions (Thinner Rows) -------------------- */
   .info-box {
     display: flex;
     align-items: center;
     background-color: #e0e0e0;
-    padding: 2px !important;
+    padding: 1px !important;    /* Reduced padding */
     border-radius: 4px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    margin-bottom: 2px !important;
+    margin-bottom: 1px !important; /* Reduced margin */
     width: 100% !important;
   }
   .info-box-wallet {
@@ -429,7 +429,7 @@
 </script>
 
 <script>
-  // Update Button Script for Jupiter button
+  // Update Button Script for Jupiter button with page refresh after update
   document.addEventListener("DOMContentLoaded", function() {
     const container = document.querySelector('.update-button[data-type="jupiter"]');
     if (!container) return;
@@ -442,6 +442,8 @@
         .then(data => {
             console.log("Update response:", data);
             img.classList.remove("spin");
+            // Quick refresh of the page after update
+            setTimeout(() => { location.reload(); }, 500);
         })
         .catch(err => {
             console.error("Error updating positions:", err);

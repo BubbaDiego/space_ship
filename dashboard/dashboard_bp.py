@@ -142,9 +142,10 @@ def compute_collateral_composition():
 # -------------------------------
 
 @dashboard_bp.route("/dashboard")
+@dashboard_bp.route("/dashboard")
 def dashboard():
     try:
-        # Retrieve positions data
+        # Retrieve positions data.
         all_positions = PositionService.get_all_positions(DB_PATH)
         valid_positions = [pos for pos in all_positions if pos.get("current_travel_percent") is not None]
         top_positions = sorted(valid_positions, key=lambda pos: pos["current_travel_percent"], reverse=True)
@@ -158,12 +159,29 @@ def dashboard():
         portfolio_change = 0
         if portfolio_history:
             portfolio_value = portfolio_history[-1].get("total_value", 0)
-            if len(portfolio_history) >= 2:
+            # Compute change over the last 24 hours.
+            cutoff = datetime.now() - timedelta(hours=24)
+            filtered_history = []
+            for entry in portfolio_history:
+                snapshot = entry.get("snapshot_time")
+                if snapshot:
+                    try:
+                        t = datetime.fromisoformat(snapshot)
+                        if t >= cutoff:
+                            filtered_history.append(entry)
+                    except Exception as e:
+                        logger.error(f"Error parsing snapshot_time: {e}")
+            if filtered_history:
+                first_val = filtered_history[0].get("total_value", 0)
+                if first_val:
+                    portfolio_change = ((filtered_history[-1].get("total_value", 0) - first_val) / first_val) * 100
+            else:
+                # Fallback: use entire history if no data in last 24 hours.
                 first_val = portfolio_history[0].get("total_value", 0)
                 if first_val:
                     portfolio_change = ((portfolio_history[-1].get("total_value", 0) - first_val) / first_val) * 100
 
-        # Format the numbers
+        # Format the numbers.
         formatted_portfolio_value = "{:,.2f}".format(portfolio_value)
         formatted_portfolio_change = "{:,.1f}".format(portfolio_change)
 
@@ -227,7 +245,6 @@ def dashboard():
             sp500_value="0.00",
             sp500_change="0.0"
         )
-
 
 @dashboard_bp.route("/theme")
 def theme_options():

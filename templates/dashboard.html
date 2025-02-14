@@ -17,6 +17,7 @@
     align-items: center;
     background-color: #e7f0fd; /* subtle blue */
     padding: 0.5rem 1rem;
+    height: 50px; /* fixed height for uniformity */
   }
   .header-icon {
     font-size: 1.5rem !important;
@@ -82,12 +83,11 @@
 
   /* -------------------- Dashboard Layout -------------------- */
   .card-container {
-    margin: 2.5px auto;  /* Reduced top margin further */
+    margin: 2.5px auto;
   }
   .row {
     margin-bottom: 20px;
   }
-  /* Two columns on medium+ screens, one column on small screens */
   .col-md-6 {
     flex: 0 0 50%;
     max-width: 50%;
@@ -99,7 +99,7 @@
     }
   }
 
-  /* -------------------- Top Positions (Using provided top_positions.html Styles) -------------------- */
+  /* -------------------- Top Positions Styles -------------------- */
   .invisible-container .card-body {
     display: block !important;
     overflow: visible !important;
@@ -187,7 +187,7 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 3rem; /* Increased space below status bar */
+    margin-bottom: 3rem;
   }
   .top-bar .update-btn img {
     width: 70px;
@@ -195,19 +195,42 @@
     cursor: pointer;
     border-radius: 50%;
   }
+  /* Right-justify the status bar */
+  .top-bar .status-bar {
+    margin-left: auto !important;
+    width: auto !important;
+  }
   .top-bar .status-bar .card {
-    margin-bottom: 0;
+    margin-bottom: 0 !important;
   }
-  /* Reduced status bar height via minimized padding */
   .top-bar .status-bar .card-body {
-    padding: 0.25rem;
+    padding: 0.15rem 0.4rem !important;
+    text-align: center;
+    min-height: 25px !important;
   }
-  .top-bar .toggle-group .btn {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
-    border-radius: 20px;
+  /* Make the status bar's text and icons a bit smaller */
+  .top-bar .status-bar .card-body h5 {
+    font-size: 1rem !important;
+    margin: 0;
   }
-  /* Custom header for Top Positions card to push the icon to the far right */
+  .top-bar .status-bar .card-body span {
+    font-size: 0.85rem !important;
+  }
+  .top-bar .status-bar .card-body i {
+    font-size: 14px !important;
+    margin-right: 2px;
+  }
+  .top-bar .status-bar .card-body img {
+    height: 14px !important;
+    margin-right: 2px;
+  }
+  /* -------------------- Radio Buttons Styles -------------------- */
+  .toggle-group .btn {
+    font-size: 0.8rem !important;
+    padding: 0.25rem 0.5rem !important;
+  }
+
+  /* -------------------- Top Positions Header -------------------- */
   .top-positions-header {
     display: flex;
     align-items: center;
@@ -219,6 +242,17 @@
     margin-left: auto;
     font-size: 1.5rem;
     text-decoration: none;
+  }
+
+  /* -------------------- Performance Card Time Controls -------------------- */
+  .performance-time-controls .btn {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.65rem;
+    opacity: 0.7;
+    margin-bottom: 0.2rem;
+  }
+  .performance-time-controls .btn:hover {
+    opacity: 1;
   }
 </style>
 {% endblock %}
@@ -236,7 +270,7 @@
       </button>
     </div>
     <!-- Status Bar with real-time data -->
-    <div class="status-bar w-100">
+    <div class="status-bar">
       <!-- Subtle Radio Toggle (aligned to right) -->
       <div class="d-flex justify-content-end mb-2 toggle-group">
         <div class="btn-group btn-group-sm" role="group" aria-label="Toggle Hours">
@@ -253,10 +287,10 @@
       <!-- Inline Status Bar Card with real data -->
       <div class="card" style="background-color: #f2f2f2;">
         <div class="card-body">
-          <div class="row text-center">
+          <div class="row">
             <!-- Portfolio -->
             <div class="col d-flex align-items-center justify-content-center border-end">
-              <i class="bi bi-wallet2" style="font-size: 24px; margin-right: 8px;"></i>
+              <i class="bi bi-wallet2" style="font-size: 14px; margin-right: 2px;"></i>
               <div>
                 <span class="text-success">
                   <i class="bi bi-caret-up-fill"></i> {{ portfolio_change }}%
@@ -267,7 +301,7 @@
             </div>
             <!-- Bitcoin -->
             <div class="col d-flex align-items-center justify-content-center border-end">
-              <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="height: 20px; margin-right: 5px;">
+              <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="height: 14px; margin-right: 2px;">
               <div>
                 <span class="text-success">
                   <i class="bi bi-caret-up-fill"></i> {{ btc_change }}%
@@ -278,7 +312,7 @@
             </div>
             <!-- Ethereum -->
             <div class="col d-flex align-items-center justify-content-center border-end">
-              <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="height: 20px; margin-right: 5px;">
+              <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="height: 14px; margin-right: 2px;">
               <div>
                 <span class="text-info">
                   <i class="bi bi-caret-left-fill"></i> {{ eth_change }}%
@@ -289,7 +323,7 @@
             </div>
             <!-- Solana -->
             <div class="col d-flex align-items-center justify-content-center border-end">
-              <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="height: 20px; margin-right: 5px;">
+              <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="height: 14px; margin-right: 2px;">
               <div>
                 <span class="text-success">
                   <i class="bi bi-caret-up-fill"></i> {{ sol_change }}%
@@ -368,23 +402,23 @@
     <!-- Portfolio Performance Card -->
     <div class="col-md-6">
       <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center" style="position: relative;">
-          <div>
-            <h3 class="card-title mb-0">Performance</h3>
-          </div>
-          <small id="percentChangeDisplay" style="font-weight: bold; font-size: 1.5rem; position: absolute; top: 50%; right: 10px; transform: translateY(-50%);"></small>
-          <div id="portfolioTimeframeControls">
-            <div class="btn-group btn-group-sm" role="group" aria-label="Portfolio Timeframe">
-              <button type="button" class="btn btn-outline-secondary" onclick="setPortfolioTimeframe(1)">1h</button>
-              <button type="button" class="btn btn-outline-secondary" onclick="setPortfolioTimeframe(3)">3h</button>
-              <button type="button" class="btn btn-outline-secondary" onclick="setPortfolioTimeframe(6)">6h</button>
-              <button type="button" class="btn btn-outline-secondary" onclick="setPortfolioTimeframe(12)">12h</button>
-              <button type="button" class="btn btn-outline-secondary" onclick="setPortfolioTimeframe(24)">24h</button>
+        <div class="card-header d-flex align-items-center">
+          <h3 class="card-title mb-0">Performance</h3>
+          <small id="percentChangeDisplay" class="ms-auto" style="font-weight: bold; font-size: 1.5rem;"></small>
+        </div>
+        <div class="card-body" style="position: relative;">
+          <div class="d-flex">
+            <div class="flex-grow-1">
+              <canvas id="portfolioChart" style="width: 100%; height: 300px;"></canvas>
+            </div>
+            <div class="performance-time-controls d-flex flex-column justify-content-center" style="margin-left: 10px;">
+              <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPortfolioTimeframe(1)">1h</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPortfolioTimeframe(3)">3h</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPortfolioTimeframe(6)">6h</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPortfolioTimeframe(12)">12h</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPortfolioTimeframe(24)">24h</button>
             </div>
           </div>
-        </div>
-        <div class="card-body">
-          <canvas id="portfolioChart" style="width: 100%; height: 300px;"></canvas>
         </div>
       </div>
     </div>
@@ -485,7 +519,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 <script>
-  // Global portfolioData and portfolioChart variable
   const portfolioData = {{ portfolio_data | tojson }};
   let portfolioChart;
 
@@ -494,7 +527,6 @@
       console.warn("No portfolio data available for chart rendering.");
       return;
     }
-    // Build the portfolio performance chart using portfolioData
     const labels = portfolioData.map(item => item.snapshot_time);
     const data = portfolioData.map(item => item.total_value);
     const ctx = document.getElementById('portfolioChart').getContext('2d');
@@ -511,15 +543,11 @@
       },
       options: {
         scales: {
-          x: {
-            type: 'time',
-            time: { unit: 'day' }
-          },
+          x: { type: 'time', time: { unit: 'day' } },
           y: { beginAtZero: true }
         }
       }
     });
-    // Initialize percent change display based on default timeframe (24h)
     setPortfolioTimeframe(24);
   });
 
@@ -528,10 +556,8 @@
     const currentTime = new Date();
     const cutoff = new Date(currentTime.getTime() - hours * 3600000);
     const filteredData = portfolioData.filter(item => new Date(item.snapshot_time) >= cutoff);
-    const newLabels = filteredData.map(item => item.snapshot_time);
-    const newData = filteredData.map(item => item.total_value);
-    portfolioChart.data.labels = newLabels;
-    portfolioChart.data.datasets[0].data = newData;
+    portfolioChart.data.labels = filteredData.map(item => item.snapshot_time);
+    portfolioChart.data.datasets[0].data = filteredData.map(item => item.total_value);
     portfolioChart.update();
 
     if (filteredData.length > 0) {
@@ -548,7 +574,6 @@
 </script>
 
 <script>
-  // Size Comparison Chart using ApexCharts with dynamic data from API
   window.onload = function() {
     if (typeof ApexCharts === 'undefined') {
       console.error("ApexCharts library not loaded!");
@@ -559,7 +584,6 @@
       console.error("positions-chart container not found");
       return;
     }
-    // Fetch the size composition data from the API
     fetch("/api/size_composition")
       .then(response => response.json())
       .then(data => {
@@ -583,17 +607,13 @@
            dataLabels: { enabled: true, style: { fontSize: '1.2rem' } }
          };
          var chartInstance = new ApexCharts(chartContainer, options);
-         chartInstance.render()
-           .catch(function(err) { console.error("ApexCharts render error:", err); });
+         chartInstance.render().catch(function(err) { console.error("ApexCharts render error:", err); });
       })
-      .catch(function(err) {
-         console.error("Error fetching size composition data:", err);
-      });
+      .catch(function(err) { console.error("Error fetching size composition data:", err); });
   };
 </script>
 
 <script>
-  // Update Button Script for Jupiter button
   document.addEventListener("DOMContentLoaded", function() {
     const container = document.querySelector('.update-button[data-type="{{ update_type | default("jupiter") }}"]');
     if (!container) return;
@@ -604,9 +624,11 @@
         .then(response => response.json())
         .then(data => {
             img.classList.remove("spin");
+            window.location.reload();
         })
         .catch(err => {
             img.classList.remove("spin");
+            console.error(err);
         });
     });
   });
@@ -618,7 +640,6 @@
 </style>
 
 <script>
-  // Theme Toggle Script remains unchanged
   document.addEventListener('DOMContentLoaded', function() {
     const currentTheme = localStorage.getItem('theme') || 'light';
     document.body.classList.add(currentTheme + '-mode');

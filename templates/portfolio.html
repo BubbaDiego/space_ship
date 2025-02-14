@@ -144,8 +144,12 @@
 
 <!-- Portfolio Performance Chart -->
 <div class="card mb-3">
-  <div class="card-header">
-    <h3 class="card-title">Portfolio Performance</h3>
+  <div class="card-header d-flex justify-content-between align-items-center" style="position: relative;">
+    <div>
+      <h3 class="card-title mb-0">Portfolio Performance</h3>
+    </div>
+    <!-- Percent Change Display in the right-hand corner, centered vertically -->
+    <small id="percentChangeDisplay" style="font-weight: bold; font-size: 1.5rem; position: absolute; top: 50%; right: 10px; transform: translateY(-50%);"></small>
     <!-- Time Range Selector -->
     <div id="portfolioTimeframeControls">
       <div class="btn-group btn-group-sm" role="group" aria-label="Portfolio Timeframe">
@@ -272,24 +276,36 @@
         }
       }
     });
+    // Initialize percent change display based on default timeframe (if needed)
+    setPortfolioTimeframe(24);
   });
 
   function setPortfolioTimeframe(hours) {
-  if (!portfolioData || portfolioData.length === 0) return;
-  // Use the actual system current time
-  const currentTime = new Date();
-  const cutoff = new Date(currentTime.getTime() - hours * 3600000);
-  console.log("Using system current time:", currentTime, "Cutoff:", cutoff);
-  const filteredData = portfolioData.filter(item => new Date(item.snapshot_time) >= cutoff);
-  console.log("Filtered data count:", filteredData.length);
-  const newLabels = filteredData.map(item => item.snapshot_time);
-  const newData = filteredData.map(item => item.total_value);
-  portfolioChart.data.labels = newLabels;
-  portfolioChart.data.datasets[0].data = newData;
-  portfolioChart.update();
-}
+    if (!portfolioData || portfolioData.length === 0) return;
+    // Use the actual system current time
+    const currentTime = new Date();
+    const cutoff = new Date(currentTime.getTime() - hours * 3600000);
+    console.log("Using system current time:", currentTime, "Cutoff:", cutoff);
+    const filteredData = portfolioData.filter(item => new Date(item.snapshot_time) >= cutoff);
+    console.log("Filtered data count:", filteredData.length);
+    const newLabels = filteredData.map(item => item.snapshot_time);
+    const newData = filteredData.map(item => item.total_value);
+    portfolioChart.data.labels = newLabels;
+    portfolioChart.data.datasets[0].data = newData;
+    portfolioChart.update();
 
-
+    // Calculate percent change based on the filtered data
+    if(filteredData.length > 0) {
+      const firstValue = filteredData[0].total_value;
+      const lastValue = filteredData[filteredData.length - 1].total_value;
+      const percentChange = ((lastValue - firstValue) / firstValue) * 100;
+      const percentElem = document.getElementById("percentChangeDisplay");
+      if(percentElem) {
+        percentElem.textContent = percentChange.toFixed(2) + "%";
+        percentElem.style.color = percentChange >= 0 ? "green" : "red";
+      }
+    }
+  }
 </script>
 <script>
   document.addEventListener("DOMContentLoaded", function() {

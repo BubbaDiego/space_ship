@@ -4,6 +4,12 @@
 
 {% block extra_styles %}
 <style>
+  /* -------------------- Background Wallpaper -------------------- */
+  body {
+    background: url("{{ url_for('static', filename='images/wallpaper.png') }}") no-repeat center center fixed;
+    background-size: cover;
+  }
+
   /* -------------------- General Card Header Styling -------------------- */
   .card-header {
     display: flex;
@@ -94,7 +100,6 @@
   }
 
   /* -------------------- Top Positions -------------------- */
-  /* (Removed red dotted container styling) */
   .info-box {
     display: flex;
     align-items: center;
@@ -173,7 +178,18 @@
 {% endblock %}
 
 {% block content %}
-<div class="container card-container">
+<!-- Jupiter Update Button in the Upper Left Corner -->
+<div style="position: absolute; top: 10px; left: 10px; z-index: 1000;">
+  <button type="button" class="update-button" data-type="jupiter" style="background: none; border: none; padding: 0;">
+    <img id="update-button-img-jupiter"
+         src="{{ url_for('static', filename='images/jupiter.jpg') }}"
+         alt="Jupiter Update Button"
+         style="width: 70px; height: 70px; cursor: pointer; border-radius: 50%; display: block;">
+  </button>
+</div>
+
+<!-- Main Dashboard Content (pushed down to avoid overlap) -->
+<div class="container card-container" style="padding-top: 90px;">
   <!-- First Row: Liquidation Bar Card and Portfolio Performance Card -->
   <div class="row">
     <!-- Liquidation Bar Card -->
@@ -239,7 +255,7 @@
 
   <!-- Second Row: Top Positions Card and Size Comparison Chart Card -->
   <div class="row">
-    <!-- Top Positions Card (Red container removed) -->
+    <!-- Top Positions Card -->
     <div class="col-md-6">
       <div class="card">
         <div class="card-header">
@@ -399,28 +415,19 @@
       .catch(function(err) { console.error("ApexCharts render error:", err); });
   };
 
-  // Update Button & Theme Scripts
+  // Update Button Script
   document.addEventListener("DOMContentLoaded", function() {
-    const container = document.querySelector('.update-button[data-type="{{ update_type | default("jupiter") }}"]');
+    const container = document.querySelector('.update-button[data-type="jupiter"]');
     if (!container) return;
     const img = container.querySelector('img');
-    const cryptoURL = "{{ url_for('static', filename='images/crypto_icon.jpg') }}";
-    const jupiterURL = "{{ url_for('static', filename='images/jupiter.jpg') }}";
     container.addEventListener("click", function() {
       console.log("Update button clicked.");
       img.classList.add("spin");
-      fetch("/positions/update_jupiter?source={{ update_type | default('jupiter') }}", { method: "POST" })
+      fetch("/positions/update_jupiter?source=jupiter", { method: "POST" })
         .then(response => response.json())
         .then(data => {
             console.log("Update response:", data);
             img.classList.remove("spin");
-            if ("{{ update_type | default('jupiter') }}" === "all") {
-                if (img.getAttribute("src") === cryptoURL) {
-                    img.setAttribute("src", jupiterURL);
-                } else {
-                    img.setAttribute("src", cryptoURL);
-                }
-            }
         })
         .catch(err => {
             console.error("Error updating positions:", err);

@@ -1,12 +1,241 @@
 {% extends "base.html" %}
 
+{% block extra_styles %}
+<style>
+  /* -------------------- Background Wallpaper -------------------- */
+  body {
+    background: url("{{ url_for('static', filename='images/wallpaper2.jpg') }}") no-repeat center center fixed;
+    background-size: cover;
+  }
+
+  /* -------------------- Card Styling -------------------- */
+  /* Use solid background for cards so the wallpaper is not visible through them */
+  .card {
+    background-color: #fff !important;
+    border: 1px solid #dee2e6;
+  }
+
+  /* -------------------- General Card Header Styling -------------------- */
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #e7f0fd; /* Solid subtle blue background */
+    padding: 0.5rem 1rem;
+  }
+  .card-header strong {
+    font-size: 1.5rem;     /* Slightly smaller title */
+    color: #003366;        /* Matches side panel color */
+  }
+  /* Percent change styling */
+  .percent-change {
+    font-size: 1.25rem;    /* Slightly smaller percent change */
+    font-weight: bold;
+    margin-left: auto;
+  }
+
+  /* -------------------- Liquidation Bar Styles -------------------- */
+  .progress.liquidation {
+    position: relative;
+    background-color: #e9ecef;
+    height: 1.5rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  .progress.liquidation::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 5;
+  }
+  .liquidation-fill {
+    position: absolute;
+    height: 100%;
+    border-radius: 1rem;
+  }
+  .liquidation-fill.striped {
+    background-image: linear-gradient(
+      45deg,
+      rgba(255,255,255,0.15) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(255,255,255,0.15) 50%,
+      rgba(255,255,255,0.15) 75%,
+      transparent 75%,
+      transparent
+    );
+    background-size: 1rem 1rem;
+  }
+  .asset-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    z-index: 10;
+  }
+  .progress-text {
+    position: absolute;
+    font-weight: bold;
+    color: white;
+    z-index: 20;
+  }
+
+  /* -------------------- Dashboard Layout -------------------- */
+  .card-container {
+    margin: 2.5px auto;
+  }
+  .row {
+    margin-bottom: 20px;
+  }
+  .col-md-4 {
+    flex: 0 0 33.33%;
+    max-width: 33.33%;
+  }
+  @media (max-width: 767.98px) {
+    .col-md-4 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+  }
+
+  /* -------------------- Top Positions Styles (from top_positions.html) -------------------- */
+  .invisible-container .card-body {
+    display: block !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+  .info-box {
+    display: flex;
+    align-items: center;
+    background-color: #e0e0e0;
+    padding: 2px !important;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2px !important;
+    width: 100% !important;
+  }
+  .info-box-wallet {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+  }
+  .info-box-wallet img {
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+  }
+  .info-box-asset {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .info-box-extra {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.6rem;
+    margin: 0;
+  }
+  .info-box-extra img {
+    vertical-align: middle;
+    width: 20px;
+    height: 20px;
+  }
+  .info-box-extra span {
+    margin-left: 2px;
+  }
+  .info-box-extra span:last-child {
+    font-size: 0.65rem;
+    font-weight: bold;
+  }
+  .info-box-icon {
+    width: 30px;
+    height: 25px;
+    line-height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    margin-right: 2px;
+  }
+  .text-bg-blue { background-color: #007bff !important; }
+  .text-bg-success { background-color: #28a745 !important; }
+  .text-bg-warning { background-color: #ffc107 !important; }
+  .text-bg-danger { background-color: #dc3545 !important; }
+  .small-percentage {
+    font-size: 0.75rem !important;
+    font-weight: bold !important;
+    font-family: 'Nunito', sans-serif;
+    color: white !important;
+    margin-right: 0 !important;
+  }
+  .info-box-details {
+    display: flex;
+    gap: 3px;
+    font-size: 0.75rem;
+    align-items: center;
+    margin-left: 2px;
+  }
+
+  /* -------------------- Size Comparison Chart -------------------- */
+  #positions-chart {
+    /* Chart container for ApexCharts */
+  }
+
+  /* -------------------- Top Bar Styles -------------------- */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+  }
+  .top-bar .update-btn img {
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
+    border-radius: 50%;
+  }
+  .top-bar .status-bar .card {
+    margin-bottom: 0;
+  }
+  .top-bar .status-bar .card-body {
+    padding: 0.25rem;
+  }
+  .top-bar .toggle-group .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 20px;
+  }
+  .top-positions-header {
+    display: flex;
+    align-items: center;
+  }
+  .top-positions-header .card-title {
+    margin: 0;
+  }
+  .top-positions-header a {
+    margin-left: auto;
+    font-size: 1.5rem;
+    text-decoration: none;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
-  <h1 class="mb-4">Position Trends (Last {{ timeframe }} Hours)</h1>
+  <!-- Updated Page Heading: "Trends" in white -->
+  <h1 class="mb-4" style="color: white;">Trends (Last {{ timeframe }} Hours)</h1>
 
   <!-- Timeframe Selection Form using radio buttons -->
   <form id="timeframeForm" method="GET" class="mb-4">
-    <label class="mb-2 d-block">Select Timeframe (Hours):</label>
+    <label class="mb-2 d-block" style="color: white;">Select Timeframe (Hours):</label>
     <div class="btn-group" role="group" aria-label="Timeframe selection">
       <input type="radio" class="btn-check" name="hours" id="hours1" value="1" autocomplete="off" {% if timeframe == 1 %}checked{% endif %} onchange="this.form.submit();">
       <label class="btn btn-outline-primary" for="hours1">1</label>
@@ -26,8 +255,9 @@
     <!-- Collateral Chart -->
     <div class="col-md-4 mb-4">
       <div class="card">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
           <strong>Collateral</strong>
+          <span id="collateral-change" class="percent-change"></span>
         </div>
         <div class="card-body">
           <div id="chart-collateral"></div>
@@ -37,8 +267,9 @@
     <!-- Value Chart -->
     <div class="col-md-4 mb-4">
       <div class="card">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
           <strong>Value</strong>
+          <span id="value-change" class="percent-change"></span>
         </div>
         <div class="card-body">
           <div id="chart-value"></div>
@@ -48,8 +279,9 @@
     <!-- Size Chart -->
     <div class="col-md-4 mb-4">
       <div class="card">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
           <strong>Size</strong>
+          <span id="size-change" class="percent-change"></span>
         </div>
         <div class="card-body">
           <div id="chart-size"></div>
@@ -62,8 +294,9 @@
     <!-- Average Leverage Chart -->
     <div class="col-md-4 mb-4">
       <div class="card">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
           <strong>Average Leverage</strong>
+          <span id="leverage-change" class="percent-change"></span>
         </div>
         <div class="card-body">
           <div id="chart-leverage"></div>
@@ -73,8 +306,9 @@
     <!-- Average Travel % Chart -->
     <div class="col-md-4 mb-4">
       <div class="card">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
           <strong>Average Travel %</strong>
+          <span id="travel-change" class="percent-change"></span>
         </div>
         <div class="card-body">
           <div id="chart-travel"></div>
@@ -84,8 +318,9 @@
     <!-- Average Heat Chart -->
     <div class="col-md-4 mb-4">
       <div class="card">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
           <strong>Average Heat</strong>
+          <span id="heat-change" class="percent-change"></span>
         </div>
         <div class="card-body">
           <div id="chart-heat"></div>
@@ -99,10 +334,10 @@
 {% block extra_scripts %}
 <!-- Include ApexCharts from CDN -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 <script>
-  // Debug: Log the chartData object to inspect its structure.
+  // Log chartData for debugging.
   var chartData = {{ chart_data | tojson }};
-  console.log("Chart Data:", chartData);
   var currentTimeframe = {{ timeframe }};
 
   function formatNumber(val) {
@@ -112,7 +347,7 @@
     });
   }
 
-  // Create chart options for a given metric
+  // Create chart options for a given metric.
   function createChartOptions(title, data) {
     return {
       chart: {
@@ -154,7 +389,7 @@
       title: {
         text: title + " (Last " + currentTimeframe + " Hours)",
         align: 'center',
-        style: { fontSize: '16px', fontWeight: 'bold' }
+        style: { fontSize: '14px', fontWeight: 'bold' }
       },
       tooltip: {
         x: { format: 'dd MMM HH:mm' },
@@ -167,7 +402,7 @@
     };
   }
 
-  // Render charts for each metric using consistent keys
+  // Render charts.
   var collateralChart = new ApexCharts(document.querySelector("#chart-collateral"), createChartOptions("Collateral", chartData.collateral));
   var valueChart = new ApexCharts(document.querySelector("#chart-value"), createChartOptions("Value", chartData.value));
   var sizeChart = new ApexCharts(document.querySelector("#chart-size"), createChartOptions("Size", chartData.size));
@@ -181,5 +416,41 @@
   leverageChart.render();
   travelChart.render();
   heatChart.render();
+
+  // Function to calculate percent change from first to last value.
+  function calculatePercentChange(data) {
+    if (!data || data.length < 2) return 0;
+    var first = data[0][1];
+    var last = data[data.length - 1][1];
+    if (first == 0) return 0;
+    return ((last - first) / first) * 100;
+  }
+
+  // Update percent change for each metric.
+  function updatePercentChanges() {
+    var collChange = calculatePercentChange(chartData.collateral);
+    var valueChange = calculatePercentChange(chartData.value);
+    var sizeChange = calculatePercentChange(chartData.size);
+    var levChange = calculatePercentChange(chartData.avg_leverage);
+    var travelChange = calculatePercentChange(chartData.avg_travel_percent);
+    var heatChange = calculatePercentChange(chartData.avg_heat);
+
+    function setElement(id, change) {
+      var elem = document.getElementById(id);
+      if (elem) {
+        elem.textContent = (change >= 0 ? "+" : "") + change.toFixed(1) + "%";
+        elem.style.color = change >= 0 ? "green" : "red";
+      }
+    }
+
+    setElement("collateral-change", collChange);
+    setElement("value-change", valueChange);
+    setElement("size-change", sizeChange);
+    setElement("leverage-change", levChange);
+    setElement("travel-change", travelChange);
+    setElement("heat-change", heatChange);
+  }
+
+  updatePercentChanges();
 </script>
 {% endblock %}

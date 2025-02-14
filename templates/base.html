@@ -77,7 +77,7 @@
         <div class="sidebar-brand">
           <a href="{{ url_for('dashboard.dashboard') }}" class="brand-link">
             <img src="{{ url_for('static', filename='images/corner_logo_owl.jpg') }}" alt="Admin Logo" class="brand-image rounded-circle shadow" />
-            <span class="brand-text fw-light">AdminLTE 4</span>
+            <span class="brand-text fw-light"> Sonic</span>
           </a>
         </div>
         <div class="sidebar-wrapper">
@@ -90,21 +90,15 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ url_for('positions.position_trends') }}" class="nav-link">
-                  <i class="nav-icon bi bi-briefcase"></i>
-                  <p>Positions</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ url_for('positions.show_top_positions') }}" class="nav-link">
-                  <i class="nav-icon bi bi-star-fill"></i>
-                  <p>Top Positions</p>
-                </a>
-              </li>
-              <li class="nav-item">
                 <a href="{{ url_for('positions.positions_table') }}" class="nav-link">
                   <i class="nav-icon bi bi-table"></i>
                   <p>Positions Table</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ url_for('positions.position_trends') }}" class="nav-link">
+                  <i class="nav-icon bi bi-briefcase"></i>
+                  <p>Trends</p>
                 </a>
               </li>
               <li class="nav-item">
@@ -125,7 +119,6 @@
                   <p>Alerts</p>
                 </a>
               </li>
-              <!-- New Portfolio Nav Item -->
               <li class="nav-item">
                 <a href="{{ url_for('portfolio.index') }}" class="nav-link">
                   <i class="nav-icon bi bi-wallet2"></i>

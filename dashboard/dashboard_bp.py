@@ -31,6 +31,7 @@ logger.setLevel(logging.DEBUG)
 # Create the blueprint object.
 dashboard_bp = Blueprint("dashboard", __name__, template_folder="templates")
 
+
 # Helper: Convert ISO timestamp to PST formatted string.
 def _convert_iso_to_pst(iso_str):
     if not iso_str or iso_str == "N/A":
@@ -43,6 +44,7 @@ def _convert_iso_to_pst(iso_str):
     except Exception as e:
         logger.error(f"Error converting timestamp: {e}")
         return "N/A"
+
 
 # Helper: Compute Size Composition.
 def compute_size_composition():
@@ -62,6 +64,7 @@ def compute_size_composition():
         series = [0, 0]
     logger.debug(f"[Size Composition] Computed series: {series}")
     return series
+
 
 # Helper: Compute Value Composition.
 def compute_value_composition():
@@ -84,7 +87,6 @@ def compute_value_composition():
             current_price = float(p.get("current_price", 0))
             collateral = float(p.get("collateral", 0))
             size = float(p.get("size", 0))
-            token_count = 0
             if entry_price > 0:
                 token_count = size / entry_price
                 if p.get("position_type", "").upper() == "LONG":
@@ -94,7 +96,8 @@ def compute_value_composition():
             else:
                 pnl = 0.0
             value = collateral + pnl
-            logger.debug(f"[Value Composition] Position {p.get('id', 'unknown')}: entry_price={entry_price}, current_price={current_price}, size={size}, collateral={collateral}, token_count={token_count if entry_price > 0 else 'N/A'}, pnl={pnl}, value={value}")
+            logger.debug(
+                f"[Value Composition] Position {p.get('id', 'unknown')}: entry_price={entry_price}, current_price={current_price}, size={size}, collateral={collateral}, pnl={pnl}, value={value}")
         except Exception as calc_err:
             logger.error(f"Error calculating value for position {p.get('id', 'unknown')}: {calc_err}", exc_info=True)
             value = 0.0
@@ -103,13 +106,15 @@ def compute_value_composition():
         elif p.get("position_type", "").upper() == "SHORT":
             short_total += value
     total = long_total + short_total
-    logger.debug(f"[Value Composition] Totals: long_total={long_total}, short_total={short_total}, overall total={total}")
+    logger.debug(
+        f"[Value Composition] Totals: long_total={long_total}, short_total={short_total}, overall total={total}")
     if total > 0:
         series = [round(long_total / total * 100), round(short_total / total * 100)]
     else:
         series = [0, 0]
     logger.debug(f"[Value Composition] Computed series: {series}")
     return series
+
 
 # Helper: Compute Collateral Composition.
 def compute_collateral_composition():
@@ -122,13 +127,15 @@ def compute_collateral_composition():
     long_total = sum(float(p.get("collateral", 0)) for p in positions if p.get("position_type", "").upper() == "LONG")
     short_total = sum(float(p.get("collateral", 0)) for p in positions if p.get("position_type", "").upper() == "SHORT")
     total = long_total + short_total
-    logger.debug(f"[Collateral Composition] Totals: long_total={long_total}, short_total={short_total}, overall total={total}")
+    logger.debug(
+        f"[Collateral Composition] Totals: long_total={long_total}, short_total={short_total}, overall total={total}")
     if total > 0:
         series = [round(long_total / total * 100), round(short_total / total * 100)]
     else:
         series = [0, 0]
     logger.debug(f"[Collateral Composition] Computed series: {series}")
     return series
+
 
 # -------------------------------
 # Dashboard Routes
@@ -144,40 +151,88 @@ def dashboard():
         bottom_positions = sorted(valid_positions, key=lambda pos: pos["current_travel_percent"])[:3]
         liquidation_positions = valid_positions  # Use all valid positions for the liquidation bar
 
-        print("Dashboard: Found {} valid positions.".format(len(valid_positions)))
-        for pos in top_positions:
-            print("Top Position - ID: {}, current_travel_percent: {}, alert_state: {}".format(
-                pos.get("id", "unknown"), pos.get("current_travel_percent"), pos.get("alert_state", "N/A")
-            ))
-        for pos in bottom_positions:
-            print("Bottom Position - ID: {}, current_travel_percent: {}, alert_state: {}".format(
-                pos.get("id", "unknown"), pos.get("current_travel_percent"), pos.get("alert_state", "N/A")
-            ))
-
-        # Retrieve portfolio history data
+        # Retrieve portfolio history data and compute portfolio stats.
         dl = DataLocker.get_instance()
-        portfolio_data = dl.get_portfolio_history() or []  # Ensure we get a list even if it's empty
+        portfolio_history = dl.get_portfolio_history() or []
+        portfolio_value = 0
+        portfolio_change = 0
+        if portfolio_history:
+            portfolio_value = portfolio_history[-1].get("total_value", 0)
+            if len(portfolio_history) >= 2:
+                first_val = portfolio_history[0].get("total_value", 0)
+                if first_val:
+                    portfolio_change = ((portfolio_history[-1].get("total_value", 0) - first_val) / first_val) * 100
+
+        # Format the numbers
+        formatted_portfolio_value = "{:,.2f}".format(portfolio_value)
+        formatted_portfolio_change = "{:,.1f}".format(portfolio_change)
+
+        # Retrieve latest price data.
+        btc_data = dl.get_latest_price("BTC") or {}
+        eth_data = dl.get_latest_price("ETH") or {}
+        sol_data = dl.get_latest_price("SOL") or {}
+        sp500_data = dl.get_latest_price("S&P 500") or {}
+
+        btc_price = float(btc_data.get("current_price", 0))
+        btc_change = float(btc_data.get("change", 0))
+        eth_price = float(eth_data.get("current_price", 0))
+        eth_change = float(eth_data.get("change", 0))
+        sol_price = float(sol_data.get("current_price", 0))
+        sol_change = float(sol_data.get("change", 0))
+        sp500_value = float(sp500_data.get("current_price", 0))
+        sp500_change = float(sp500_data.get("change", 0))
+
+        formatted_btc_price = "{:,.2f}".format(btc_price)
+        formatted_btc_change = "{:,.1f}".format(btc_change)
+        formatted_eth_price = "{:,.2f}".format(eth_price)
+        formatted_eth_change = "{:,.1f}".format(eth_change)
+        formatted_sol_price = "{:,.2f}".format(sol_price)
+        formatted_sol_change = "{:,.1f}".format(sol_change)
+        formatted_sp500_value = "{:,.2f}".format(sp500_value)
+        formatted_sp500_change = "{:,.1f}".format(sp500_change)
 
         return render_template(
             "dashboard.html",
             top_positions=top_positions,
             bottom_positions=bottom_positions,
             liquidation_positions=liquidation_positions,
-            portfolio_data=portfolio_data  # Pass portfolio data for the chart
+            portfolio_data=portfolio_history,
+            portfolio_value=formatted_portfolio_value,
+            portfolio_change=formatted_portfolio_change,
+            btc_price=formatted_btc_price,
+            btc_change=formatted_btc_change,
+            eth_price=formatted_eth_price,
+            eth_change=formatted_eth_change,
+            sol_price=formatted_sol_price,
+            sol_change=formatted_sol_change,
+            sp500_value=formatted_sp500_value,
+            sp500_change=formatted_sp500_change
         )
     except Exception as e:
-        print("Error retrieving dashboard data:", e)
+        logger.error("Error retrieving dashboard data: %s", e, exc_info=True)
         return render_template(
             "dashboard.html",
             top_positions=[],
             bottom_positions=[],
             liquidation_positions=[],
-            portfolio_data=[]  # Default to an empty list if there's an error
+            portfolio_data=[],
+            portfolio_value="0.00",
+            portfolio_change="0.0",
+            btc_price="0.00",
+            btc_change="0.0",
+            eth_price="0.00",
+            eth_change="0.0",
+            sol_price="0.00",
+            sol_change="0.0",
+            sp500_value="0.00",
+            sp500_change="0.0"
         )
+
 
 @dashboard_bp.route("/theme")
 def theme_options():
     return render_template("theme.html")
+
 
 # -------------------------------
 # API Endpoints for Chart Data (Real Data)
@@ -196,6 +251,7 @@ def api_size_composition():
         logger.error(f"Error in api_size_composition: {e}", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
+
 @dashboard_bp.route("/api/value_composition")
 def api_value_composition():
     """
@@ -211,6 +267,7 @@ def api_value_composition():
     except Exception as e:
         logger.error(f"Error in api_value_composition: {e}", exc_info=True)
         return jsonify({"error": str(e)}), 500
+
 
 @dashboard_bp.route("/api/collateral_composition")
 def api_collateral_composition():

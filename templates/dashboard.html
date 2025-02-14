@@ -82,7 +82,7 @@
 
   /* -------------------- Dashboard Layout -------------------- */
   .card-container {
-    margin: 20px auto;
+    margin: 2.5px auto;  /* Reduced top margin further */
   }
   .row {
     margin-bottom: 20px;
@@ -99,15 +99,20 @@
     }
   }
 
-  /* -------------------- Top Positions (Thinner Rows) -------------------- */
+  /* -------------------- Top Positions (Using provided top_positions.html Styles) -------------------- */
+  .invisible-container .card-body {
+    display: block !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
   .info-box {
     display: flex;
     align-items: center;
     background-color: #e0e0e0;
-    padding: 1px !important;
+    padding: 2px !important;
     border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    margin-bottom: 1px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2px !important;
     width: 100% !important;
   }
   .info-box-wallet {
@@ -136,7 +141,9 @@
     width: 20px;
     height: 20px;
   }
-  .info-box-extra span { margin-left: 2px; }
+  .info-box-extra span {
+    margin-left: 2px;
+  }
   .info-box-extra span:last-child {
     font-size: 0.65rem;
     font-weight: bold;
@@ -174,22 +181,140 @@
   #positions-chart {
     /* Chart container for ApexCharts */
   }
+
+  /* -------------------- Top Bar Styles -------------------- */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 3rem; /* Increased space below status bar */
+  }
+  .top-bar .update-btn img {
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
+    border-radius: 50%;
+  }
+  .top-bar .status-bar .card {
+    margin-bottom: 0;
+  }
+  /* Reduced status bar height via minimized padding */
+  .top-bar .status-bar .card-body {
+    padding: 0.25rem;
+  }
+  .top-bar .toggle-group .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 20px;
+  }
+  /* Custom header for Top Positions card to push the icon to the far right */
+  .top-positions-header {
+    display: flex;
+    align-items: center;
+  }
+  .top-positions-header .card-title {
+    margin: 0;
+  }
+  .top-positions-header a {
+    margin-left: auto;
+    font-size: 1.5rem;
+    text-decoration: none;
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Jupiter Update Button in the Upper Left Corner -->
-<div style="position: absolute; top: 10px; left: 10px; z-index: 1000;">
-  <button type="button" class="update-button" data-type="jupiter" style="background: none; border: none; padding: 0;">
-    <img id="update-button-img-jupiter"
-         src="{{ url_for('static', filename='images/jupiter.jpg') }}"
-         alt="Jupiter Update Button"
-         style="width: 70px; height: 70px; cursor: pointer; border-radius: 50%; display: block;">
-  </button>
-</div>
+<div class="container card-container">
+  <!-- Top Bar: Jupiter Update Button + Status Bar -->
+  <div class="top-bar">
+    <!-- Jupiter Update Button -->
+    <div class="update-btn">
+      <button type="button" class="update-button" data-type="jupiter" style="background: none; border: none; padding: 0;">
+        <img id="update-button-img-jupiter"
+             src="{{ url_for('static', filename='images/jupiter.jpg') }}"
+             alt="Jupiter Update Button">
+      </button>
+    </div>
+    <!-- Status Bar with real-time data -->
+    <div class="status-bar w-100">
+      <!-- Subtle Radio Toggle (aligned to right) -->
+      <div class="d-flex justify-content-end mb-2 toggle-group">
+        <div class="btn-group btn-group-sm" role="group" aria-label="Toggle Hours">
+          <input type="radio" class="btn-check" name="hours" id="hours1" value="1" autocomplete="off" checked>
+          <label class="btn btn-outline-secondary" for="hours1">1h</label>
+          <input type="radio" class="btn-check" name="hours" id="hours6" value="6" autocomplete="off">
+          <label class="btn btn-outline-secondary" for="hours6">6h</label>
+          <input type="radio" class="btn-check" name="hours" id="hours12" value="12" autocomplete="off">
+          <label class="btn btn-outline-secondary" for="hours12">12h</label>
+          <input type="radio" class="btn-check" name="hours" id="hours14" value="14" autocomplete="off">
+          <label class="btn btn-outline-secondary" for="hours14">14h</label>
+        </div>
+      </div>
+      <!-- Inline Status Bar Card with real data -->
+      <div class="card" style="background-color: #f2f2f2;">
+        <div class="card-body">
+          <div class="row text-center">
+            <!-- Portfolio -->
+            <div class="col d-flex align-items-center justify-content-center border-end">
+              <i class="bi bi-wallet2" style="font-size: 24px; margin-right: 8px;"></i>
+              <div>
+                <span class="text-success">
+                  <i class="bi bi-caret-up-fill"></i> {{ portfolio_change }}%
+                </span>
+                <h5 class="fw-bold mb-0">${{ portfolio_value }}</h5>
+                <span class="text-uppercase">PORTFOLIO</span>
+              </div>
+            </div>
+            <!-- Bitcoin -->
+            <div class="col d-flex align-items-center justify-content-center border-end">
+              <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="height: 20px; margin-right: 5px;">
+              <div>
+                <span class="text-success">
+                  <i class="bi bi-caret-up-fill"></i> {{ btc_change }}%
+                </span>
+                <h5 class="fw-bold mb-0">${{ btc_price }}</h5>
+                <span class="text-uppercase">BITCOIN</span>
+              </div>
+            </div>
+            <!-- Ethereum -->
+            <div class="col d-flex align-items-center justify-content-center border-end">
+              <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="height: 20px; margin-right: 5px;">
+              <div>
+                <span class="text-info">
+                  <i class="bi bi-caret-left-fill"></i> {{ eth_change }}%
+                </span>
+                <h5 class="fw-bold mb-0">${{ eth_price }}</h5>
+                <span class="text-uppercase">ETHEREUM</span>
+              </div>
+            </div>
+            <!-- Solana -->
+            <div class="col d-flex align-items-center justify-content-center border-end">
+              <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="height: 20px; margin-right: 5px;">
+              <div>
+                <span class="text-success">
+                  <i class="bi bi-caret-up-fill"></i> {{ sol_change }}%
+                </span>
+                <h5 class="fw-bold mb-0">${{ sol_price }}</h5>
+                <span class="text-uppercase">SOLANA</span>
+              </div>
+            </div>
+            <!-- S&P 500 -->
+            <div class="col d-flex align-items-center justify-content-center">
+              <div>
+                <span class="text-danger">
+                  <i class="bi bi-caret-down-fill"></i> {{ sp500_change }}%
+                </span>
+                <h5 class="fw-bold mb-0">{{ sp500_value }}</h5>
+                <span class="text-uppercase">S&P 500</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<!-- Main Dashboard Content (pushed down to avoid overlap) -->
-<div class="container card-container" style="padding-top: 90px;">
+  <!-- Existing Dashboard Content -->
   <!-- Row 1: Liquidation Bar Card and Portfolio Performance Card -->
   <div class="row">
     <!-- Liquidation Bar Card -->
@@ -240,16 +365,14 @@
         </div>
       </div>
     </div>
-    <!-- Portfolio Performance Card (Updated Title) -->
+    <!-- Portfolio Performance Card -->
     <div class="col-md-6">
       <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center" style="position: relative;">
           <div>
             <h3 class="card-title mb-0">Performance</h3>
           </div>
-          <!-- Percent Change Display -->
           <small id="percentChangeDisplay" style="font-weight: bold; font-size: 1.5rem; position: absolute; top: 50%; right: 10px; transform: translateY(-50%);"></small>
-          <!-- Time Range Selector -->
           <div id="portfolioTimeframeControls">
             <div class="btn-group btn-group-sm" role="group" aria-label="Portfolio Timeframe">
               <button type="button" class="btn btn-outline-secondary" onclick="setPortfolioTimeframe(1)">1h</button>
@@ -267,13 +390,14 @@
     </div>
   </div>
 
-  <!-- Row 2: Top Positions Card and Size Comparison Chart Card (Unchanged) -->
+  <!-- Row 2: Top Positions Card and Size Comparison Chart Card -->
   <div class="row">
     <!-- Top Positions Card -->
     <div class="col-md-6">
-      <div class="card">
-        <div class="card-header">
+      <div class="card invisible-container">
+        <div class="card-header top-positions-header">
           <h3 class="card-title">Top Positions</h3>
+          <a href="{{ url_for('positions.positions_table') }}" title="Positions Table">📊</a>
         </div>
         <div class="card-body">
           {% if top_positions %}
@@ -315,7 +439,7 @@
               </div>
             {% endfor %}
           {% else %}
-            <!-- Sample data for testing (if no positions found) -->
+            <!-- Sample data for testing -->
             <div class="info-box">
               <span class="info-box-icon text-bg-blue text-white">
                 <span class="small-percentage">75%</span>
@@ -370,7 +494,7 @@
       console.warn("No portfolio data available for chart rendering.");
       return;
     }
-    // Build the portfolio performance chart using all portfolioData
+    // Build the portfolio performance chart using portfolioData
     const labels = portfolioData.map(item => item.snapshot_time);
     const data = portfolioData.map(item => item.total_value);
     const ctx = document.getElementById('portfolioChart').getContext('2d');
@@ -403,9 +527,7 @@
     if (!portfolioData || portfolioData.length === 0) return;
     const currentTime = new Date();
     const cutoff = new Date(currentTime.getTime() - hours * 3600000);
-    console.log("Current Time:", currentTime, "Cutoff:", cutoff);
     const filteredData = portfolioData.filter(item => new Date(item.snapshot_time) >= cutoff);
-    console.log("Filtered data count:", filteredData.length);
     const newLabels = filteredData.map(item => item.snapshot_time);
     const newData = filteredData.map(item => item.total_value);
     portfolioChart.data.labels = newLabels;
@@ -428,7 +550,6 @@
 <script>
   // Size Comparison Chart using ApexCharts with dynamic data from API
   window.onload = function() {
-    console.log("Window loaded, fetching size composition data");
     if (typeof ApexCharts === 'undefined') {
       console.error("ApexCharts library not loaded!");
       return;
@@ -443,7 +564,6 @@
       .then(response => response.json())
       .then(data => {
          var seriesData = data.series || [0, 0];
-         console.log("Fetched size composition data:", seriesData);
          var options = {
            series: seriesData,
            chart: {
@@ -454,7 +574,6 @@
                  var currentType = chartInstance.w.config.chart.type;
                  var newType = currentType === 'pie' ? 'donut' : 'pie';
                  chartInstance.updateOptions({ chart: { type: newType } });
-                 console.log("Chart type toggled to:", newType);
                }
              }
            },
@@ -463,10 +582,8 @@
            legend: { position: 'bottom' },
            dataLabels: { enabled: true, style: { fontSize: '1.2rem' } }
          };
-         // Create and render the chart instance
          var chartInstance = new ApexCharts(chartContainer, options);
          chartInstance.render()
-           .then(function() { console.log("ApexCharts rendered successfully with size composition data"); })
            .catch(function(err) { console.error("ApexCharts render error:", err); });
       })
       .catch(function(err) {
@@ -476,22 +593,19 @@
 </script>
 
 <script>
-  // Update Button Script for Jupiter button (unchanged)
+  // Update Button Script for Jupiter button
   document.addEventListener("DOMContentLoaded", function() {
     const container = document.querySelector('.update-button[data-type="{{ update_type | default("jupiter") }}"]');
     if (!container) return;
     const img = container.querySelector('img');
     container.addEventListener("click", function() {
-      console.log("Update button clicked.");
       img.classList.add("spin");
       fetch("/positions/update_jupiter?source={{ update_type | default('jupiter') }}", { method: "POST" })
         .then(response => response.json())
         .then(data => {
-            console.log("Update response:", data);
             img.classList.remove("spin");
         })
         .catch(err => {
-            console.error("Error updating positions:", err);
             img.classList.remove("spin");
         });
     });

@@ -172,7 +172,7 @@
 
   /* -------------------- Size Comparison Chart -------------------- */
   #positions-chart {
-    /* sits flush within its card-body */
+    /* Chart container for ApexCharts */
   }
 </style>
 {% endblock %}
@@ -323,7 +323,6 @@
                 <img src="https://via.placeholder.com/30" alt="Wallet Logo">
               </div>
             </div>
-            <!-- Additional sample entries would follow -->
           {% endif %}
         </div>
       </div>
@@ -377,10 +376,12 @@
       }
     });
   });
+</script>
 
-  // Size Comparison Chart using ApexCharts
+<script>
+  // Size Comparison Chart using ApexCharts with dynamic data from API
   window.onload = function() {
-    console.log("Window loaded, starting ApexCharts initialization");
+    console.log("Window loaded, fetching size composition data");
     if (typeof ApexCharts === 'undefined') {
       console.error("ApexCharts library not loaded!");
       return;
@@ -390,32 +391,45 @@
       console.error("positions-chart container not found");
       return;
     }
-    var options = {
-      series: [65, 35],
-      chart: {
-        type: 'pie',
-        height: 350,
-        events: {
-          click: function(event, chartContext, config) {
-            var currentType = chartInstance.w.config.chart.type;
-            var newType = currentType === 'pie' ? 'donut' : 'pie';
-            chartInstance.updateOptions({ chart: { type: newType } });
-            console.log("Chart type toggled to:", newType);
-          }
-        }
-      },
-      labels: ['Long Positions', 'Short Positions'],
-      colors: ['#0d6efd', '#5dcc8e'],
-      legend: { position: 'bottom' },
-      dataLabels: { enabled: true, style: { fontSize: '1.2rem' } }
-    };
-    var chartInstance = new ApexCharts(chartContainer, options);
-    chartInstance.render()
-      .then(function() { console.log("ApexCharts rendered successfully"); })
-      .catch(function(err) { console.error("ApexCharts render error:", err); });
+    // Fetch the size composition data from the API
+    fetch("/api/size_composition")
+      .then(response => response.json())
+      .then(data => {
+         var seriesData = data.series || [0, 0];
+         console.log("Fetched size composition data:", seriesData);
+         var options = {
+           series: seriesData,
+           chart: {
+             type: 'pie',
+             height: 350,
+             events: {
+               click: function(event, chartContext, config) {
+                 var currentType = chartInstance.w.config.chart.type;
+                 var newType = currentType === 'pie' ? 'donut' : 'pie';
+                 chartInstance.updateOptions({ chart: { type: newType } });
+                 console.log("Chart type toggled to:", newType);
+               }
+             }
+           },
+           labels: ['Long Positions', 'Short Positions'],
+           colors: ['#0d6efd', '#5dcc8e'],
+           legend: { position: 'bottom' },
+           dataLabels: { enabled: true, style: { fontSize: '1.2rem' } }
+         };
+         // Create and render the chart instance
+         var chartInstance = new ApexCharts(chartContainer, options);
+         chartInstance.render()
+           .then(function() { console.log("ApexCharts rendered successfully with size composition data"); })
+           .catch(function(err) { console.error("ApexCharts render error:", err); });
+      })
+      .catch(function(err) {
+         console.error("Error fetching size composition data:", err);
+      });
   };
+</script>
 
-  // Update Button Script
+<script>
+  // Update Button Script for Jupiter button
   document.addEventListener("DOMContentLoaded", function() {
     const container = document.querySelector('.update-button[data-type="jupiter"]');
     if (!container) return;
@@ -436,6 +450,7 @@
     });
   });
 </script>
+
 <style>
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   .spin { animation: spin 1s linear infinite; }

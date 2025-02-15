@@ -178,7 +178,6 @@
   }
 
   /* -------------------- Composition Chart (Size + Collateral) -------------------- */
-  /* Title bar for the two side-by-side headings */
   .composition-header {
     display: flex;
     justify-content: space-between;
@@ -192,7 +191,6 @@
     text-align: center;
     font-size: 1.2rem; /* a bit smaller than default */
   }
-
   .composition-container {
     display: flex;
     justify-content: space-between;
@@ -203,13 +201,12 @@
     height: 233px;
   }
 
-  /* -------------------- Top Bar Styles -------------------- */
+  /* -------------------- Top Bar & Status Bar Layout -------------------- */
   .top-row {
     display: flex;
     flex-wrap: wrap;
     margin-bottom: 2rem;
   }
-  /* Put the update button in a col-md-6, status bar in col-md-6 */
   .update-col, .status-col {
     flex: 0 0 100%;
   }
@@ -220,7 +217,6 @@
     }
   }
   .top-bar {
-    /* remove margin, we do layout with row & col now */
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -233,15 +229,21 @@
     border-radius: 50%;
   }
   .status-bar {
-    /* limit width to 100% of its column */
     width: 100%;
   }
-
-  /* Right-justify the toggle group */
   .toggle-group {
     margin-left: auto;
   }
-  /* Make the status bar's text and icons a bit smaller */
+  .status-bar .card-body {
+    padding: 0.15rem 0.4rem !important;
+    text-align: center;
+    min-height: 25px !important;
+    padding-top: 0.05rem !important;
+  }
+  /* Top-justify the status bar text in each column */
+  .status-bar .card-body .row > .col {
+    align-items: flex-start !important;
+  }
   .status-bar .card-body h5 {
     font-size: 1rem !important;
     margin: 0;
@@ -254,8 +256,15 @@
     margin-right: 2px;
   }
   .status-bar .card-body img {
-    height: 14px !important;
-    margin-right: 2px;
+    margin-right: 4px;
+    height: 24px !important; /* bigger icons */
+    margin-top: 4px;        /* move down from top */
+  }
+
+  /* Dark Blue label for "PORTFOLIO" only */
+  .portfolio-label {
+    color: #00008B;
+    font-weight: bold;
   }
 
   /* -------------------- Performance Card Time Controls -------------------- */
@@ -273,23 +282,21 @@
 
 {% block content %}
 <div class="container card-container">
-  <!-- Row for the Update Button & Status Bar, each 50% width -->
+  <!-- Row for the Update Button & Status Bar -->
   <div class="row top-row">
     <div class="col-md-6 update-col">
       <div class="top-bar">
         <!-- Jupiter Update Button -->
         <div class="update-btn">
           <button type="button" class="update-button" data-type="jupiter" style="background: none; border: none; padding: 0;">
-            <img id="update-button-img-jupiter"
-                 src="{{ url_for('static', filename='images/jupiter.jpg') }}"
-                 alt="Jupiter Update Button">
+            <img id="update-button-img-jupiter" src="{{ url_for('static', filename='images/jupiter.jpg') }}" alt="Jupiter Update Button">
           </button>
         </div>
       </div>
     </div>
     <div class="col-md-6 status-col">
       <div class="top-bar">
-        <!-- Subtle Radio Toggle (aligned right) -->
+        <!-- Subtle Radio Toggle -->
         <div class="toggle-group d-flex">
           <div class="btn-group btn-group-sm" role="group" aria-label="Toggle Hours">
             <input type="radio" class="btn-check" name="hours" id="hours1" value="1" autocomplete="off" checked>
@@ -303,61 +310,50 @@
           </div>
         </div>
       </div>
-      <!-- Status Bar with real-time data (matching the performance card width) -->
-      <div class="status-bar mt-2">
-        <div class="card" style="background-color: #f2f2f2;">
+      <!-- Status Bar with cityscape wallpaper -->
+      <div class="status-bar mt-2"
+           style="background: url('{{ url_for('static', filename='images/cityscape.jpg') }}') no-repeat center center; background-size: cover;">
+        <!-- Transparent card so text is legible -->
+        <div class="card" style="background-color: rgba(255, 255, 255, 0.5);">
           <div class="card-body">
             <div class="row">
-              <!-- Portfolio -->
+              <!-- Portfolio: label is dark blue, price is normal color -->
               <div class="col d-flex align-items-center justify-content-center border-end">
-                <i class="bi bi-wallet2" style="font-size: 14px; margin-right: 2px;"></i>
+                <img src="{{ url_for('static', filename='images/wallet.png') }}" alt="Wallet Icon">
                 <div>
-                  <span class="text-success">
-                    <i class="bi bi-caret-up-fill"></i> {{ portfolio_change }}%
-                  </span>
+                  <span class="text-success"><i class="bi bi-caret-up-fill"></i> {{ portfolio_change }}%</span>
                   <h5 class="fw-bold mb-0">${{ portfolio_value }}</h5>
-                  <span class="text-uppercase">PORTFOLIO</span>
+                  <span class="portfolio-label">PORTFOLIO</span>
                 </div>
               </div>
-              <!-- Bitcoin -->
+              <!-- Bitcoin: No label, bigger icon, moved down -->
               <div class="col d-flex align-items-center justify-content-center border-end">
-                <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="height: 14px; margin-right: 2px;">
+                <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC">
                 <div>
-                  <span class="text-success">
-                    <i class="bi bi-caret-up-fill"></i> {{ btc_change }}%
-                  </span>
+                  <span class="text-success"><i class="bi bi-caret-up-fill"></i> {{ btc_change }}%</span>
                   <h5 class="fw-bold mb-0">${{ btc_price }}</h5>
-                  <span class="text-uppercase">BITCOIN</span>
                 </div>
               </div>
-              <!-- Ethereum -->
+              <!-- Ethereum: No label, bigger icon, moved down -->
               <div class="col d-flex align-items-center justify-content-center border-end">
-                <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="height: 14px; margin-right: 2px;">
+                <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH">
                 <div>
-                  <span class="text-info">
-                    <i class="bi bi-caret-left-fill"></i> {{ eth_change }}%
-                  </span>
+                  <span class="text-info"><i class="bi bi-caret-left-fill"></i> {{ eth_change }}%</span>
                   <h5 class="fw-bold mb-0">${{ eth_price }}</h5>
-                  <span class="text-uppercase">ETHEREUM</span>
                 </div>
               </div>
-              <!-- Solana -->
+              <!-- Solana: No label, bigger icon, moved down -->
               <div class="col d-flex align-items-center justify-content-center border-end">
-                <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="height: 14px; margin-right: 2px;">
+                <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL">
                 <div>
-                  <span class="text-success">
-                    <i class="bi bi-caret-up-fill"></i> {{ sol_change }}%
-                  </span>
+                  <span class="text-success"><i class="bi bi-caret-up-fill"></i> {{ sol_change }}%</span>
                   <h5 class="fw-bold mb-0">${{ sol_price }}</h5>
-                  <span class="text-uppercase">SOLANA</span>
                 </div>
               </div>
-              <!-- S&P 500 -->
+              <!-- S&P 500: Keep label -->
               <div class="col d-flex align-items-center justify-content-center">
                 <div>
-                  <span class="text-danger">
-                    <i class="bi bi-caret-down-fill"></i> {{ sp500_change }}%
-                  </span>
+                  <span class="text-danger"><i class="bi bi-caret-down-fill"></i> {{ sp500_change }}%</span>
                   <h5 class="fw-bold mb-0">{{ sp500_value }}</h5>
                   <span class="text-uppercase">S&P 500</span>
                 </div>
@@ -369,31 +365,23 @@
     </div>
   </div> <!-- end row -->
 
-  <!-- Row 1: Liquidation Bar Card and Portfolio Performance Card -->
+  <!-- Row: Liquidation Bar & Portfolio Performance -->
   <div class="row">
     <!-- Liquidation Bar Card -->
     <div class="col-md-6">
       <div class="card">
         <div class="card-header">
-          <div class="header-icon left">
-            <i class="bi bi-currency-dollar"></i>
-          </div>
-          <div class="header-icon center">
-            <span>⚖</span>
-          </div>
-          <div class="header-icon right">
-            <span>💀</span>
-          </div>
+          <div class="header-icon left"><i class="bi bi-currency-dollar"></i></div>
+          <div class="header-icon center"><span>⚖</span></div>
+          <div class="header-icon right"><span>💀</span></div>
         </div>
         <div class="card-body">
           {% for pos in liquidation_positions %}
             {% set travel = pos.current_travel_percent | float %}
             <div class="progress liquidation">
               {% if travel >= 0 %}
-                <div class="liquidation-fill striped bg-success"
-                     style="right: 50%; width: calc(({{ travel }} / 100) * 50%);"></div>
-                <img class="asset-icon"
-                     src="{{ url_for('static', filename='images/' ~ (pos.asset_type|default('btc')|lower) ~ '_logo.png') }}"
+                <div class="liquidation-fill striped bg-success" style="right: 50%; width: calc(({{ travel }} / 100) * 50%);"></div>
+                <img class="asset-icon" src="{{ url_for('static', filename='images/' ~ (pos.asset_type|default('btc')|lower) ~ '_logo.png') }}"
                      alt="{{ pos.asset_type|default('btc')|lower }} logo"
                      style="left: calc(50% - ({{ travel }} / 100 * 50%) - 15px); {% if (pos.asset_type|default('btc')|lower)=='eth' %}background-color: white;{% endif %}">
                 {% if travel > 25 %}
@@ -402,10 +390,8 @@
                   </span>
                 {% endif %}
               {% else %}
-                <div class="liquidation-fill striped bg-danger"
-                     style="left: 50%; width: calc(({{ travel | abs }} / 100) * 50%);"></div>
-                <img class="asset-icon"
-                     src="{{ url_for('static', filename='images/' ~ (pos.asset_type|default('btc')|lower) ~ '_logo.png') }}"
+                <div class="liquidation-fill striped bg-danger" style="left: 50%; width: calc(({{ travel | abs }} / 100) * 50%);"></div>
+                <img class="asset-icon" src="{{ url_for('static', filename='images/' ~ (pos.asset_type|default('btc')|lower) ~ '_logo.png') }}"
                      alt="{{ pos.asset_type|default('btc')|lower }} logo"
                      style="left: calc(50% + ({{ travel | abs }} / 100 * 50%) - 15px); {% if (pos.asset_type|default('btc')|lower)=='eth' %}background-color: white;{% endif %}">
                 {% if travel < -25 %}
@@ -445,7 +431,7 @@
     </div>
   </div>
 
-  <!-- Row 2: Top Positions Card and Composition Card -->
+  <!-- Row: Top Positions & Composition Card -->
   <div class="row">
     <!-- Top Positions Card -->
     <div class="col-md-6">
@@ -494,7 +480,6 @@
               </div>
             {% endfor %}
           {% else %}
-            <!-- Sample data for testing -->
             <div class="info-box">
               <span class="info-box-icon text-bg-blue text-white">
                 <span class="small-percentage">75%</span>
@@ -524,7 +509,6 @@
     <!-- Composition Card with headings "📐 Size" and "Collateral 💸" -->
     <div class="col-md-6">
       <div class="card">
-        <!-- Title bar matching other cards -->
         <div class="composition-header">
           <h3>📐 Size</h3>
           <h3>Collateral 💸</h3>
@@ -533,7 +517,7 @@
           <div class="composition-container">
             <!-- Left chart: Size Composition -->
             <div id="positions-chart"></div>
-            <!-- Right chart: Collateral Composition -->
+            <!-- Right chart: Collateral Composition (fetching real data from /api/collateral_composition) -->
             <div id="collateral-composition-chart"></div>
           </div>
         </div>
@@ -595,13 +579,10 @@
     const currentTime = new Date();
     const cutoff = new Date(currentTime.getTime() - hours * 3600000);
     const filteredData = portfolioData.filter(item => new Date(item.snapshot_time) >= cutoff);
-
     portfolioChart.data.labels = filteredData.map(item => item.snapshot_time);
     portfolioChart.data.datasets[0].data = filteredData.map(item => item.total_value);
     portfolioChart.data.datasets[1].data = filteredData.map(item => item.total_collateral);
     portfolioChart.update();
-
-    // Update percent change display for portfolio value
     if (filteredData.length > 0) {
       const firstValue = filteredData[0].total_value;
       const lastValue = filteredData[filteredData.length - 1].total_value;
@@ -621,7 +602,6 @@
       console.error("ApexCharts library not loaded!");
       return;
     }
-
     // SIZE Composition Chart
     const positionsChartContainer = document.getElementById("positions-chart");
     if (positionsChartContainer) {
@@ -647,18 +627,14 @@
             legend: { position: 'bottom' },
             dataLabels: {
               enabled: true,
-              style: {
-                fontSize: '1rem' /* smaller text */
-              },
+              style: { fontSize: '1rem' },
               formatter: function (val) {
                 return val.toFixed(2) + "%";
               }
             },
             plotOptions: {
               pie: {
-                dataLabels: {
-                  offset: -5 /* shift label inward to center */
-                }
+                dataLabels: { offset: -5 }
               }
             }
           };
@@ -672,46 +648,50 @@
         });
     }
 
-    // COLLATERAL Composition Chart
+    // COLLATERAL Composition Chart: now fetching from /api/collateral_composition
     const collateralChartContainer = document.getElementById("collateral-composition-chart");
     if (collateralChartContainer) {
-      const collateralOptions = {
-        series: [40, 60], // or real data from an API
-        chart: {
-          type: 'pie',
-          height: 233,
-          events: {
-            click: function(event, chartContext, config) {
-              const currentType = collateralChartInstance.w.config.chart.type;
-              const newType = (currentType === 'pie') ? 'donut' : 'pie';
-              collateralChartInstance.updateOptions({ chart: { type: newType } });
-            }
-          }
-        },
-        labels: ['Long Collateral', 'Short Collateral'],
-        colors: ['#28a745', '#ffc107'],
-        legend: { position: 'bottom' },
-        dataLabels: {
-          enabled: true,
-          style: {
-            fontSize: '1rem' /* smaller text */
-          },
-          formatter: function (val) {
-            return val.toFixed(2) + "%";
-          }
-        },
-        plotOptions: {
-          pie: {
+      fetch("/api/collateral_composition") // <-- REAL endpoint for collateral
+        .then(response => response.json())
+        .then(data => {
+          const seriesData = data.series || [0, 0];
+          const collateralOptions = {
+            series: seriesData,
+            chart: {
+              type: 'pie',
+              height: 233,
+              events: {
+                click: function(event, chartContext, config) {
+                  const currentType = collateralChartInstance.w.config.chart.type;
+                  const newType = (currentType === 'pie') ? 'donut' : 'pie';
+                  collateralChartInstance.updateOptions({ chart: { type: newType } });
+                }
+              }
+            },
+            labels: ['Long Collateral', 'Short Collateral'],
+            colors: ['#28a745', '#ffc107'],
+            legend: { position: 'bottom' },
             dataLabels: {
-              offset: -5
+              enabled: true,
+              style: { fontSize: '1rem' },
+              formatter: function (val) {
+                return val.toFixed(2) + "%";
+              }
+            },
+            plotOptions: {
+              pie: {
+                dataLabels: { offset: -5 }
+              }
             }
-          }
-        }
-      };
-      const collateralChartInstance = new ApexCharts(collateralChartContainer, collateralOptions);
-      collateralChartInstance.render().catch(err => {
-        console.error("ApexCharts (Collateral) render error:", err);
-      });
+          };
+          const collateralChartInstance = new ApexCharts(collateralChartContainer, collateralOptions);
+          collateralChartInstance.render().catch(err => {
+            console.error("ApexCharts (Collateral) render error:", err);
+          });
+        })
+        .catch(err => {
+          console.error("Error fetching collateral composition data:", err);
+        });
     }
   };
 </script>
@@ -726,12 +706,12 @@
       fetch("/positions/update_jupiter?source={{ update_type | default('jupiter') }}", { method: "POST" })
         .then(response => response.json())
         .then(data => {
-            img.classList.remove("spin");
-            window.location.reload();
+          img.classList.remove("spin");
+          window.location.reload();
         })
         .catch(err => {
-            img.classList.remove("spin");
-            console.error(err);
+          img.classList.remove("spin");
+          console.error(err);
         });
     });
   });

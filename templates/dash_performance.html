@@ -1,0 +1,108 @@
+{# dash_performance.html #}
+{% extends "base.html" %}
+
+{% block title %}Performance Chart{% endblock %}
+
+{% block extra_styles %}
+<style>
+  /* Performance chart card specific styles */
+  .performance-card {
+    margin: 1rem auto;
+  }
+  .performance-time-controls .btn {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.65rem;
+    opacity: 0.7;
+    margin-bottom: 0.2rem;
+  }
+  .performance-time-controls .btn:hover {
+    opacity: 1;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container performance-card">
+  <div class="card">
+    <div class="card-header d-flex align-items-center">
+      <h3 class="card-title mb-0">Performance</h3>
+      <small id="percentChangeDisplay" class="ms-auto" style="font-weight: bold; font-size: 1.5rem;"></small>
+    </div>
+    <div class="card-body" style="position: relative;">
+      <div class="d-flex">
+        <div class="flex-grow-1">
+          <canvas id="portfolioChart" style="width: 100%; height: 300px;"></canvas>
+        </div>
+        <div class="performance-time-controls d-flex flex-column justify-content-center" style="margin-left: 10px;">
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPortfolioTimeframe(1)">1h</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPortfolioTimeframe(3)">3h</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPortfolioTimeframe(6)">6h</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPortfolioTimeframe(12)">12h</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPortfolioTimeframe(24)">24h</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Include Chart.js and date adapter -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+<script>
+  // 'portfolio_data' should be passed from your Flask view.
+  const portfolioData = {{ portfolio_data | tojson }};
+  let portfolioChart;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    if (!portfolioData || portfolioData.length === 0) {
+      console.warn("No portfolio data available for chart rendering.");
+      return;
+    }
+    const labels = portfolioData.map(item => item.snapshot_time);
+    const data = portfolioData.map(item => item.total_value);
+    const ctx = document.getElementById('portfolioChart').getContext('2d');
+    portfolioChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Total Portfolio Value',
+          data: data,
+          borderColor: 'rgba(75, 192, 192, 1)',
+          fill: false
+        }]
+      },
+      options: {
+        scales: {
+          x: { type: 'time', time: { unit: 'day' } },
+          y: { beginAtZero: true }
+        }
+      }
+    });
+    setPortfolioTimeframe(24);
+  });
+
+  function setPortfolioTimeframe(hours) {
+    if (!portfolioData || portfolioData.length === 0) return;
+    const currentTime = new Date();
+    const cutoff = new Date(currentTime.getTime() - hours * 3600000);
+    const filteredData = portfolioData.filter(item => new Date(item.snapshot_time) >= cutoff);
+    portfolioChart.data.labels = filteredData.map(item => item.snapshot_time);
+    portfolioChart.data.datasets[0].data = filteredData.map(item => item.total_value);
+    portfolioChart.update();
+
+    if (filteredData.length > 0) {
+      const firstValue = filteredData[0].total_value;
+      const lastValue = filteredData[filteredData.length - 1].total_value;
+      const percentChange = ((lastValue - firstValue) / firstValue) * 100;
+      const percentElem = document.getElementById("percentChangeDisplay");
+      if (percentElem) {
+        percentElem.textContent = percentChange.toFixed(2) + "%";
+        percentElem.style.color = percentChange >= 0 ? "green" : "red";
+      }
+    }
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Size Balance</title>
+    <!-- Bootstrap CSS for basic styling -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      crossorigin="anonymous"
+    />
+    <!-- ApexCharts CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.css"
+      crossorigin="anonymous"
+    />
+    <!-- Bootstrap Icons CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      crossorigin="anonymous"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+        padding: 20px;
+      }
+      .card {
+        margin: 0 auto;
+        max-width: 1000px;
+      }
+      /* Legend styling in header */
+      .legend span {
+        font-size: 0.9rem;
+      }
+      /* Custom asset label styling */
+      .asset-labels {
+        /* Move the images down (less negative margin means lower on the page) */
+        margin-top: -16px;
+        display: flex;
+        justify-content: space-between;
+        /* Increase left padding to nudge images to the right */
+        padding: 0 60px 0 120px;
+      }
+      .asset-info {
+        text-align: center;
+      }
+      .asset-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid #ccc;
+        display: block;
+        margin: 0 auto 5px;
+      }
+      .wallet-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 1px solid #ccc;
+        display: block;
+        margin: 0 auto 5px;
+      }
+      .asset-info p {
+        margin: 2px 0;
+        font-size: 11px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card shadow">
+      <!-- Card header with title and legend in the upper right -->
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title mb-0">Size Balance</h3>
+        <div class="legend">
+          <span class="me-3">
+            <i class="bi bi-square-fill" style="color:#0d6efd;"></i> Long
+          </span>
+          <span class="me-3">
+            <i class="bi bi-square-fill" style="color:#20c997;"></i> Short
+          </span>
+          <span>
+            <i class="bi bi-square-fill" style="color:#ffc107;"></i> Total
+          </span>
+        </div>
+      </div>
+      <div class="card-body">
+        <!-- Chart container -->
+        <div id="size-chart"></div>
+
+        <!-- Custom group labels using asset & wallet images -->
+        <div class="asset-labels">
+          <!-- Wallet 1 (ObiVault) groups -->
+          <div class="asset-info">
+            <img class="asset-icon" src="/static/images/btc_logo.png" alt="BTC logo">
+            <img class="wallet-icon" src="/static/images/obivault.jpg" alt="ObiVault">
+            <p>BTC</p>
+          </div>
+          <div class="asset-info">
+            <img class="asset-icon" src="/static/images/eth_logo.png" alt="ETH logo">
+            <img class="wallet-icon" src="/static/images/obivault.jpg" alt="ObiVault">
+            <p>ETH</p>
+          </div>
+          <div class="asset-info">
+            <img class="asset-icon" src="/static/images/sol_logo.png" alt="SOL logo">
+            <img class="wallet-icon" src="/static/images/obivault.jpg" alt="ObiVault">
+            <p>SOL</p>
+          </div>
+          <!-- Wallet 2 (R2Vault) groups -->
+          <div class="asset-info">
+            <img class="asset-icon" src="/static/images/btc_logo.png" alt="BTC logo">
+            <img class="wallet-icon" src="/static/images/r2vault.jpg" alt="R2Vault">
+            <p>BTC</p>
+          </div>
+          <div class="asset-info">
+            <img class="asset-icon" src="/static/images/eth_logo.png" alt="ETH logo">
+            <img class="wallet-icon" src="/static/images/r2vault.jpg" alt="R2Vault">
+            <p>ETH</p>
+          </div>
+          <div class="asset-info">
+            <img class="asset-icon" src="/static/images/sol_logo.png" alt="SOL logo">
+            <img class="wallet-icon" src="/static/images/r2vault.jpg" alt="R2Vault">
+            <p>SOL</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ApexCharts JS -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      // Sample data for 6 groups:
+      // Wallet 1 (ObiVault):
+      //   BTC:   Long = 7500, Short = 5000, Total = 12500
+      //   ETH:   Long = 3000, Short = 1500, Total = 4500
+      //   SOL:   Long = 2000, Short = 800,  Total = 2800
+      // Wallet 2 (R2Vault):
+      //   BTC:   Long = 8500, Short = 6000, Total = 14500
+      //   ETH:   Long = 3500, Short = 1800, Total = 5300
+      //   SOL:   Long = 2500, Short = 1000, Total = 3500
+
+      // Calculated averages:
+      // Average Long = 4500
+      // Average Short ≈ 2683.33
+
+      const chartOptions = {
+        series: [
+          {
+            name: 'Long',
+            data: [7500, 3000, 2000, 8500, 3500, 2500]
+          },
+          {
+            name: 'Short',
+            data: [5000, 1500, 800, 6000, 1800, 1000]
+          },
+          {
+            name: 'Total',
+            data: [12500, 4500, 2800, 14500, 5300, 3500]
+          }
+        ],
+        chart: {
+          type: 'bar',
+          height: 400,
+          toolbar: { show: false }
+        },
+        grid: {
+          padding: { bottom: 0 } /* reduce bottom padding so images are closer */
+        },
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            columnWidth: '55%',
+            endingShape: 'rounded'
+          }
+        },
+        dataLabels: { enabled: false },
+        stroke: { show: true, width: 2, colors: ['transparent'] },
+        colors: ['#0d6efd', '#20c997', '#ffc107'],
+        xaxis: {
+          categories: ['', '', '', '', '', ''],
+          labels: { show: false }
+        },
+        yaxis: {
+          title: { text: 'Size Amount' },
+          labels: {
+            formatter: function(val) {
+              return Math.round(val/1000) + "k";
+            }
+          }
+        },
+        fill: { opacity: 1 },
+        tooltip: {
+          y: { formatter: (val) => val }
+        },
+        legend: { show: false },
+        annotations: {
+          yaxis: [
+            {
+              y: 2683.33,
+              borderColor: '#20c997',
+              label: {
+                borderColor: '#20c997',
+                style: { color: '#fff', background: '#20c997' },
+                text: 'Avg Short'
+              },
+              strokeDashArray: 4
+            },
+            {
+              y: 4500,
+              borderColor: '#0d6efd',
+              label: {
+                borderColor: '#0d6efd',
+                style: { color: '#fff', background: '#0d6efd' },
+                text: 'Avg Long'
+              },
+              strokeDashArray: 4
+            }
+          ]
+        }
+      };
+
+      const chart = new ApexCharts(document.querySelector("#size-chart"), chartOptions);
+      chart.render();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Pie Grid</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Include ApexCharts library -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- Include Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      /* Scale wrapper to reduce the entire panel by 50% */
+      .scale-50 {
+        transform: scale(0.5);
+        transform-origin: top center;
+      }
+      /* Card Container */
+      .card {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      .card-header {
+        background-color: #f5f5f5;
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .card-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+      }
+      .card-body {
+        padding: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+      }
+      /* Each chart wrapper takes about half the width */
+      .chart-wrapper {
+        width: 45%;
+        min-height: 350px;
+        margin-bottom: 20px;
+      }
+      .chart-wrapper > div {
+        min-height: 350px;
+      }
+      .dark {
+        background-color: #333;
+        color: #fff;
+      }
+      button {
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Wrapper that scales down the entire panel by 50% -->
+    <div class="scale-50">
+      <!-- Card Container for 4 Pie Charts -->
+      <div class="card" id="card-charts">
+        <div class="card-header">
+          <h3>Composition Grid</h3>
+          <button id="toggle-theme" title="Toggle Theme">
+            <i class="fas fa-adjust"></i>
+          </button>
+        </div>
+        <div class="card-body">
+          <!-- Chart area for Pie Chart 1 -->
+          <div class="chart-wrapper" id="chart1-wrapper">
+            <div id="chart1"></div>
+          </div>
+          <!-- Chart area for Pie Chart 2 -->
+          <div class="chart-wrapper" id="chart2-wrapper">
+            <div id="chart2"></div>
+          </div>
+          <!-- Chart area for Pie Chart 3 -->
+          <div class="chart-wrapper" id="chart3-wrapper">
+            <div id="chart3"></div>
+          </div>
+          <!-- Chart area for Pie Chart 4 -->
+          <div class="chart-wrapper" id="chart4-wrapper">
+            <div id="chart4"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ChartModule class to initialize individual charts
+      class ChartModule {
+        constructor(config) {
+          this.type = config.type;
+          this.labels = config.labels;
+          this.series = config.series || [0, 0];
+          this.colors = config.colors;
+          this.containerId = config.containerId;
+          this.currentTheme = 'light';
+          this.isDonut = false;
+          this.chart = null;
+        }
+
+        initChart() {
+          const options = {
+            series: this.series,
+            chart: {
+              type: 'pie',
+              height: 350,
+              background: 'transparent'
+            },
+            labels: this.labels,
+            colors: this.currentTheme === 'light' ? this.colors.light : this.colors.dark,
+            legend: { position: 'bottom' },
+            dataLabels: { enabled: true, style: { fontSize: '1.2rem' } }
+          };
+
+          const chartEl = document.querySelector(`#${this.containerId}`);
+          if (!chartEl) {
+            console.error("Chart container not found for", this.type);
+            return;
+          }
+          this.chart = new ApexCharts(chartEl, options);
+          this.chart
+            .render()
+            .then(() => console.log(`${this.type} chart rendered`))
+            .catch(err => console.error(err));
+
+          // Toggle between pie and donut on chart click
+          chartEl.addEventListener("click", () => {
+            this.isDonut = !this.isDonut;
+            this.chart.updateOptions({
+              chart: { type: this.isDonut ? 'donut' : 'pie' }
+            });
+          });
+        }
+
+        updateTheme(theme) {
+          this.currentTheme = theme;
+          this.chart.updateOptions({
+            colors: theme === 'light' ? this.colors.light : this.colors.dark
+          });
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        // Initialize 4 charts with canned data
+
+        // Chart 1: Size Composition
+        const chart1 = new ChartModule({
+          type: 'size',
+          labels: ['Long Positions', 'Short Positions'],
+          series: [65, 35],
+          colors: {
+            light: ['#0d6efd', '#5dcc8e'],
+            dark: ['#66b0ff', '#ff6b81']
+          },
+          containerId: 'chart1'
+        });
+        chart1.initChart();
+
+        // Chart 2: Collateral Composition
+        const chart2 = new ChartModule({
+          type: 'collateral',
+          labels: ['Long Collateral', 'Short Collateral'],
+          series: [50, 50],
+          colors: {
+            light: ['#28a745', '#ffc107'],
+            dark: ['#5cb85c', '#f0ad4e']
+          },
+          containerId: 'chart2'
+        });
+        chart2.initChart();
+
+        // Chart 3: Value Composition
+        const chart3 = new ChartModule({
+          type: 'value',
+          labels: ['Long Value', 'Short Value'],
+          series: [70, 30],
+          colors: {
+            light: ['#f44336', '#ff9800'],
+            dark: ['#e57373', '#ffb74d']
+          },
+          containerId: 'chart3'
+        });
+        chart3.initChart();
+
+        // Chart 4: Leverage Composition (example)
+        const chart4 = new ChartModule({
+          type: 'leverage',
+          labels: ['High Leverage', 'Low Leverage'],
+          series: [40, 60],
+          colors: {
+            light: ['#9c27b0', '#673ab7'],
+            dark: ['#ba68c8', '#9575cd']
+          },
+          containerId: 'chart4'
+        });
+        chart4.initChart();
+
+        // Theme toggle for all charts
+        let currentTheme = 'light';
+        const toggleBtn = document.getElementById("toggle-theme");
+        toggleBtn.addEventListener("click", () => {
+          currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+          // Toggle dark class on all chart wrappers
+          document.querySelectorAll('.chart-wrapper').forEach(wrapper => {
+            wrapper.classList.toggle("dark", currentTheme === 'dark');
+          });
+          // Update theme for all charts
+          chart1.updateTheme(currentTheme);
+          chart2.updateTheme(currentTheme);
+          chart3.updateTheme(currentTheme);
+          chart4.updateTheme(currentTheme);
+        });
+      });
+    </script>
+  </body>
+</html>

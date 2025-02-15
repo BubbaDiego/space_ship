@@ -177,17 +177,54 @@
     margin-left: 2px;
   }
 
-  /* -------------------- Size Comparison Chart -------------------- */
-  #positions-chart {
-    /* Chart container for ApexCharts */
+  /* -------------------- Composition Chart (Size + Collateral) -------------------- */
+  /* Title bar for the two side-by-side headings */
+  .composition-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #e7f0fd; /* match other card headers */
+    padding: 0.5rem 1rem;
+  }
+  .composition-header h3 {
+    margin: 0;
+    width: 50%;
+    text-align: center;
+    font-size: 1.2rem; /* a bit smaller than default */
+  }
+
+  .composition-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+  }
+  .composition-container > div {
+    width: 48%;
+    height: 233px;
   }
 
   /* -------------------- Top Bar Styles -------------------- */
+  .top-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+  /* Put the update button in a col-md-6, status bar in col-md-6 */
+  .update-col, .status-col {
+    flex: 0 0 100%;
+  }
+  @media (min-width: 768px) {
+    .update-col, .status-col {
+      flex: 0 0 50%;
+      max-width: 50%;
+    }
+  }
   .top-bar {
+    /* remove margin, we do layout with row & col now */
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 3rem;
+    margin-bottom: 0;
   }
   .top-bar .update-btn img {
     width: 70px;
@@ -195,53 +232,30 @@
     cursor: pointer;
     border-radius: 50%;
   }
-  /* Right-justify the status bar */
-  .top-bar .status-bar {
-    margin-left: auto !important;
-    width: auto !important;
+  .status-bar {
+    /* limit width to 100% of its column */
+    width: 100%;
   }
-  .top-bar .status-bar .card {
-    margin-bottom: 0 !important;
-  }
-  .top-bar .status-bar .card-body {
-    padding: 0.15rem 0.4rem !important;
-    text-align: center;
-    min-height: 25px !important;
+
+  /* Right-justify the toggle group */
+  .toggle-group {
+    margin-left: auto;
   }
   /* Make the status bar's text and icons a bit smaller */
-  .top-bar .status-bar .card-body h5 {
+  .status-bar .card-body h5 {
     font-size: 1rem !important;
     margin: 0;
   }
-  .top-bar .status-bar .card-body span {
+  .status-bar .card-body span {
     font-size: 0.85rem !important;
   }
-  .top-bar .status-bar .card-body i {
+  .status-bar .card-body i {
     font-size: 14px !important;
     margin-right: 2px;
   }
-  .top-bar .status-bar .card-body img {
+  .status-bar .card-body img {
     height: 14px !important;
     margin-right: 2px;
-  }
-  /* -------------------- Radio Buttons Styles -------------------- */
-  .toggle-group .btn {
-    font-size: 0.8rem !important;
-    padding: 0.25rem 0.5rem !important;
-  }
-
-  /* -------------------- Top Positions Header -------------------- */
-  .top-positions-header {
-    display: flex;
-    align-items: center;
-  }
-  .top-positions-header .card-title {
-    margin: 0;
-  }
-  .top-positions-header a {
-    margin-left: auto;
-    font-size: 1.5rem;
-    text-decoration: none;
   }
 
   /* -------------------- Performance Card Time Controls -------------------- */
@@ -259,96 +273,102 @@
 
 {% block content %}
 <div class="container card-container">
-  <!-- Top Bar: Jupiter Update Button + Status Bar -->
-  <div class="top-bar">
-    <!-- Jupiter Update Button -->
-    <div class="update-btn">
-      <button type="button" class="update-button" data-type="jupiter" style="background: none; border: none; padding: 0;">
-        <img id="update-button-img-jupiter"
-             src="{{ url_for('static', filename='images/jupiter.jpg') }}"
-             alt="Jupiter Update Button">
-      </button>
-    </div>
-    <!-- Status Bar with real-time data -->
-    <div class="status-bar">
-      <!-- Subtle Radio Toggle (aligned to right) -->
-      <div class="d-flex justify-content-end mb-2 toggle-group">
-        <div class="btn-group btn-group-sm" role="group" aria-label="Toggle Hours">
-          <input type="radio" class="btn-check" name="hours" id="hours1" value="1" autocomplete="off" checked>
-          <label class="btn btn-outline-secondary" for="hours1">1h</label>
-          <input type="radio" class="btn-check" name="hours" id="hours6" value="6" autocomplete="off">
-          <label class="btn btn-outline-secondary" for="hours6">6h</label>
-          <input type="radio" class="btn-check" name="hours" id="hours12" value="12" autocomplete="off">
-          <label class="btn btn-outline-secondary" for="hours12">12h</label>
-          <input type="radio" class="btn-check" name="hours" id="hours14" value="14" autocomplete="off">
-          <label class="btn btn-outline-secondary" for="hours14">14h</label>
+  <!-- Row for the Update Button & Status Bar, each 50% width -->
+  <div class="row top-row">
+    <div class="col-md-6 update-col">
+      <div class="top-bar">
+        <!-- Jupiter Update Button -->
+        <div class="update-btn">
+          <button type="button" class="update-button" data-type="jupiter" style="background: none; border: none; padding: 0;">
+            <img id="update-button-img-jupiter"
+                 src="{{ url_for('static', filename='images/jupiter.jpg') }}"
+                 alt="Jupiter Update Button">
+          </button>
         </div>
       </div>
-      <!-- Inline Status Bar Card with real data -->
-      <div class="card" style="background-color: #f2f2f2;">
-        <div class="card-body">
-          <div class="row">
-            <!-- Portfolio -->
-            <div class="col d-flex align-items-center justify-content-center border-end">
-              <i class="bi bi-wallet2" style="font-size: 14px; margin-right: 2px;"></i>
-              <div>
-                <span class="text-success">
-                  <i class="bi bi-caret-up-fill"></i> {{ portfolio_change }}%
-                </span>
-                <h5 class="fw-bold mb-0">${{ portfolio_value }}</h5>
-                <span class="text-uppercase">PORTFOLIO</span>
-              </div>
-            </div>
-            <!-- Bitcoin -->
-            <div class="col d-flex align-items-center justify-content-center border-end">
-              <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="height: 14px; margin-right: 2px;">
-              <div>
-                <span class="text-success">
-                  <i class="bi bi-caret-up-fill"></i> {{ btc_change }}%
-                </span>
-                <h5 class="fw-bold mb-0">${{ btc_price }}</h5>
-                <span class="text-uppercase">BITCOIN</span>
-              </div>
-            </div>
-            <!-- Ethereum -->
-            <div class="col d-flex align-items-center justify-content-center border-end">
-              <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="height: 14px; margin-right: 2px;">
-              <div>
-                <span class="text-info">
-                  <i class="bi bi-caret-left-fill"></i> {{ eth_change }}%
-                </span>
-                <h5 class="fw-bold mb-0">${{ eth_price }}</h5>
-                <span class="text-uppercase">ETHEREUM</span>
-              </div>
-            </div>
-            <!-- Solana -->
-            <div class="col d-flex align-items-center justify-content-center border-end">
-              <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="height: 14px; margin-right: 2px;">
-              <div>
-                <span class="text-success">
-                  <i class="bi bi-caret-up-fill"></i> {{ sol_change }}%
-                </span>
-                <h5 class="fw-bold mb-0">${{ sol_price }}</h5>
-                <span class="text-uppercase">SOLANA</span>
-              </div>
-            </div>
-            <!-- S&P 500 -->
-            <div class="col d-flex align-items-center justify-content-center">
-              <div>
-                <span class="text-danger">
-                  <i class="bi bi-caret-down-fill"></i> {{ sp500_change }}%
-                </span>
-                <h5 class="fw-bold mb-0">{{ sp500_value }}</h5>
-                <span class="text-uppercase">S&P 500</span>
-              </div>
-            </div>
+    </div>
+    <div class="col-md-6 status-col">
+      <div class="top-bar">
+        <!-- Subtle Radio Toggle (aligned right) -->
+        <div class="toggle-group d-flex">
+          <div class="btn-group btn-group-sm" role="group" aria-label="Toggle Hours">
+            <input type="radio" class="btn-check" name="hours" id="hours1" value="1" autocomplete="off" checked>
+            <label class="btn btn-outline-secondary" for="hours1">1h</label>
+            <input type="radio" class="btn-check" name="hours" id="hours6" value="6" autocomplete="off">
+            <label class="btn btn-outline-secondary" for="hours6">6h</label>
+            <input type="radio" class="btn-check" name="hours" id="hours12" value="12" autocomplete="off">
+            <label class="btn btn-outline-secondary" for="hours12">12h</label>
+            <input type="radio" class="btn-check" name="hours" id="hours14" value="14" autocomplete="off">
+            <label class="btn btn-outline-secondary" for="hours14">14h</label>
           </div>
         </div>
       </div>
+      <!-- Status Bar with real-time data (matching the performance card width) -->
+      <div class="status-bar mt-2">
+        <div class="card" style="background-color: #f2f2f2;">
+          <div class="card-body">
+            <div class="row">
+              <!-- Portfolio -->
+              <div class="col d-flex align-items-center justify-content-center border-end">
+                <i class="bi bi-wallet2" style="font-size: 14px; margin-right: 2px;"></i>
+                <div>
+                  <span class="text-success">
+                    <i class="bi bi-caret-up-fill"></i> {{ portfolio_change }}%
+                  </span>
+                  <h5 class="fw-bold mb-0">${{ portfolio_value }}</h5>
+                  <span class="text-uppercase">PORTFOLIO</span>
+                </div>
+              </div>
+              <!-- Bitcoin -->
+              <div class="col d-flex align-items-center justify-content-center border-end">
+                <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC" style="height: 14px; margin-right: 2px;">
+                <div>
+                  <span class="text-success">
+                    <i class="bi bi-caret-up-fill"></i> {{ btc_change }}%
+                  </span>
+                  <h5 class="fw-bold mb-0">${{ btc_price }}</h5>
+                  <span class="text-uppercase">BITCOIN</span>
+                </div>
+              </div>
+              <!-- Ethereum -->
+              <div class="col d-flex align-items-center justify-content-center border-end">
+                <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH" style="height: 14px; margin-right: 2px;">
+                <div>
+                  <span class="text-info">
+                    <i class="bi bi-caret-left-fill"></i> {{ eth_change }}%
+                  </span>
+                  <h5 class="fw-bold mb-0">${{ eth_price }}</h5>
+                  <span class="text-uppercase">ETHEREUM</span>
+                </div>
+              </div>
+              <!-- Solana -->
+              <div class="col d-flex align-items-center justify-content-center border-end">
+                <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL" style="height: 14px; margin-right: 2px;">
+                <div>
+                  <span class="text-success">
+                    <i class="bi bi-caret-up-fill"></i> {{ sol_change }}%
+                  </span>
+                  <h5 class="fw-bold mb-0">${{ sol_price }}</h5>
+                  <span class="text-uppercase">SOLANA</span>
+                </div>
+              </div>
+              <!-- S&P 500 -->
+              <div class="col d-flex align-items-center justify-content-center">
+                <div>
+                  <span class="text-danger">
+                    <i class="bi bi-caret-down-fill"></i> {{ sp500_change }}%
+                  </span>
+                  <h5 class="fw-bold mb-0">{{ sp500_value }}</h5>
+                  <span class="text-uppercase">S&P 500</span>
+                </div>
+              </div>
+            </div> <!-- end row -->
+          </div> <!-- end card-body -->
+        </div> <!-- end card -->
+      </div> <!-- end status-bar -->
     </div>
-  </div>
+  </div> <!-- end row -->
 
-  <!-- Existing Dashboard Content -->
   <!-- Row 1: Liquidation Bar Card and Portfolio Performance Card -->
   <div class="row">
     <!-- Liquidation Bar Card -->
@@ -399,6 +419,7 @@
         </div>
       </div>
     </div>
+
     <!-- Portfolio Performance Card -->
     <div class="col-md-6">
       <div class="card">
@@ -424,7 +445,7 @@
     </div>
   </div>
 
-  <!-- Row 2: Top Positions Card and Size Comparison Chart Card -->
+  <!-- Row 2: Top Positions Card and Composition Card -->
   <div class="row">
     <!-- Top Positions Card -->
     <div class="col-md-6">
@@ -499,14 +520,22 @@
         </div>
       </div>
     </div>
-    <!-- Size Comparison Chart Card -->
+
+    <!-- Composition Card with headings "📐 Size" and "Collateral 💸" -->
     <div class="col-md-6">
       <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">Size Comparison Chart</h3>
+        <!-- Title bar matching other cards -->
+        <div class="composition-header">
+          <h3>📐 Size</h3>
+          <h3>Collateral 💸</h3>
         </div>
         <div class="card-body">
-          <div id="positions-chart"></div>
+          <div class="composition-container">
+            <!-- Left chart: Size Composition -->
+            <div id="positions-chart"></div>
+            <!-- Right chart: Collateral Composition -->
+            <div id="collateral-composition-chart"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -529,7 +558,7 @@
     }
     const labels = portfolioData.map(item => item.snapshot_time);
     const valueData = portfolioData.map(item => item.total_value);
-    const collateralData = portfolioData.map(item => item.total_collateral); // new collateral field
+    const collateralData = portfolioData.map(item => item.total_collateral);
 
     const ctx = document.getElementById('portfolioChart').getContext('2d');
     portfolioChart = new Chart(ctx, {
@@ -569,10 +598,10 @@
 
     portfolioChart.data.labels = filteredData.map(item => item.snapshot_time);
     portfolioChart.data.datasets[0].data = filteredData.map(item => item.total_value);
-    portfolioChart.data.datasets[1].data = filteredData.map(item => item.total_collateral); // update collateral data
+    portfolioChart.data.datasets[1].data = filteredData.map(item => item.total_collateral);
     portfolioChart.update();
 
-    // Update percent change display for portfolio value (optional)
+    // Update percent change display for portfolio value
     if (filteredData.length > 0) {
       const firstValue = filteredData[0].total_value;
       const lastValue = filteredData[filteredData.length - 1].total_value;
@@ -592,37 +621,98 @@
       console.error("ApexCharts library not loaded!");
       return;
     }
-    var chartContainer = document.getElementById("positions-chart");
-    if (!chartContainer) {
-      console.error("positions-chart container not found");
-      return;
+
+    // SIZE Composition Chart
+    const positionsChartContainer = document.getElementById("positions-chart");
+    if (positionsChartContainer) {
+      fetch("/api/size_composition")
+        .then(response => response.json())
+        .then(data => {
+          const seriesData = data.series || [0, 0];
+          const options = {
+            series: seriesData,
+            chart: {
+              type: 'pie',
+              height: 233,
+              events: {
+                click: function(event, chartContext, config) {
+                  const currentType = positionsChartInstance.w.config.chart.type;
+                  const newType = (currentType === 'pie') ? 'donut' : 'pie';
+                  positionsChartInstance.updateOptions({ chart: { type: newType } });
+                }
+              }
+            },
+            labels: ['Long Positions', 'Short Positions'],
+            colors: ['#0d6efd', '#5dcc8e'],
+            legend: { position: 'bottom' },
+            dataLabels: {
+              enabled: true,
+              style: {
+                fontSize: '1rem' /* smaller text */
+              },
+              formatter: function (val) {
+                return val.toFixed(2) + "%";
+              }
+            },
+            plotOptions: {
+              pie: {
+                dataLabels: {
+                  offset: -5 /* shift label inward to center */
+                }
+              }
+            }
+          };
+          const positionsChartInstance = new ApexCharts(positionsChartContainer, options);
+          positionsChartInstance.render().catch(err => {
+            console.error("ApexCharts (Size) render error:", err);
+          });
+        })
+        .catch(err => {
+          console.error("Error fetching size composition data:", err);
+        });
     }
-    fetch("/api/size_composition")
-      .then(response => response.json())
-      .then(data => {
-         var seriesData = data.series || [0, 0];
-         var options = {
-           series: seriesData,
-           chart: {
-             type: 'pie',
-             height: 350,
-             events: {
-               click: function(event, chartContext, config) {
-                 var currentType = chartInstance.w.config.chart.type;
-                 var newType = currentType === 'pie' ? 'donut' : 'pie';
-                 chartInstance.updateOptions({ chart: { type: newType } });
-               }
-             }
-           },
-           labels: ['Long Positions', 'Short Positions'],
-           colors: ['#0d6efd', '#5dcc8e'],
-           legend: { position: 'bottom' },
-           dataLabels: { enabled: true, style: { fontSize: '1.2rem' } }
-         };
-         var chartInstance = new ApexCharts(chartContainer, options);
-         chartInstance.render().catch(function(err) { console.error("ApexCharts render error:", err); });
-      })
-      .catch(function(err) { console.error("Error fetching size composition data:", err); });
+
+    // COLLATERAL Composition Chart
+    const collateralChartContainer = document.getElementById("collateral-composition-chart");
+    if (collateralChartContainer) {
+      const collateralOptions = {
+        series: [40, 60], // or real data from an API
+        chart: {
+          type: 'pie',
+          height: 233,
+          events: {
+            click: function(event, chartContext, config) {
+              const currentType = collateralChartInstance.w.config.chart.type;
+              const newType = (currentType === 'pie') ? 'donut' : 'pie';
+              collateralChartInstance.updateOptions({ chart: { type: newType } });
+            }
+          }
+        },
+        labels: ['Long Collateral', 'Short Collateral'],
+        colors: ['#28a745', '#ffc107'],
+        legend: { position: 'bottom' },
+        dataLabels: {
+          enabled: true,
+          style: {
+            fontSize: '1rem' /* smaller text */
+          },
+          formatter: function (val) {
+            return val.toFixed(2) + "%";
+          }
+        },
+        plotOptions: {
+          pie: {
+            dataLabels: {
+              offset: -5
+            }
+          }
+        }
+      };
+      const collateralChartInstance = new ApexCharts(collateralChartContainer, collateralOptions);
+      collateralChartInstance.render().catch(err => {
+        console.error("ApexCharts (Collateral) render error:", err);
+      });
+    }
   };
 </script>
 
@@ -648,7 +738,10 @@
 </script>
 
 <style>
-  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
   .spin { animation: spin 1s linear infinite; }
 </style>
 
@@ -657,7 +750,7 @@
     const currentTheme = localStorage.getItem('theme') || 'light';
     document.body.classList.add(currentTheme + '-mode');
     const themeToggle = document.getElementById('themeToggle');
-    themeToggle.checked = currentTheme === 'dark';
+    themeToggle.checked = (currentTheme === 'dark');
     themeToggle.addEventListener('change', function() {
       if (this.checked) {
         document.body.classList.remove('light-mode');

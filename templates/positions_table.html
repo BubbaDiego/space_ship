@@ -220,36 +220,39 @@ document.addEventListener("DOMContentLoaded", function () {
   headers.forEach(function(header) {
     header.addEventListener("click", function () {
       var colIndex = parseInt(header.getAttribute("data-col-index"));
+      // Toggle sort direction: default to "asc" if not set.
+      var currentSortDirection = header.getAttribute("data-sort-direction") || "asc";
+      var newSortDirection = (currentSortDirection === "asc") ? "desc" : "asc";
+      header.setAttribute("data-sort-direction", newSortDirection);
+
       var tbody = table.getElementsByTagName("tbody")[0];
       var rows = Array.from(tbody.getElementsByTagName("tr"));
 
-      // Sort rows in descending order based on the clicked column
       rows.sort(function (a, b) {
         var aCell = a.getElementsByTagName("td")[colIndex];
         var bCell = b.getElementsByTagName("td")[colIndex];
 
-        // Attempt to get text content, if empty, check for image alt attribute
         var aText = aCell.innerText.trim();
         var bText = bCell.innerText.trim();
-        if(aText === "" && aCell.querySelector("img")){
-           aText = aCell.querySelector("img").getAttribute("alt") || "";
+
+        if (aText === "" && aCell.querySelector("img")) {
+          aText = aCell.querySelector("img").getAttribute("alt") || "";
         }
-        if(bText === "" && bCell.querySelector("img")){
-           bText = bCell.querySelector("img").getAttribute("alt") || "";
+        if (bText === "" && bCell.querySelector("img")) {
+          bText = bCell.querySelector("img").getAttribute("alt") || "";
         }
-        // Remove commas, currency symbols, etc., and try to parse as number
+
         var aNum = parseFloat(aText.replace(/[^0-9.-]+/g, ""));
         var bNum = parseFloat(bText.replace(/[^0-9.-]+/g, ""));
 
-        // If both values are valid numbers, sort numerically; otherwise, sort as strings.
         if (!isNaN(aNum) && !isNaN(bNum)) {
-          return bNum - aNum; // descending
+          return (newSortDirection === "asc") ? aNum - bNum : bNum - aNum;
         } else {
-          return bText.localeCompare(aText);
+          return (newSortDirection === "asc") ? aText.localeCompare(bText) : bText.localeCompare(aText);
         }
       });
 
-      // Re-append sorted rows
+      // Re-append sorted rows to tbody.
       rows.forEach(function (row) {
         tbody.appendChild(row);
       });

@@ -528,18 +528,28 @@
       return;
     }
     const labels = portfolioData.map(item => item.snapshot_time);
-    const data = portfolioData.map(item => item.total_value);
+    const valueData = portfolioData.map(item => item.total_value);
+    const collateralData = portfolioData.map(item => item.total_collateral); // new collateral field
+
     const ctx = document.getElementById('portfolioChart').getContext('2d');
     portfolioChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: labels,
-        datasets: [{
-          label: 'Total Portfolio Value',
-          data: data,
-          borderColor: 'rgba(75, 192, 192, 1)',
-          fill: false
-        }]
+        datasets: [
+          {
+            label: 'Total Portfolio Value',
+            data: valueData,
+            borderColor: 'rgba(75, 192, 192, 1)',
+            fill: false
+          },
+          {
+            label: 'Total Collateral',
+            data: collateralData,
+            borderColor: 'rgba(192, 75, 192, 1)',
+            fill: false
+          }
+        ]
       },
       options: {
         scales: {
@@ -556,10 +566,13 @@
     const currentTime = new Date();
     const cutoff = new Date(currentTime.getTime() - hours * 3600000);
     const filteredData = portfolioData.filter(item => new Date(item.snapshot_time) >= cutoff);
+
     portfolioChart.data.labels = filteredData.map(item => item.snapshot_time);
     portfolioChart.data.datasets[0].data = filteredData.map(item => item.total_value);
+    portfolioChart.data.datasets[1].data = filteredData.map(item => item.total_collateral); // update collateral data
     portfolioChart.update();
 
+    // Update percent change display for portfolio value (optional)
     if (filteredData.length > 0) {
       const firstValue = filteredData[0].total_value;
       const lastValue = filteredData[filteredData.length - 1].total_value;

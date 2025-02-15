@@ -147,10 +147,23 @@ def dashboard():
     try:
         # Retrieve positions data.
         all_positions = PositionService.get_all_positions(DB_PATH)
+        positions = all_positions  # Pass all positions to the template for the positions table
         valid_positions = [pos for pos in all_positions if pos.get("current_travel_percent") is not None]
         top_positions = sorted(valid_positions, key=lambda pos: pos["current_travel_percent"], reverse=True)
         bottom_positions = sorted(valid_positions, key=lambda pos: pos["current_travel_percent"])[:3]
         liquidation_positions = valid_positions  # Use all valid positions for the liquidation bar
+
+        # Compute totals for positions table.
+        totals = {}
+        totals["total_collateral"] = sum(float(pos.get("collateral", 0)) for pos in positions)
+        totals["total_value"] = sum(float(pos.get("value", 0)) for pos in positions)
+        totals["total_size"] = sum(float(pos.get("size", 0)) for pos in positions)
+        if positions:
+            totals["avg_leverage"] = sum(float(pos.get("leverage", 0)) for pos in positions) / len(positions)
+            totals["avg_travel_percent"] = sum(float(pos.get("current_travel_percent", 0)) for pos in positions) / len(positions)
+        else:
+            totals["avg_leverage"] = 0
+            totals["avg_travel_percent"] = 0
 
         # Retrieve portfolio history data and compute portfolio stats.
         dl = DataLocker.get_instance()
@@ -224,7 +237,9 @@ def dashboard():
             sol_price=formatted_sol_price,
             sol_change=formatted_sol_change,
             sp500_value=formatted_sp500_value,
-            sp500_change=formatted_sp500_change
+            sp500_change=formatted_sp500_change,
+            positions=positions,    # For the positions table in the dashboard
+            totals=totals           # Totals for the positions table footer
         )
     except Exception as e:
         logger.error("Error retrieving dashboard data: %s", e, exc_info=True)
@@ -243,8 +258,17 @@ def dashboard():
             sol_price="0.00",
             sol_change="0.0",
             sp500_value="0.00",
-            sp500_change="0.0"
+            sp500_change="0.0",
+            positions=[],  # Empty list when error occurs
+            totals={}      # Empty totals dict when error occurs
         )
+
+@dashboard_bp.route("/dash_performance")
+def dash_performance():
+    # Make sure to pass in the required data
+    portfolio_data = DataLocker.get_instance().get_portfolio_history() or []
+    return render_template("dash_performance.html", portfolio_data=portfolio_data)
+
 
 @dashboard_bp.route("/theme")
 def theme_options():
@@ -259,6 +283,7 @@ def theme_options():
 def api_size_composition():
     """
     Computes the composition of positions by size.
+    Returns percentages for LONG vs. SHORT sizes.
     Returns percentages for LONG vs. SHORT sizes.
     """
     try:

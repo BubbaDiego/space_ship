@@ -196,27 +196,8 @@ def edit_wallet(wallet_name):
             return redirect(url_for("assets"))
         return render_template("edit_wallet.html", wallet=wallet)
 
-@app.route("/database-viewer")
-def database_viewer():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT name FROM sqlite_master
-        WHERE type='table' AND name NOT LIKE 'sqlite_%'
-        ORDER BY name
-    """)
-    tables = [row["name"] for row in cur.fetchall()]
-    db_data = {}
-    for table in tables:
-        cur.execute(f"PRAGMA table_info({table})")
-        columns = [col["name"] for col in cur.fetchall()]
-        cur.execute(f"SELECT * FROM {table}")
-        rows_raw = cur.fetchall()
-        rows = [dict(r) for r in rows_raw]
-        db_data[table] = {"columns": columns, "rows": rows}
-    conn.close()
-    return render_template("database_viewer.html", db_data=db_data)
+
+
 
 @app.route("/console_view")
 def console_view():
@@ -251,6 +232,80 @@ def save_theme_route():
     except Exception as e:
         current_app.logger.error("Error saving theme: %s", e, exc_info=True)
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+# API endpoint to update a row
+@app.route('/api/update_row', methods=['POST'])
+def api_update_row():
+    try:
+        data = request.get_json()
+        table = data.get('table')
+        pk_field = data.get('pk_field')
+        pk_value = data.get('pk_value')
+        row_data = data.get('row')
+
+        dl = DataLocker.get_instance()
+
+        if table == 'wallets':
+            # Use the update_wallet method
+            dl.update_wallet(pk_value, row_data)
+        elif table == 'positions':
+            # You'd implement a similar method for positions
+            # Example: dl.update_position(pk_value, row_data['size'], row_data['collateral'])
+            pass
+        else:
+            # Handle other tables as needed
+            pass
+
+        return jsonify({"status": "success"}), 200
+    except Exception as e:
+        logger.exception("Error updating row")
+        return jsonify({"error": str(e)}), 500
+
+
+# API endpoint to delete a row
+@app.route('/api/delete_row', methods=['POST'])
+def api_delete_row():
+    try:
+        data = request.get_json()
+        table = data.get('table')
+        pk_field = data.get('pk_field')
+        pk_value = data.get('pk_value')
+
+        dl = DataLocker.get_instance()
+
+        if table == 'wallets':
+            return jsonify({"error": "Wallet deletion is disabled"}), 400
+        elif table == 'positions':
+            dl.delete_position(pk_value)
+        else:
+            # Handle other tables as needed
+            pass
+
+        return jsonify({"status": "success"}), 200
+    except Exception as e:
+        logger.exception("Error deleting row")
+        return jsonify({"error": str(e)}), 500
+
+
+# Route to render the database viewer
+@app.route('/database-viewer')
+def database_viewer():
+    dl = DataLocker.get_instance()
+
+    # Build db_data for wallets (add other tables as needed)
+    db_data = {
+        'wallets': {
+            "columns": ["name", "public_address", "private_address", "image_path", "balance"],
+            "rows": dl.read_wallets()
+        }
+        # You can add other tables like positions, alerts, etc.
+    }
+
+    # For portfolio_data, supply an empty list or actual data if available.
+    portfolio_data = []
+    return render_template("database_viewer.html", db_data=db_data, portfolio_data=portfolio_data)
+
 
 # ---------------------------------------------------------------------------
 # Context Processor

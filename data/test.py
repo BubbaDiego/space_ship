@@ -1,29 +1,27 @@
 #!/usr/bin/env python
-import random
-from datetime import datetime, timedelta
-from data.data_locker import DataLocker
+import sqlite3
+from config.config_constants import DB_PATH
 
-def inject_sample_data(num_entries=10):
-    """
-    Injects sample portfolio entries into the database.
-    Each entry will have a snapshot_time and a random total_value.
-    """
-    dl = DataLocker.get_instance()
-    now = datetime.now()
-    for i in range(num_entries):
-        # For each entry, set the snapshot time to a different day in the past.
-        snapshot_time = (now - timedelta(days=i)).isoformat()
-        # Generate a random total_value between 1000 and 5000.
-        total_value = round(random.uniform(1000, 5000), 2)
-        entry = {
-            "snapshot_time": snapshot_time,
-            "total_value": total_value
-        }
-        try:
-            dl.add_portfolio_entry(entry)
-            print(f"Inserted portfolio entry with snapshot_time={snapshot_time} and total_value={total_value}")
-        except Exception as e:
-            print(f"Error inserting entry: {e}")
+def insert_test_wallet():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    # Replace these values as needed.
+    wallet_data = (
+        "TestWalletd",             # name
+        "test_public_addressd",      # public_address
+        "test_private_addressd",     # private_address
+        "images/wallpaper.png",       # image_path
+        100.0                       # balance
+    )
+    cursor.execute("""
+        INSERT OR REPLACE INTO wallets (name, public_address, private_address, image_path, balance)
+        VALUES (?, ?, ?, ?, ?)
+    """, wallet_data)
+    conn.commit()
+    cursor.close()
+    conn.close()
+    print("Test wallet inserted.")
 
-if __name__ == '__main__':
-    inject_sample_data(10)
+if __name__ == "__main__":
+    insert_test_wallet()

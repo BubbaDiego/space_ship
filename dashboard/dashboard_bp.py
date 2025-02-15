@@ -7,7 +7,7 @@ Description:
       - The index route.
       - The main dashboard view.
       - Theme options.
-      - API endpoints for chart data (size_composition, value_composition, collateral_composition).
+      - API endpoints for chart data (size_composition, value_composition, collateral_composition, size_balance).
 Usage:
     Import and register this blueprint in your main application.
 """
@@ -160,7 +160,8 @@ def dashboard():
         totals["total_size"] = sum(float(pos.get("size", 0)) for pos in positions)
         if positions:
             totals["avg_leverage"] = sum(float(pos.get("leverage", 0)) for pos in positions) / len(positions)
-            totals["avg_travel_percent"] = sum(float(pos.get("current_travel_percent", 0)) for pos in positions) / len(positions)
+            totals["avg_travel_percent"] = sum(float(pos.get("current_travel_percent", 0)) for pos in positions) / len(
+                positions)
         else:
             totals["avg_leverage"] = 0
             totals["avg_travel_percent"] = 0
@@ -238,8 +239,8 @@ def dashboard():
             sol_change=formatted_sol_change,
             sp500_value=formatted_sp500_value,
             sp500_change=formatted_sp500_change,
-            positions=positions,    # For the positions table in the dashboard
-            totals=totals           # Totals for the positions table footer
+            positions=positions,  # For the positions table in the dashboard
+            totals=totals  # Totals for the positions table footer
         )
     except Exception as e:
         logger.error("Error retrieving dashboard data: %s", e, exc_info=True)
@@ -260,8 +261,9 @@ def dashboard():
             sp500_value="0.00",
             sp500_change="0.0",
             positions=[],  # Empty list when error occurs
-            totals={}      # Empty totals dict when error occurs
+            totals={}  # Empty totals dict when error occurs
         )
+
 
 @dashboard_bp.route("/dash_performance")
 def dash_performance():
@@ -283,7 +285,6 @@ def theme_options():
 def api_size_composition():
     """
     Computes the composition of positions by size.
-    Returns percentages for LONG vs. SHORT sizes.
     Returns percentages for LONG vs. SHORT sizes.
     """
     try:
@@ -314,19 +315,54 @@ def api_value_composition():
 @dashboard_bp.route("/api/size_balance")
 def api_size_balance():
     """
-    Provides data for the Size Balance bar chart.
-    Returns sample data for 'Long', 'Short', and 'Total' sizes across 6 groups.
+    Provides data for the Size Balance bar chart using live data.
+    Dynamically groups positions by wallet and asset type that have non-zero total size.
+    Expected groups include, for example:
+      - ("ObiVault", "BTC"), ("ObiVault", "ETH"), ("ObiVault", "SOL"),
+      - ("R2Vault", "BTC"), ("R2Vault", "ETH"), ("R2Vault", "SOL")
+    For each group, sums the 'size' for LONG and SHORT positions.
+    Returns JSON with a key "groups" containing a list of group objects,
+    each with keys: "wallet", "asset", "long", "short", and "total".
+    Only groups with a non-zero total will be included.
     """
     try:
-        data = {
-            "long": [7500, 3000, 2000, 8500, 3500, 2500],
-            "short": [5000, 1500, 800, 6000, 1800, 1000],
-            "total": [12500, 4500, 2800, 14500, 5300, 3500]
-        }
-        return jsonify(data)
+        positions = PositionService.get_all_positions(DB_PATH)
+        groups = {}
+        for pos in positions:
+            wallet = pos.get("wallet", "ObiVault")
+            asset = pos.get("asset_type", "BTC").upper()
+            if asset not in ["BTC", "ETH", "SOL"]:
+                continue
+            if wallet not in ["ObiVault", "R2Vault"]:
+                wallet = "ObiVault"
+            key = (wallet, asset)
+            if key not in groups:
+                groups[key] = {"long": 0, "short": 0}
+            try:
+                size = float(pos.get("size", 0))
+            except Exception:
+                size = 0
+            position_type = pos.get("position_type", "").upper()
+            if position_type == "LONG":
+                groups[key]["long"] += size
+            elif position_type == "SHORT":
+                groups[key]["short"] += size
+        groups_list = []
+        for (wallet, asset), values in groups.items():
+            total = values["long"] + values["short"]
+            if total > 0:
+                groups_list.append({
+                    "wallet": wallet,
+                    "asset": asset,
+                    "long": values["long"],
+                    "short": values["short"],
+                    "total": total
+                })
+        return jsonify({"groups": groups_list})
     except Exception as e:
         logger.error(f"Error in api_size_balance: {e}", exc_info=True)
         return jsonify({"error": str(e)}), 500
+
 
 @dashboard_bp.route("/api/collateral_composition")
 def api_collateral_composition():

@@ -311,6 +311,23 @@ def api_value_composition():
         return jsonify({"error": str(e)}), 500
 
 
+@dashboard_bp.route("/api/size_balance")
+def api_size_balance():
+    """
+    Provides data for the Size Balance bar chart.
+    Returns sample data for 'Long', 'Short', and 'Total' sizes across 6 groups.
+    """
+    try:
+        data = {
+            "long": [7500, 3000, 2000, 8500, 3500, 2500],
+            "short": [5000, 1500, 800, 6000, 1800, 1000],
+            "total": [12500, 4500, 2800, 14500, 5300, 3500]
+        }
+        return jsonify(data)
+    except Exception as e:
+        logger.error(f"Error in api_size_balance: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
 @dashboard_bp.route("/api/collateral_composition")
 def api_collateral_composition():
     """

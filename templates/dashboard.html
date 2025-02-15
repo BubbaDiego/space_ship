@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% block title %}Dashboard{% endblock %}
 
 {% block extra_styles %}
@@ -15,9 +14,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #e7f0fd; /* subtle blue */
+    background-color: #e7f0fd;
     padding: 0.5rem 1rem;
-    height: 50px; /* fixed height for uniformity */
+    height: 50px;
   }
   .header-icon {
     font-size: 1.5rem !important;
@@ -99,108 +98,6 @@
     }
   }
 
-  /* -------------------- Top Positions Styles -------------------- */
-  .invisible-container .card-body {
-    display: block !important;
-    overflow: visible !important;
-    height: auto !important;
-  }
-  .info-box {
-    display: flex;
-    align-items: center;
-    background-color: #e0e0e0;
-    padding: 2px !important;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    margin-bottom: 2px !important;
-    width: 100% !important;
-  }
-  .info-box-wallet {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-  }
-  .info-box-wallet img {
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-  }
-  .info-box-asset {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-  }
-  .info-box-extra {
-    display: inline-flex;
-    align-items: center;
-    font-size: 0.6rem;
-    margin: 0;
-  }
-  .info-box-extra img {
-    vertical-align: middle;
-    width: 20px;
-    height: 20px;
-  }
-  .info-box-extra span {
-    margin-left: 2px;
-  }
-  .info-box-extra span:last-child {
-    font-size: 0.65rem;
-    font-weight: bold;
-  }
-  .info-box-icon {
-    width: 30px;
-    height: 25px;
-    line-height: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    margin-right: 2px;
-  }
-  .text-bg-blue { background-color: #007bff !important; }
-  .text-bg-success { background-color: #28a745 !important; }
-  .text-bg-warning { background-color: #ffc107 !important; }
-  .text-bg-danger { background-color: #dc3545 !important; }
-  .small-percentage {
-    font-size: 0.75rem !important;
-    font-weight: bold !important;
-    font-family: 'Nunito', sans-serif;
-    color: white !important;
-    margin-right: 0 !important;
-  }
-  .info-box-details {
-    display: flex;
-    gap: 3px;
-    font-size: 0.75rem;
-    align-items: center;
-    margin-left: 2px;
-  }
-
-  /* -------------------- Composition Chart (Size + Collateral) -------------------- */
-  .composition-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #e7f0fd; /* match other card headers */
-    padding: 0.5rem 1rem;
-  }
-  .composition-header h3 {
-    margin: 0;
-    width: 50%;
-    text-align: center;
-    font-size: 1.2rem; /* a bit smaller than default */
-  }
-  .composition-container {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 1rem;
-  }
-  .composition-container > div {
-    width: 48%;
-    height: 233px;
-  }
-
   /* -------------------- Top Bar & Status Bar Layout -------------------- */
   .top-row {
     display: flex;
@@ -240,7 +137,6 @@
     min-height: 25px !important;
     padding-top: 0.05rem !important;
   }
-  /* Top-justify the status bar text in each column */
   .status-bar .card-body .row > .col {
     align-items: flex-start !important;
   }
@@ -257,14 +153,36 @@
   }
   .status-bar .card-body img {
     margin-right: 4px;
-    height: 24px !important; /* bigger icons */
-    margin-top: 4px;        /* move down from top */
+    height: 24px !important;
+    margin-top: 4px;
   }
-
-  /* Dark Blue label for "PORTFOLIO" only */
   .portfolio-label {
     color: #00008B;
     font-weight: bold;
+  }
+
+  /* -------------------- Composition Chart (Size + Collateral) -------------------- */
+  .composition-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #e7f0fd;
+    padding: 0.5rem 1rem;
+  }
+  .composition-header h3 {
+    margin: 0;
+    width: 50%;
+    text-align: center;
+    font-size: 1.2rem;
+  }
+  .composition-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+  }
+  .composition-container > div {
+    width: 48%;
+    height: 233px;
   }
 
   /* -------------------- Performance Card Time Controls -------------------- */
@@ -277,6 +195,93 @@
   .performance-time-controls .btn:hover {
     opacity: 1;
   }
+
+  /*
+    ========================
+    START: SIZE BALANCE SECTION (CSS)
+    ========================
+    - We add extra bottom padding to the chart for image space.
+    - Then we position the images row (asset-labels) with a negative top margin.
+    - We now offset each column individually as follows:
+        Column 1: +50px (unchanged)
+        Columns 2,3,4,5: shifted an extra 1 space (25px) to the right from their previous values.
+        Column 6 remains the same.
+  */
+
+  /*
+    Move the entire images row up an extra 12px (half a space)
+    New margin-top: -132px (was -120px)
+  */
+  .asset-labels {
+    display: flex;
+    justify-content: space-around;
+    margin-top: -142px;
+    margin-bottom: 20px;
+  }
+
+  /*
+    Each column container (.size-chart-col) holds the wallet image on top and the asset image below.
+    New offsets:
+      - Column 1: margin-left: 50px (unchanged)
+      - Column 2: margin-left: 50px (was 25px + 25px)
+      - Column 3: margin-left: 37px (was 12px + 25px)
+      - Column 4: margin-left: 25px (was 0 + 25px)
+      - Column 5: margin-left: 25px (was 0 + 25px)
+      - Column 6: margin-left: -12px (unchanged)
+  */
+  .size-chart-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .size-chart-col:nth-child(1) {
+    margin-left: 60px;
+  }
+  .size-chart-col:nth-child(2) {
+    margin-left: 55x;
+  }
+  .size-chart-col:nth-child(3) {
+    margin-left: 5px;
+  }
+  .size-chart-col:nth-child(4) {
+    margin-left: 5px;
+  }
+  .size-chart-col:nth-child(5) {
+    margin-left: 4px;
+  }
+  .size-chart-col:nth-child(6) {
+    margin-left: 2px;
+  }
+
+  /*
+    Set images sizes at 50% reduction:
+    - wallet-icon: 25x25
+    - asset-icon2: 20x20
+  */
+  .wallet-icon {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    margin-bottom: 5px;
+  }
+  .asset-icon2 {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+  }
+
+  .size-chart-col p {
+    margin: 2px 0;
+    font-size: 10px;
+  }
+
+  /*
+    ======================
+    END: SIZE BALANCE SECTION (CSS)
+    ======================
+  */
 </style>
 {% endblock %}
 
@@ -431,82 +436,71 @@
     </div>
   </div>
 
-  <!-- Row: Top Positions & Composition Card -->
+  <!-- Row: Size Balance Bar Chart & Composition Card -->
   <div class="row">
-    <!-- Top Positions Card -->
+    <!--
+      ============================
+      START: SIZE BALANCE SECTION (HTML)
+      ============================
+    -->
     <div class="col-md-6">
-      <div class="card invisible-container">
-        <div class="card-header top-positions-header">
-          <h3 class="card-title">Top Positions</h3>
-          <a href="{{ url_for('positions.positions_table') }}" title="Positions Table">📊</a>
+      <div class="card shadow">
+        <!-- Card header with title and legend -->
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h3 class="card-title mb-0">Size Balance</h3>
+          <div class="legend">
+            <span class="me-3">
+              <i class="bi bi-square-fill" style="color:#0d6efd;"></i> Long
+            </span>
+            <span class="me-3">
+              <i class="bi bi-square-fill" style="color:#20c997;"></i> Short
+            </span>
+            <span>
+              <i class="bi bi-square-fill" style="color:#ffc107;"></i> Total
+            </span>
+          </div>
         </div>
         <div class="card-body">
-          {% if top_positions %}
-            {% for pos in top_positions %}
-              {% set box_class = "text-bg-blue" %}
-              {% if pos.alert_state == "alert-low" %}
-                {% set box_class = "text-bg-success" %}
-              {% elif pos.alert_state == "alert-medium" %}
-                {% set box_class = "text-bg-warning" %}
-              {% elif pos.alert_state == "alert-high" %}
-                {% set box_class = "text-bg-danger" %}
-              {% endif %}
-              <div class="info-box">
-                <span class="info-box-icon {{ box_class }} text-white">
-                  <span class="small-percentage">
-                    {{ pos.current_travel_percent | round(0, 'floor') | int }}%
-                  </span>
-                </span>
-                <div class="info-box-content">
-                  <div class="info-box-asset">
-                    <span class="info-box-extra">
-                      <img src="{{ url_for('static', filename='images/' ~ pos.asset_type|lower ~ '_logo.png') }}"
-                           alt="{{ pos.asset_type }} Logo"
-                           onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/default_logo.png') }}';">
-                      <span>{{ pos.position_type }}</span>
-                    </span>
-                    <div class="info-box-details">
-                      <span>Value: <strong>${{ pos.value }}</strong></span>
-                      <span>Size: <strong>{{ pos.size }}</strong></span>
-                      <span>Collateral: <strong>${{ pos.collateral }}</strong></span>
-                    </div>
-                  </div>
-                </div>
-                <div class="info-box-wallet">
-                  <img src="{{ pos.wallet_image or url_for('static', filename='images/landovault.jpg') }}"
-                       alt="Wallet Logo"
-                       onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/landovault.jpg') }}';">
-                </div>
-              </div>
-            {% endfor %}
-          {% else %}
-            <div class="info-box">
-              <span class="info-box-icon text-bg-blue text-white">
-                <span class="small-percentage">75%</span>
-              </span>
-              <div class="info-box-content">
-                <div class="info-box-asset">
-                  <span class="info-box-extra">
-                    <img src="https://via.placeholder.com/20" alt="BTC Logo">
-                    <span>Long BTC</span>
-                  </span>
-                  <div class="info-box-details">
-                    <span>Value: <strong>$10,000</strong></span>
-                    <span>Size: <strong>1.5</strong></span>
-                    <span>Collateral: <strong>$5,000</strong></span>
-                  </div>
-                </div>
-              </div>
-              <div class="info-box-wallet">
-                <img src="https://via.placeholder.com/30" alt="Wallet Logo">
-              </div>
+          <!-- Chart container -->
+          <div id="size-chart"></div>
+
+          <!-- 6 columns to match 6 bar groups -->
+          <div class="asset-labels">
+            <div class="size-chart-col">
+              <img class="wallet-icon" src="{{ url_for('static', filename='images/obivault.jpg') }}" alt="ObiVault">
+              <img class="asset-icon2" src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC">
             </div>
-          {% endif %}
+            <div class="size-chart-col">
+              <img class="wallet-icon" src="{{ url_for('static', filename='images/obivault.jpg') }}" alt="ObiVault">
+              <img class="asset-icon2" src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH">
+            </div>
+            <div class="size-chart-col">
+              <img class="wallet-icon" src="{{ url_for('static', filename='images/obivault.jpg') }}" alt="ObiVault">
+              <img class="asset-icon2" src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL">
+            </div>
+            <div class="size-chart-col">
+              <img class="wallet-icon" src="{{ url_for('static', filename='images/r2vault.jpg') }}" alt="R2Vault">
+              <img class="asset-icon2" src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC">
+            </div>
+            <div class="size-chart-col">
+              <img class="wallet-icon" src="{{ url_for('static', filename='images/r2vault.jpg') }}" alt="R2Vault">
+              <img class="asset-icon2" src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH">
+            </div>
+            <div class="size-chart-col">
+              <img class="wallet-icon" src="{{ url_for('static', filename='images/r2vault.jpg') }}" alt="R2Vault">
+              <img class="asset-icon2" src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL">
+            </div>
+          </div>
         </div>
       </div>
     </div>
+    <!--
+      ==========================
+      END: SIZE BALANCE SECTION (HTML)
+      ==========================
+    -->
 
-    <!-- Composition Card with headings "📐 Size" and "Collateral 💸" -->
+    <!-- Composition Card (unchanged) -->
     <div class="col-md-6">
       <div class="card">
         <div class="composition-header">
@@ -517,7 +511,7 @@
           <div class="composition-container">
             <!-- Left chart: Size Composition -->
             <div id="positions-chart"></div>
-            <!-- Right chart: Collateral Composition (fetching real data from /api/collateral_composition) -->
+            <!-- Right chart: Collateral Composition -->
             <div id="collateral-composition-chart"></div>
           </div>
         </div>
@@ -596,13 +590,16 @@
   }
 </script>
 
+<!-- ApexCharts for the Size/Collateral Composition & Size Balance charts -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.min.js" crossorigin="anonymous"></script>
 <script>
+  // SIZE Composition Chart (Pie) - for the Composition Card
   window.onload = function() {
     if (typeof ApexCharts === 'undefined') {
       console.error("ApexCharts library not loaded!");
       return;
     }
-    // SIZE Composition Chart
+    // SIZE Composition (left pie chart)
     const positionsChartContainer = document.getElementById("positions-chart");
     if (positionsChartContainer) {
       fetch("/api/size_composition")
@@ -648,10 +645,10 @@
         });
     }
 
-    // COLLATERAL Composition Chart: now fetching from /api/collateral_composition
+    // COLLATERAL Composition Chart (Pie) - for the Composition Card
     const collateralChartContainer = document.getElementById("collateral-composition-chart");
     if (collateralChartContainer) {
-      fetch("/api/collateral_composition") // <-- REAL endpoint for collateral
+      fetch("/api/collateral_composition")
         .then(response => response.json())
         .then(data => {
           const seriesData = data.series || [0, 0];
@@ -694,6 +691,95 @@
         });
     }
   };
+
+  /*
+    ============================
+    START: SIZE BALANCE SECTION (JS)
+    ============================
+    This bar chart displays the Size Balance data from /api/size_balance,
+    with extra bottom padding for the image row.
+  */
+  document.addEventListener('DOMContentLoaded', function() {
+    const sizeChartContainer = document.getElementById("size-chart");
+    if (sizeChartContainer) {
+      fetch("/api/size_balance")
+        .then(response => response.json())
+        .then(data => {
+          const chartOptions = {
+            series: [
+              { name: 'Long',  data: data.long  },
+              { name: 'Short', data: data.short },
+              { name: 'Total', data: data.total }
+            ],
+            chart: {
+              type: 'bar',
+              height: 400,
+              toolbar: { show: false }
+            },
+            grid: { padding: { bottom: 120 } },
+            plotOptions: {
+              bar: {
+                horizontal: false,
+                columnWidth: '55%',
+                endingShape: 'rounded'
+              }
+            },
+            dataLabels: { enabled: false },
+            stroke: { show: true, width: 2, colors: ['transparent'] },
+            colors: ['#0d6efd', '#20c997', '#ffc107'],
+            xaxis: {
+              categories: ['', '', '', '', '', ''],
+              labels: { show: false }
+            },
+            yaxis: {
+              title: { text: 'Size Amount' },
+              labels: {
+                formatter: function(val) {
+                  return Math.round(val / 1000) + "k";
+                }
+              }
+            },
+            fill: { opacity: 1 },
+            tooltip: {
+              y: { formatter: (val) => val }
+            },
+            legend: { show: false },
+            annotations: {
+              yaxis: [
+                {
+                  y: data.avg_short || 2683.33,
+                  borderColor: '#20c997',
+                  label: {
+                    borderColor: '#20c997',
+                    style: { color: '#fff', background: '#20c997' },
+                    text: 'Avg Short'
+                  },
+                  strokeDashArray: 4
+                },
+                {
+                  y: data.avg_long || 4500,
+                  borderColor: '#0d6efd',
+                  label: {
+                    borderColor: '#0d6efd',
+                    style: { color: '#fff', background: '#0d6efd' },
+                    text: 'Avg Long'
+                  },
+                  strokeDashArray: 4
+                }
+              ]
+            }
+          };
+          const sizeChart = new ApexCharts(sizeChartContainer, chartOptions);
+          sizeChart.render();
+        })
+        .catch(err => console.error("Error fetching size balance data:", err));
+    }
+  });
+  /*
+    ==========================
+    END: SIZE BALANCE SECTION (JS)
+    ==========================
+  */
 </script>
 
 <script>
@@ -730,6 +816,7 @@
     const currentTheme = localStorage.getItem('theme') || 'light';
     document.body.classList.add(currentTheme + '-mode');
     const themeToggle = document.getElementById('themeToggle');
+    if (!themeToggle) return;
     themeToggle.checked = (currentTheme === 'dark');
     themeToggle.addEventListener('change', function() {
       if (this.checked) {

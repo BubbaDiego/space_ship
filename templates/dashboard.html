@@ -23,7 +23,7 @@
     font-size: 1.5rem !important;
   }
   .header-icon.left i { color: green !important; }
-  /* Remove the flex centering on the center icon and position it over the marker */
+  /* Position the center icon over the "0" marker */
   .header-icon.center {
     position: absolute;
     left: 25%; /* Align with the "0" marker */
@@ -233,16 +233,17 @@
   .size-chart-col:nth-child(4) { margin-left: 25px; }
   .size-chart-col:nth-child(5) { margin-left: 25px; }
   .size-chart-col:nth-child(6) { margin-left: -12px; }
+  /* Increased images in Size Balance by 50% */
   .wallet-icon {
-    width: 25px;
-    height: 25px;
+    width: 37.5px;
+    height: 37.5px;
     border-radius: 50%;
     border: 1px solid #ccc;
     margin-bottom: 5px;
   }
   .asset-icon2 {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     border: 1px solid #ccc;
   }
@@ -264,7 +265,7 @@
 
   <!-- Row: Two Symmetrical Status Bars Side by Side -->
   <div class="row status-bar-container">
-    <!-- LEFT Status Bar: Now labeled BTC, ETH, SOL, S&P500, Placeholder -->
+    <!-- LEFT Status Bar: Now labeled BTC, ETH, SOL, S&P500, and Update Info -->
     <div class="col-md-6 status-col-left">
       <!-- No toggle row for a single-row layout -->
       <div class="status-bar mt-2">
@@ -290,10 +291,11 @@
               <img src="{{ url_for('static', filename='images/sp500.png') }}" alt="S&P 500">
               <h5 class="fw-bold mb-0">{{ sp500_value }}</h5>
             </div>
-            <!-- Column 5: Placeholder -->
-            <div class="col d-flex flex-column align-items-center justify-content-center">
-              <span class="label">Placeholder</span>
-              <h5 class="fw-bold mb-0">--</h5>
+            <!-- Column 5: Update Info (Concise Display) -->
+            <div class="col d-flex flex-column align-items-center justify-content-center" style="font-size:0.9rem; font-weight:normal;">
+              <div>Time: <i>{{ last_update_time_only }}</i></div>
+              <div>Date: <i>{{ last_update_date_only }}</i></div>
+              <div>Source: <i>{{ last_update_positions_source }}</i></div>
             </div>
           </div>
         </div>
@@ -316,24 +318,30 @@
             <div class="col d-flex flex-column align-items-center justify-content-center">
               <span class="label">Leverage</span>
               <h5 class="fw-bold mb-0">
-                {% if totals.avg_leverage %}
-                  {{ "{:.2f}".format(totals.avg_leverage) }}
+                {% if totals.avg_leverage|default(0) %}
+                  {{ "{:.2f}".format(totals.avg_leverage|default(0)) }}
                 {% else %}
                   N/A
                 {% endif %}
               </h5>
             </div>
-            <!-- Column 3: Size -->
+            <!-- Column 3: Size (formatted to k) -->
             <div class="col d-flex flex-column align-items-center justify-content-center">
               <span class="label">Size</span>
-              <h5 class="fw-bold mb-0">${{ totals.total_size }}</h5>
+              <h5 class="fw-bold mb-0">
+                {% if (totals.total_size|default(0))/1000 >= 100 %}
+                  ${{ "{:.0f}".format((totals.total_size|default(0))/1000) }}k
+                {% else %}
+                  ${{ "{:.1f}".format((totals.total_size|default(0))/1000) }}k
+                {% endif %}
+              </h5>
             </div>
             <!-- Column 4: Size Ratio -->
             <div class="col d-flex flex-column align-items-center justify-content-center">
               <span class="label">Size Ratio</span>
               <h5 class="fw-bold mb-0">
-                {% if totals.avg_leverage and totals.avg_leverage != 0 %}
-                  {{ "{:.2f}".format(totals.total_size / totals.avg_leverage) }}
+                {% if totals.avg_leverage|default(0) and totals.avg_leverage|default(0) != 0 %}
+                  {{ "{:.2f}".format((totals.total_size|default(0)) / (totals.avg_leverage|default(0))) }}
                 {% else %}
                   N/A
                 {% endif %}
@@ -343,8 +351,8 @@
             <div class="col d-flex flex-column align-items-center justify-content-center">
               <span class="label">Travel Percent</span>
               <h5 class="fw-bold mb-0">
-                {% if totals.avg_travel_percent %}
-                  {{ "{:.1f}".format(totals.avg_travel_percent) }}%
+                {% if totals.avg_travel_percent|default(0) %}
+                  {{ "{:.1f}".format(totals.avg_travel_percent|default(0)) }}%
                 {% else %}
                   N/A
                 {% endif %}
@@ -405,7 +413,7 @@
       </div>
     </div>
 
-    <!-- Portfolio Performance Card (Unchanged) -->
+    <!-- Portfolio Performance Card (Unchanged except for y-axis labels) -->
     <div class="col-md-6">
       <div class="card">
         <div class="card-header d-flex align-items-center">
@@ -516,7 +524,18 @@
       options: {
         scales: {
           x: { type: 'time', time: { unit: 'day' } },
-          y: { beginAtZero: true }
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value, index, values) {
+                if (value >= 1000) {
+                  let num = value / 1000;
+                  return num >= 100 ? num.toFixed(0) + 'k' : num.toFixed(1) + 'k';
+                }
+                return value;
+              }
+            }
+          }
         }
       }
     });

@@ -30,7 +30,7 @@
   "alert_ranges": {
     "heat_index_ranges": {
       "enabled": true,
-      "low": 333.0,
+      "low": 234.0,
       "low_notifications": {
         "call": true,
         "sms": true,

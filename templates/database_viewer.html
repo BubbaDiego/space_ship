@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Database Viewer - Wallets</title>
+  <title>Database Viewer - Wallets, Positions & System Vars</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
@@ -44,8 +44,9 @@
 </head>
 <body>
   <div class="container mt-5">
-    <h1 class="mb-4">Database Viewer - Wallets</h1>
-    {# Assume db_data.wallets exists; if not, set a default #}
+    <h1 class="mb-4">Database Viewer</h1>
+
+    {# Wallets Section #}
     {% set wallet_data = db_data.wallets | default({ "columns": [], "rows": [] }) %}
     <div class="card" data-table="wallets" data-columns='{{ wallet_data.columns | tojson | safe }}'>
       <div class="card-header" data-target="#collapse-wallets">
@@ -92,6 +93,103 @@
         </div>
       </div>
     </div>
+
+    {# Positions Section #}
+    {% set positions_data = db_data.positions | default({ "columns": [], "rows": [] }) %}
+    <div class="card" data-table="positions" data-columns='{{ positions_data.columns | tojson | safe }}'>
+      <div class="card-header" data-target="#collapse-positions">
+        <button class="btn btn-light" type="button">
+          <strong>Positions</strong>
+        </button>
+        <button class="btn btn-sm btn-outline-danger deleteTableBtn" title="Delete Table">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+      <div id="collapse-positions" class="collapse show">
+        <div class="card-body">
+          <table class="table table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                {% for col in positions_data.columns %}
+                  <th>{{ col }}</th>
+                {% endfor %}
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in positions_data.rows %}
+                <tr data-row-json='{{ row | tojson | safe }}'>
+                  {% for col in positions_data.columns %}
+                    <td>{{ row[col] }}</td>
+                  {% endfor %}
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-secondary editBtn" title="Edit">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger deleteBtn" title="Delete Row">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td colspan="{{ positions_data.columns|length + 1 }}" class="text-center">No positions found.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    {# System Vars Section #}
+    {% set sysvars_data = db_data.system_vars | default({ "columns": [], "rows": [] }) %}
+    <div class="card" data-table="system_vars" data-columns='{{ sysvars_data.columns | tojson | safe }}'>
+      <div class="card-header" data-target="#collapse-sysvars">
+        <button class="btn btn-light" type="button">
+          <strong>System Vars</strong>
+        </button>
+        <button class="btn btn-sm btn-outline-danger deleteTableBtn" title="Delete Table">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+      <div id="collapse-sysvars" class="collapse show">
+        <div class="card-body">
+          <table class="table table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                {% for col in sysvars_data.columns %}
+                  <th>{{ col }}</th>
+                {% endfor %}
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in sysvars_data.rows %}
+                <tr data-row-json='{{ row | tojson | safe }}'>
+                  {% for col in sysvars_data.columns %}
+                    <td>{{ row[col] }}</td>
+                  {% endfor %}
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-secondary editBtn" title="Edit">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger deleteBtn" title="Delete Row">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td colspan="{{ sysvars_data.columns|length + 1 }}" class="text-center">No system vars found.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Shared Edit Modal -->
@@ -100,7 +198,7 @@
       <form id="editForm">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="editModalLabel">Edit Wallet</h5>
+            <h5 class="modal-title" id="editModalLabel">Edit Row</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -121,14 +219,13 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // For this file, we'll assume wallets is fully editable (edit and delete)
-    const fullyEditableTables = ['wallets'];
+    // For this file, we'll assume all tables are fully editable.
+    const fullyEditableTables = ['wallets', 'positions', 'system_vars'];
 
     document.addEventListener('DOMContentLoaded', function() {
-      // Override default collapse behavior using our custom handler
+      // Toggle collapse functionality for each card header.
       document.querySelectorAll('.card-header').forEach(function(header) {
         header.addEventListener('click', function(e) {
-          // If clicking on an inner button (but not the main toggle button), ignore.
           if (e.target.closest('button') && !e.target.closest('.btn-light')) return;
           const targetSelector = header.getAttribute('data-target');
           const targetElem = document.querySelector(targetSelector);
@@ -142,17 +239,14 @@
       const editModal = new bootstrap.Modal(document.getElementById('editModal'), { backdrop: 'static', keyboard: false });
       const editFormContainer = document.getElementById('editFormContainer');
 
-      // Wallet-specific form generator
-      function generateWalletEditForm(rowData) {
-        // Define the wallet fields (adjust as needed)
-        const walletFields = ['name', 'public_address', 'private_address', 'image_path', 'balance'];
+      // Simple form generator that creates inputs for each column.
+      function generateEditForm(rowData, fields) {
         editFormContainer.innerHTML = '';
-        walletFields.forEach(function(field) {
+        fields.forEach(function(field) {
           const formGroup = document.createElement('div');
           formGroup.className = 'mb-3';
           const label = document.createElement('label');
           label.className = 'form-label';
-          // Convert field to title-case for display
           label.innerText = field.replace('_', ' ').toUpperCase();
           label.setAttribute('for', 'edit-' + field);
           formGroup.appendChild(label);
@@ -161,13 +255,12 @@
           input.id = 'edit-' + field;
           input.name = field;
           input.value = rowData[field] !== null ? rowData[field] : '';
-          // Allow editing all fields, even "name" (since delete and edit must work)
           formGroup.appendChild(input);
           editFormContainer.appendChild(formGroup);
         });
       }
 
-      // Edit button click handler
+      // Edit button click handler.
       document.addEventListener('click', function(e) {
         const editBtn = e.target.closest('.editBtn');
         if (editBtn) {
@@ -175,30 +268,27 @@
           const rowData = JSON.parse(currentRow.getAttribute('data-row-json'));
           currentCard = editBtn.closest('.card');
           currentColumns = JSON.parse(currentCard.getAttribute('data-columns'));
-          // For wallets, generate wallet-specific edit form.
-          if (currentCard.getAttribute('data-table') === 'wallets') {
-            generateWalletEditForm(rowData);
-            document.getElementById('editModalLabel').innerText = "Edit Wallet";
-          }
+          // For all tables, use the currentColumns if available, otherwise use keys of rowData.
+          const fields = currentColumns.length ? currentColumns : Object.keys(rowData);
+          generateEditForm(rowData, fields);
+          document.getElementById('editModalLabel').innerText = "Edit " + currentCard.getAttribute('data-table');
           editModal.show();
           e.stopPropagation();
         }
       });
 
-      // Handle edit form submission
+      // Handle edit form submission.
       document.getElementById('editForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const tableName = currentCard.getAttribute('data-table');
         let updatedData = {};
-        // For wallets, use the walletFields array
-        const fields = (tableName === 'wallets') ? ['name', 'public_address', 'private_address', 'image_path', 'balance'] : currentColumns;
+        const fields = currentColumns.length ? currentColumns : Object.keys(JSON.parse(currentRow.getAttribute('data-row-json')));
         fields.forEach(function(field) {
           const input = document.getElementById('edit-' + field);
           if (input) {
             updatedData[field] = input.value;
           }
         });
-        // Update row display (update cells for wallet table)
         const cells = currentRow.getElementsByTagName('td');
         fields.forEach(function(field, index) {
           if (cells[index]) {
@@ -208,9 +298,9 @@
         currentRow.setAttribute('data-row-json', JSON.stringify(updatedData));
         editModal.hide();
 
-        // Send AJAX update for wallets
+        // Send AJAX update.
         if (fullyEditableTables.includes(tableName)) {
-          const pkField = 'name'; // use "name" as primary key for wallets
+          const pkField = (tableName === 'wallets' || tableName === 'positions') ? 'name' : 'id';
           const pkValue = updatedData[pkField];
           fetch('/api/update_row', {
             method: 'POST',
@@ -234,7 +324,7 @@
         }
       });
 
-      // Delete row handler (for wallets)
+      // Delete row handler.
       document.addEventListener('click', function(e) {
         const deleteBtn = e.target.closest('.deleteBtn');
         if (deleteBtn) {
@@ -243,7 +333,7 @@
           const tableName = card.getAttribute('data-table');
           if (confirm('Are you sure you want to delete this row?')) {
             const rowData = JSON.parse(row.getAttribute('data-row-json'));
-            const pkField = 'name'; // primary key for wallets
+            const pkField = (tableName === 'wallets' || tableName === 'positions') ? 'name' : 'id';
             const pkValue = rowData[pkField];
             if (fullyEditableTables.includes(tableName)) {
               fetch('/api/delete_row', {
@@ -274,7 +364,7 @@
         }
       });
 
-      // Delete table handler
+      // Delete table handler.
       document.addEventListener('click', function(e) {
         const deleteTableBtn = e.target.closest('.deleteTableBtn');
         if (deleteTableBtn) {

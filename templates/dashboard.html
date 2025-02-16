@@ -11,6 +11,7 @@
 
   /* -------------------- General Card Header Styling -------------------- */
   .card-header {
+    position: relative; /* Added to allow absolute positioning of center icon */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -22,8 +23,14 @@
     font-size: 1.5rem !important;
   }
   .header-icon.left i { color: green !important; }
-  .header-icon.center { flex-grow: 1; text-align: center; }
-  .header-icon.center span,
+  /* Remove the flex centering on the center icon and position it over the marker */
+  .header-icon.center {
+    position: absolute;
+    left: 25%; /* Align with the "0" marker */
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 15;
+  }
   .header-icon.right span { font-size: 1.5rem; color: #000; }
 
   /* -------------------- Liquidation Bar Styles -------------------- */
@@ -38,7 +45,7 @@
   .progress.liquidation::before {
     content: "";
     position: absolute;
-    left: 50%;
+    left: 25%; /* "0" marker moved from 50% to 25% */
     top: 0;
     bottom: 0;
     width: 3px;
@@ -349,7 +356,7 @@
     </div>
   </div>
 
-  <!-- Row: Liquidation Bar & Portfolio Performance (Unchanged) -->
+  <!-- Row: Liquidation Bar & Portfolio Performance (Unchanged except for liquidation bar adjustments) -->
   <div class="row">
     <!-- Liquidation Bar Card -->
     <div class="col-md-6">
@@ -364,22 +371,30 @@
             {% set travel = pos.current_travel_percent | float %}
             <div class="progress liquidation">
               {% if travel >= 0 %}
-                <div class="liquidation-fill striped bg-success" style="right: 50%; width: calc(({{ travel }} / 100) * 50%);"></div>
-                <img class="asset-icon" src="{{ url_for('static', filename='images/' ~ (pos.asset_type|default('btc')|lower) ~ '_logo.png') }}"
+                {# Positive travel: Range 25 (far left) to 0 at the marker (25% from left) #}
+                <div class="liquidation-fill striped bg-success" style="right: 75%; width: calc(({{ travel }} / 25) * 25%);"></div>
+                <img class="asset-icon"
+                     src="{{ url_for('static', filename='images/' ~ (pos.asset_type|default('btc')|lower) ~ '_logo.png') }}"
                      alt="{{ pos.asset_type|default('btc')|lower }} logo"
-                     style="left: calc(50% - ({{ travel }} / 100 * 50%) - 15px); {% if (pos.asset_type|default('btc')|lower)=='eth' %}background-color: white;{% endif %}">
-                {% if travel > 25 %}
-                  <span class="progress-text" style="left: calc(50% - ({{ travel }} / 100 * 25%)); top: 50%; transform: translate(-50%, -50%);">
+                     style="left: calc(25% - ({{ travel }} / 25 * 25%) - 15px); {% if (pos.asset_type|default('btc')|lower)=='eth' %}background-color: white;{% endif %}">
+                {% if travel > 12.5 %}
+                  <span class="progress-text" style="left: calc(25% - ({{ travel }} / 25 * 12.5%)); top: 50%; transform: translate(-50%, -50%);">
                     {{ travel }}%
                   </span>
                 {% endif %}
               {% else %}
-                <div class="liquidation-fill striped bg-danger" style="left: 50%; width: calc(({{ travel | abs }} / 100) * 50%);"></div>
-                <img class="asset-icon" src="{{ url_for('static', filename='images/' ~ (pos.asset_type|default('btc')|lower) ~ '_logo.png') }}"
+                {# Negative travel: Range 0 at the marker (25%) to -100 at the far right #}
+                {% if travel|abs <= 50 %}
+                  <div class="liquidation-fill striped bg-warning" style="left: 25%; width: calc(({{ travel | abs }} / 100) * 75%);"></div>
+                {% else %}
+                  <div class="liquidation-fill striped bg-danger" style="left: 25%; width: calc(({{ travel | abs }} / 100) * 75%);"></div>
+                {% endif %}
+                <img class="asset-icon"
+                     src="{{ url_for('static', filename='images/' ~ (pos.asset_type|default('btc')|lower) ~ '_logo.png') }}"
                      alt="{{ pos.asset_type|default('btc')|lower }} logo"
-                     style="left: calc(50% + ({{ travel | abs }} / 100 * 50%) - 15px); {% if (pos.asset_type|default('btc')|lower)=='eth' %}background-color: white;{% endif %}">
+                     style="left: calc(25% + ({{ travel | abs }} / 100 * 75%) - 15px); {% if (pos.asset_type|default('btc')|lower)=='eth' %}background-color: white;{% endif %}">
                 {% if travel < -25 %}
-                  <span class="progress-text" style="left: calc(50% + ({{ travel | abs }} / 100 * 25%)); top: 50%; transform: translate(-50%, -50%);">
+                  <span class="progress-text" style="left: calc(25% + ({{ travel | abs }} / 100 * 37.5%)); top: 50%; transform: translate(-50%, -50%);">
                     {{ travel }}%
                   </span>
                 {% endif %}
@@ -432,7 +447,7 @@
               Short(<b id="legend-short-value">0K</b>)
             </span>
             <span>
-              <i class="bi bi-square-fill" style="color:#ffc107;"></i>
+              <i class="bi bi-square-fill" style="color:#ab79e8;"></i>
               Total(<b id="legend-total-value">0K</b>)
             </span>
           </div>
@@ -603,7 +618,7 @@
               }
             },
             labels: ['Long Collateral', 'Short Collateral'],
-            colors: ['#28a745', '#ffc107'],
+            colors: ['#ca477d', '#d1ef9a'],
             legend: { position: 'bottom' },
             dataLabels: {
               enabled: true,
@@ -667,7 +682,7 @@
             },
             dataLabels: { enabled: false },
             stroke: { show: true, width: 2, colors: ['transparent'] },
-            colors: ['#0d6efd', '#20c997', '#ffc107'],
+            colors: ['#0d6efd', '#20c997', '#ab79e8'],
             xaxis: {
               categories: categories,
               labels: { show: true }

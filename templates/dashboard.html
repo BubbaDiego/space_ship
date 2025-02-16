@@ -98,67 +98,81 @@
     }
   }
 
-  /* -------------------- Top Bar & Status Bar Layout -------------------- */
-  .top-row {
+  /* -------------------- Update Button Row -------------------- */
+  .update-row {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .update-row button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+  .update-row img {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+  }
+
+  /* -------------------- Unified Status Bar Layout -------------------- */
+  .status-bar-container {
     display: flex;
     flex-wrap: wrap;
     margin-bottom: 2rem;
   }
-  .update-col, .status-col {
-    flex: 0 0 100%;
+  .status-col-left, .status-col-right {
+    flex: 0 0 50%;
+    max-width: 50%;
   }
-  @media (min-width: 768px) {
-    .update-col, .status-col {
-      flex: 0 0 50%;
-      max-width: 50%;
+  @media (max-width: 768px) {
+    .status-col-left, .status-col-right {
+      flex: 0 0 100%;
+      max-width: 100%;
     }
   }
-  .top-bar {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 0;
-  }
-  .top-bar .update-btn img {
-    width: 70px;
-    height: 70px;
-    cursor: pointer;
-    border-radius: 50%;
-  }
+  /* Use a single-row layout with a fixed min-height to preserve the tall design */
   .status-bar {
     width: 100%;
+    min-height: 120px;  /* Force same tall height */
+    background: url("{{ url_for('static', filename='images/cityscape.jpg') }}") no-repeat center center;
+    background-size: cover;
+    border-radius: 0.5rem;
   }
-  .toggle-group {
-    margin-left: auto;
+  .status-bar .card {
+    background-color: rgba(255,255,255,0.5);
+    border: none;
+    border-radius: 0.5rem;
+    min-height: 120px;
   }
   .status-bar .card-body {
-    padding: 0.15rem 0.4rem !important;
+    display: flex;
+    align-items: flex-start; /* Top justify the text */
+    justify-content: space-between;
+    padding: 1rem;
+    min-height: 120px;
+  }
+  .status-bar .col {
+    flex: 1;
     text-align: center;
-    min-height: 25px !important;
-    padding-top: 0.05rem !important;
+    border-right: 1px solid #ccc;
+    padding: 0 0.5rem;
   }
-  .status-bar .card-body .row > .col {
-    align-items: flex-start !important;
+  .status-bar .col:last-child {
+    border-right: none;
   }
-  .status-bar .card-body h5 {
-    font-size: 1rem !important;
+  .status-bar .col span.label {
+    display: block;
+    font-size: 0.85rem;
+    color: #333;
+  }
+  .status-bar .col h5 {
+    font-size: 1rem;
+    font-weight: bold;
     margin: 0;
   }
-  .status-bar .card-body span {
-    font-size: 0.85rem !important;
-  }
-  .status-bar .card-body i {
-    font-size: 14px !important;
-    margin-right: 2px;
-  }
-  .status-bar .card-body img {
-    margin-right: 4px;
-    height: 24px !important;
-    margin-top: 4px;
-  }
-  /* "PORTFOLIO" text removed from status bar */
 
-  /* -------------------- Composition Chart (Size + Collateral) -------------------- */
+  /* -------------------- Composition Chart & Other Sections (Unchanged) -------------------- */
   .composition-header {
     display: flex;
     justify-content: space-between;
@@ -181,8 +195,6 @@
     width: 48%;
     height: 233px;
   }
-
-  /* -------------------- Performance Card Time Controls -------------------- */
   .performance-time-controls .btn {
     padding: 0.2rem 0.4rem;
     font-size: 0.65rem;
@@ -192,20 +204,10 @@
   .performance-time-controls .btn:hover {
     opacity: 1;
   }
-
-  /*
-    ========================
-    START: SIZE BALANCE SECTION (CSS)
-    ========================
-    - Extra bottom padding for the chart (for images).
-    - .asset-labels row is positioned with negative top margin.
-    - The legend includes the dynamic total values in parentheses.
-  */
-
   .asset-labels {
     display: flex;
     justify-content: space-around;
-    margin-top: -132px; /* move up closer to the chart bottom */
+    margin-top: -132px;
     margin-bottom: 20px;
   }
   .size-chart-col {
@@ -213,14 +215,12 @@
     flex-direction: column;
     align-items: center;
   }
-  /* Offsets for columns (if you have 6 groups) */
   .size-chart-col:nth-child(1) { margin-left: 50px; }
   .size-chart-col:nth-child(2) { margin-left: 50px; }
   .size-chart-col:nth-child(3) { margin-left: 37px; }
   .size-chart-col:nth-child(4) { margin-left: 25px; }
   .size-chart-col:nth-child(5) { margin-left: 25px; }
   .size-chart-col:nth-child(6) { margin-left: -12px; }
-
   .wallet-icon {
     width: 25px;
     height: 25px;
@@ -238,100 +238,108 @@
     margin: 2px 0;
     font-size: 10px;
   }
-
-  /*
-    ======================
-    END: SIZE BALANCE SECTION (CSS)
-    ======================
-  */
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container card-container">
-  <!-- Row for the Update Button & Status Bar -->
-  <div class="row top-row">
-    <div class="col-md-6 update-col">
-      <div class="top-bar">
-        <!-- Jupiter Update Button -->
-        <div class="update-btn">
-          <button type="button" class="update-button" data-type="jupiter" style="background: none; border: none; padding: 0;">
-            <img id="update-button-img-jupiter" src="{{ url_for('static', filename='images/jupiter.jpg') }}" alt="Jupiter Update Button">
-          </button>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6 status-col">
-      <div class="top-bar">
-        <!-- Subtle Radio Toggle -->
-        <div class="toggle-group d-flex">
-          <div class="btn-group btn-group-sm" role="group" aria-label="Toggle Hours">
-            <input type="radio" class="btn-check" name="hours" id="hours1" value="1" autocomplete="off" checked>
-            <label class="btn btn-outline-secondary" for="hours1">1h</label>
-            <input type="radio" class="btn-check" name="hours" id="hours6" value="6" autocomplete="off">
-            <label class="btn btn-outline-secondary" for="hours6">6h</label>
-            <input type="radio" class="btn-check" name="hours" id="hours12" value="12" autocomplete="off">
-            <label class="btn btn-outline-secondary" for="hours12">12h</label>
-            <input type="radio" class="btn-check" name="hours" id="hours14" value="14" autocomplete="off">
-            <label class="btn btn-outline-secondary" for="hours14">14h</label>
+  <!-- Row: Jupiter Update Button Above the Status Bars -->
+  <div class="row update-row">
+    <button type="button" class="update-button" data-type="jupiter">
+      <img id="update-button-img-jupiter" src="{{ url_for('static', filename='images/jupiter.jpg') }}" alt="Jupiter Update Button">
+    </button>
+  </div>
+
+  <!-- Row: Two Symmetrical Status Bars Side by Side -->
+  <div class="row status-bar-container">
+    <!-- LEFT Status Bar: Custom text-only status bar -->
+    <div class="col-md-6 status-col-left">
+      <!-- No toggle row for the left bar -->
+      <div class="status-bar mt-2">
+        <div class="card">
+          <div class="card-body">
+            <div class="col">
+              <span class="label">Total Leverage</span>
+              <h5 class="fw-bold mb-0">1,000</h5>
+            </div>
+            <div class="col">
+              <span class="label">Total Size</span>
+              <h5 class="fw-bold mb-0">$2,500</h5>
+            </div>
+            <div class="col">
+              <span class="label">Ratio</span>
+              <h5 class="fw-bold mb-0">2.50</h5>
+            </div>
+            <div class="col">
+              <span class="label">Placeholder 1</span>
+              <h5 class="fw-bold mb-0">.</h5>
+            </div>
+            <div class="col">
+              <span class="label">Placeholder 2</span>
+              <h5 class="fw-bold mb-0">.</h5>
+            </div>
           </div>
         </div>
       </div>
-      <!-- Status Bar with cityscape wallpaper -->
+    </div>
+
+    <!-- RIGHT Status Bar: Relabeled columns -->
+    <div class="col-md-6 status-col-right">
+      <!-- No toggle row for the right bar -->
       <div class="status-bar mt-2"
            style="background: url('{{ url_for('static', filename='images/cityscape.jpg') }}') no-repeat center center; background-size: cover;">
-        <!-- Transparent card so text is legible -->
-        <div class="card" style="background-color: rgba(255, 255, 255, 0.5);">
+        <div class="card">
           <div class="card-body">
-            <div class="row">
-              <!-- Wallet column (portfolio) - removed "PORTFOLIO" text -->
-              <div class="col d-flex align-items-center justify-content-center border-end">
-                <img src="{{ url_for('static', filename='images/wallet.png') }}" alt="Wallet Icon">
-                <div>
-                  <span class="text-success"><i class="bi bi-caret-up-fill"></i> {{ portfolio_change }}%</span>
-                  <h5 class="fw-bold mb-0">${{ portfolio_value }}</h5>
-                </div>
-              </div>
-              <!-- Bitcoin -->
-              <div class="col d-flex align-items-center justify-content-center border-end">
-                <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC">
-                <div>
-                  <span class="text-success"><i class="bi bi-caret-up-fill"></i> {{ btc_change }}%</span>
-                  <h5 class="fw-bold mb-0">${{ btc_price }}</h5>
-                </div>
-              </div>
-              <!-- Ethereum -->
-              <div class="col d-flex align-items-center justify-content-center border-end">
-                <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH">
-                <div>
-                  <span class="text-info"><i class="bi bi-caret-left-fill"></i> {{ eth_change }}%</span>
-                  <h5 class="fw-bold mb-0">${{ eth_price }}</h5>
-                </div>
-              </div>
-              <!-- Solana -->
-              <div class="col d-flex align-items-center justify-content-center border-end">
-                <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL">
-                <div>
-                  <span class="text-success"><i class="bi bi-caret-up-fill"></i> {{ sol_change }}%</span>
-                  <h5 class="fw-bold mb-0">${{ sol_price }}</h5>
-                </div>
-              </div>
-              <!-- S&P 500 -->
-              <div class="col d-flex align-items-center justify-content-center">
-                <div>
-                  <span class="text-danger"><i class="bi bi-caret-down-fill"></i> {{ sp500_change }}%</span>
-                  <h5 class="fw-bold mb-0">{{ sp500_value }}</h5>
-                  <span class="text-uppercase">S&P 500</span>
-                </div>
-              </div>
-            </div> <!-- end row -->
-          </div> <!-- end card-body -->
-        </div> <!-- end card -->
-      </div> <!-- end status-bar -->
+            <!-- Column 1: Value -->
+            <div class="col">
+              <span class="label">Value</span>
+              <h5 class="fw-bold mb-0">${{ portfolio_value }}</h5>
+            </div>
+            <!-- Column 2: Leverage -->
+            <div class="col">
+              <span class="label">Leverage</span>
+              <h5 class="fw-bold mb-0">
+                {% if totals.avg_leverage %}
+                  {{ "{:.2f}".format(totals.avg_leverage) }}
+                {% else %}
+                  N/A
+                {% endif %}
+              </h5>
+            </div>
+            <!-- Column 3: Size -->
+            <div class="col">
+              <span class="label">Size</span>
+              <h5 class="fw-bold mb-0">${{ totals.total_size }}</h5>
+            </div>
+            <!-- Column 4: Size Ratio -->
+            <div class="col">
+              <span class="label">Size Ratio</span>
+              <h5 class="fw-bold mb-0">
+                {% if totals.avg_leverage and totals.avg_leverage != 0 %}
+                  {{ "{:.2f}".format(totals.total_size / totals.avg_leverage) }}
+                {% else %}
+                  N/A
+                {% endif %}
+              </h5>
+            </div>
+            <!-- Column 5: Travel Percent -->
+            <div class="col">
+              <span class="label">Travel Percent</span>
+              <h5 class="fw-bold mb-0">
+                {% if totals.avg_travel_percent %}
+                  {{ "{:.1f}".format(totals.avg_travel_percent) }}%
+                {% else %}
+                  N/A
+                {% endif %}
+              </h5>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div> <!-- end row -->
+  </div>
 
-  <!-- Row: Liquidation Bar & Portfolio Performance -->
+  <!-- Row: Liquidation Bar & Portfolio Performance (Unchanged) -->
   <div class="row">
     <!-- Liquidation Bar Card -->
     <div class="col-md-6">
@@ -372,7 +380,7 @@
       </div>
     </div>
 
-    <!-- Portfolio Performance Card -->
+    <!-- Portfolio Performance Card (Unchanged) -->
     <div class="col-md-6">
       <div class="card">
         <div class="card-header d-flex align-items-center">
@@ -397,23 +405,13 @@
     </div>
   </div>
 
-  <!-- Row: Size Balance Bar Chart & Composition Card -->
+  <!-- Row: Size Balance Bar Chart & Composition Card (Unchanged) -->
   <div class="row">
-    <!--
-      ============================
-      START: SIZE BALANCE SECTION (HTML & Dynamic Labels)
-      ============================
-      "Size Balance" label is in the far left corner.
-      The legend includes the total values in parentheses:
-        e.g., "Long(<b>41.8K</b>)"
-    -->
+    <!-- SIZE BALANCE SECTION -->
     <div class="col-md-6">
       <div class="card shadow">
-        <!-- Single row: "Size Balance" at far left, legend squares + values at right -->
         <div class="card-header d-flex align-items-center justify-content-between">
-          <!-- Far left corner label -->
           <h3 class="card-title mb-0">Size Balance</h3>
-          <!-- Legend with placeholders for bolded total values in parentheses -->
           <div class="legend">
             <span class="me-3">
               <i class="bi bi-square-fill" style="color:#0d6efd;"></i>
@@ -430,20 +428,13 @@
           </div>
         </div>
         <div class="card-body">
-          <!-- Chart container -->
           <div id="size-chart"></div>
-          <!-- Container for dynamic asset labels -->
           <div class="asset-labels"></div>
         </div>
       </div>
     </div>
-    <!--
-      ==========================
-      END: SIZE BALANCE SECTION (HTML & Dynamic Labels)
-      ==========================
-    -->
 
-    <!-- Composition Card (unchanged) -->
+    <!-- Composition Card (Unchanged) -->
     <div class="col-md-6">
       <div class="card">
         <div class="composition-header">
@@ -452,9 +443,7 @@
         </div>
         <div class="card-body">
           <div class="composition-container">
-            <!-- Left chart: Size Composition -->
             <div id="positions-chart"></div>
-            <!-- Right chart: Collateral Composition -->
             <div id="collateral-composition-chart"></div>
           </div>
         </div>
@@ -471,7 +460,6 @@
 <script>
   const portfolioData = {{ portfolio_data | tojson }};
   let portfolioChart;
-
   document.addEventListener('DOMContentLoaded', function() {
     if (!portfolioData || portfolioData.length === 0) {
       console.warn("No portfolio data available for chart rendering.");
@@ -480,7 +468,6 @@
     const labels = portfolioData.map(item => item.snapshot_time);
     const valueData = portfolioData.map(item => item.total_value);
     const collateralData = portfolioData.map(item => item.total_collateral);
-
     const ctx = document.getElementById('portfolioChart').getContext('2d');
     portfolioChart = new Chart(ctx, {
       type: 'line',
@@ -510,7 +497,6 @@
     });
     setPortfolioTimeframe(24);
   });
-
   function setPortfolioTimeframe(hours) {
     if (!portfolioData || portfolioData.length === 0) return;
     const currentTime = new Date();
@@ -586,7 +572,6 @@
           console.error("Error fetching size composition data:", err);
         });
     }
-
     // COLLATERAL Composition Chart (Pie) - for the Composition Card
     const collateralChartContainer = document.getElementById("collateral-composition-chart");
     if (collateralChartContainer) {
@@ -638,10 +623,6 @@
     ============================
     START: SIZE BALANCE SECTION (JS)
     ============================
-    1) Fetch dynamic data from /api/size_balance.
-    2) Build the bar chart.
-    3) Compute sum of long, short, total => update the legend text in parentheses, e.g. "Long(<b>41.8K</b>)"
-    4) Dynamically build the asset-labels row for wallet & asset images.
   */
   document.addEventListener('DOMContentLoaded', function() {
     const sizeChartContainer = document.getElementById("size-chart");
@@ -650,7 +631,6 @@
         .then(response => response.json())
         .then(data => {
           const groups = data.groups;
-          // Build categories and series arrays dynamically
           const categories = groups.map(g => `${g.wallet} ${g.asset}`);
           const longData = groups.map(g => g.long);
           const shortData = groups.map(g => g.short);
@@ -720,7 +700,6 @@
               ]
             }
           };
-
           const sizeChart = new ApexCharts(sizeChartContainer, chartOptions);
           sizeChart.render();
 
@@ -729,33 +708,27 @@
           const sumShort = shortData.reduce((acc, val) => acc + val, 0);
           const sumTotal = totalData.reduce((acc, val) => acc + val, 0);
 
-          // Helper to format e.g. 41.8K
           function formatK(num) {
             return num >= 1000 ? (num / 1000).toFixed(1) + "K" : num;
           }
-
-          // Update the legend text in parentheses, e.g. "Long(<b>41.8K</b>)"
           document.getElementById("legend-long-value").textContent = formatK(sumLong);
           document.getElementById("legend-short-value").textContent = formatK(sumShort);
           document.getElementById("legend-total-value").textContent = formatK(sumTotal);
 
-          // Dynamically generate the asset labels row:
-          let labelsContainer = document.querySelector(".asset-labels");
-          labelsContainer.innerHTML = ""; // Clear existing
+          // Dynamically generate the asset labels row
+          const labelsContainer = document.querySelector(".asset-labels");
+          labelsContainer.innerHTML = "";
           groups.forEach(g => {
-            let col = document.createElement("div");
+            const col = document.createElement("div");
             col.className = "size-chart-col";
-            // Create wallet image
-            let walletImg = document.createElement("img");
+            const walletImg = document.createElement("img");
             walletImg.className = "wallet-icon";
             walletImg.src = `/static/images/${g.wallet.toLowerCase()}.jpg`;
             walletImg.alt = g.wallet;
-            // Create asset image
-            let assetImg = document.createElement("img");
+            const assetImg = document.createElement("img");
             assetImg.className = "asset-icon2";
             assetImg.src = `/static/images/${g.asset.toLowerCase()}_logo.png`;
             assetImg.alt = g.asset;
-            // Append
             col.appendChild(walletImg);
             col.appendChild(assetImg);
             labelsContainer.appendChild(col);
@@ -773,12 +746,12 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", function() {
-    const container = document.querySelector('.update-button[data-type="{{ update_type | default("jupiter") }}"]');
+    const container = document.querySelector('.update-button[data-type="jupiter"]');
     if (!container) return;
     const img = container.querySelector('img');
     container.addEventListener("click", function() {
       img.classList.add("spin");
-      fetch("/positions/update_jupiter?source={{ update_type | default('jupiter') }}", { method: "POST" })
+      fetch("/positions/update_jupiter?source=jupiter", { method: "POST" })
         .then(response => response.json())
         .then(data => {
           img.classList.remove("spin");

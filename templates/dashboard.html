@@ -101,7 +101,7 @@
   /* -------------------- Update Button Row -------------------- */
   .update-row {
     text-align: center;
-    margin-bottom: 20px;
+    margin: 10px 0;  /* Reduced top & bottom margin */
   }
   .update-row button {
     background: none;
@@ -131,10 +131,10 @@
       max-width: 100%;
     }
   }
-  /* Use a single-row layout with a fixed min-height to preserve the tall design */
+  /* Single-row status bar with fixed min-height */
   .status-bar {
     width: 100%;
-    min-height: 120px;  /* Force same tall height */
+    min-height: 120px;
     background: url("{{ url_for('static', filename='images/cityscape.jpg') }}") no-repeat center center;
     background-size: cover;
     border-radius: 0.5rem;
@@ -149,7 +149,7 @@
     display: flex;
     align-items: flex-start; /* Top justify the text */
     justify-content: space-between;
-    padding: 1rem;
+    padding: 0.5rem 1rem; /* Reduced padding for less vertical spacing */
     min-height: 120px;
   }
   .status-bar .col {
@@ -170,6 +170,11 @@
     font-size: 1rem;
     font-weight: bold;
     margin: 0;
+  }
+  /* Adjust asset image styling for left status bar */
+  .status-col-left .card-body .col img {
+    height: 24px !important;
+    margin-top: 0; /* Reduced top margin */
   }
 
   /* -------------------- Composition Chart & Other Sections (Unchanged) -------------------- */
@@ -252,51 +257,56 @@
 
   <!-- Row: Two Symmetrical Status Bars Side by Side -->
   <div class="row status-bar-container">
-    <!-- LEFT Status Bar: Custom text-only status bar -->
+    <!-- LEFT Status Bar: Now labeled BTC, ETH, SOL, S&P500, Placeholder -->
     <div class="col-md-6 status-col-left">
-      <!-- No toggle row for the left bar -->
+      <!-- No toggle row for a single-row layout -->
       <div class="status-bar mt-2">
         <div class="card">
           <div class="card-body">
-            <div class="col">
-              <span class="label">Total Leverage</span>
-              <h5 class="fw-bold mb-0">1,000</h5>
+            <!-- Column 1: BTC -->
+            <div class="col d-flex flex-column align-items-center justify-content-center">
+              <img src="{{ url_for('static', filename='images/btc_logo.png') }}" alt="BTC">
+              <h5 class="fw-bold mb-0">${{ btc_price }}</h5>
             </div>
-            <div class="col">
-              <span class="label">Total Size</span>
-              <h5 class="fw-bold mb-0">$2,500</h5>
+            <!-- Column 2: ETH -->
+            <div class="col d-flex flex-column align-items-center justify-content-center">
+              <img src="{{ url_for('static', filename='images/eth_logo.png') }}" alt="ETH">
+              <h5 class="fw-bold mb-0">${{ eth_price }}</h5>
             </div>
-            <div class="col">
-              <span class="label">Ratio</span>
-              <h5 class="fw-bold mb-0">2.50</h5>
+            <!-- Column 3: SOL -->
+            <div class="col d-flex flex-column align-items-center justify-content-center">
+              <img src="{{ url_for('static', filename='images/sol_logo.png') }}" alt="SOL">
+              <h5 class="fw-bold mb-0">${{ sol_price }}</h5>
             </div>
-            <div class="col">
-              <span class="label">Placeholder 1</span>
-              <h5 class="fw-bold mb-0">.</h5>
+            <!-- Column 4: S&P500 -->
+            <div class="col d-flex flex-column align-items-center justify-content-center">
+              <img src="{{ url_for('static', filename='images/sp500.png') }}" alt="S&P 500">
+              <h5 class="fw-bold mb-0">{{ sp500_value }}</h5>
             </div>
-            <div class="col">
-              <span class="label">Placeholder 2</span>
-              <h5 class="fw-bold mb-0">.</h5>
+            <!-- Column 5: Placeholder -->
+            <div class="col d-flex flex-column align-items-center justify-content-center">
+              <span class="label">Placeholder</span>
+              <h5 class="fw-bold mb-0">--</h5>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT Status Bar: Relabeled columns -->
+    <!-- RIGHT Status Bar: Relabeled Columns: Value, Leverage, Size, Size Ratio, Travel Percent -->
     <div class="col-md-6 status-col-right">
-      <!-- No toggle row for the right bar -->
+      <!-- No toggle row for a single-row layout -->
       <div class="status-bar mt-2"
            style="background: url('{{ url_for('static', filename='images/cityscape.jpg') }}') no-repeat center center; background-size: cover;">
         <div class="card">
           <div class="card-body">
             <!-- Column 1: Value -->
-            <div class="col">
+            <div class="col d-flex flex-column align-items-center justify-content-center">
               <span class="label">Value</span>
               <h5 class="fw-bold mb-0">${{ portfolio_value }}</h5>
             </div>
             <!-- Column 2: Leverage -->
-            <div class="col">
+            <div class="col d-flex flex-column align-items-center justify-content-center">
               <span class="label">Leverage</span>
               <h5 class="fw-bold mb-0">
                 {% if totals.avg_leverage %}
@@ -307,12 +317,12 @@
               </h5>
             </div>
             <!-- Column 3: Size -->
-            <div class="col">
+            <div class="col d-flex flex-column align-items-center justify-content-center">
               <span class="label">Size</span>
               <h5 class="fw-bold mb-0">${{ totals.total_size }}</h5>
             </div>
             <!-- Column 4: Size Ratio -->
-            <div class="col">
+            <div class="col d-flex flex-column align-items-center justify-content-center">
               <span class="label">Size Ratio</span>
               <h5 class="fw-bold mb-0">
                 {% if totals.avg_leverage and totals.avg_leverage != 0 %}
@@ -323,7 +333,7 @@
               </h5>
             </div>
             <!-- Column 5: Travel Percent -->
-            <div class="col">
+            <div class="col d-flex flex-column align-items-center justify-content-center">
               <span class="label">Travel Percent</span>
               <h5 class="fw-bold mb-0">
                 {% if totals.avg_travel_percent %}

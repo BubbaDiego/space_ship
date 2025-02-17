@@ -190,6 +190,54 @@
       </div>
     </div>
 
+    {# Prices Section - New #}
+    {% set prices_data = db_data.prices | default({ "columns": [], "rows": [] }) %}
+    <div class="card" data-table="prices" data-columns='{{ prices_data.columns | tojson | safe }}'>
+      <div class="card-header" data-target="#collapse-prices">
+        <button class="btn btn-light" type="button">
+          <strong>Prices</strong>
+        </button>
+        <button class="btn btn-sm btn-outline-danger deleteTableBtn" title="Delete Table">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+      <div id="collapse-prices" class="collapse show">
+        <div class="card-body">
+          <table class="table table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                {% for col in prices_data.columns %}
+                  <th>{{ col }}</th>
+                {% endfor %}
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in prices_data.rows %}
+                <tr data-row-json='{{ row | tojson | safe }}'>
+                  {% for col in prices_data.columns %}
+                    <td>{{ row[col] }}</td>
+                  {% endfor %}
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-secondary editBtn" title="Edit">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger deleteBtn" title="Delete Row">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td colspan="{{ prices_data.columns|length + 1 }}" class="text-center">No prices found.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Shared Edit Modal -->
@@ -220,7 +268,7 @@
 
   <script>
     // For this file, we'll assume all tables are fully editable.
-    const fullyEditableTables = ['wallets', 'positions', 'system_vars'];
+    const fullyEditableTables = ['wallets', 'positions', 'system_vars', 'prices'];
 
     document.addEventListener('DOMContentLoaded', function() {
       // Toggle collapse functionality for each card header.

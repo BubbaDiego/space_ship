@@ -33,7 +33,8 @@ class PriceMonitor:
 
         # 4) Parse price configuration.
         price_cfg = self.config.get("price_config", {})
-        self.assets = price_cfg.get("assets", ["BTC", "ETH"])
+        # The assets list now may include "SP500" (in addition to crypto symbols)
+        self.assets = price_cfg.get("assets", ["BTC", "ETH", "SP500"])
         self.currency = price_cfg.get("currency", "USD")
         self.cmc_api_key = price_cfg.get("cmc_api_key")
 
@@ -56,6 +57,9 @@ class PriceMonitor:
             tasks.append(self._fetch_coinpaprika_prices())
         if self.binance_enabled:
             tasks.append(self._fetch_binance_prices())
+        # Added support for S&P500:
+        if "SP500" in [a.upper() for a in self.assets]:
+            tasks.append(self._fetch_sp500_prices())
 
         if not tasks:
             logger.warning("No API sources enabled for update_prices.")
@@ -63,11 +67,11 @@ class PriceMonitor:
 
         results_list = await asyncio.gather(*tasks)
 
-        # Combine results into a dict: { "BTC": [p1, p2, ...], "ETH": [p3, p4, ...] }
+        # Combine results into a dict: { "BTC": [p1, p2, ...], ... }
         aggregated: Dict[str, List[float]] = {}
         for result_dict in results_list:
             for sym, price_val in result_dict.items():
-                aggregated.setdefault(sym, []).append(price_val)
+                aggregated.setdefault(sym.upper(), []).append(price_val)
 
         # Compute the average per symbol & insert/update the price.
         for sym, price_list in aggregated.items():
@@ -88,10 +92,11 @@ class PriceMonitor:
         }
         slugs = []
         for sym in self.assets:
-            if sym.upper() in slug_map:
-                slugs.append(slug_map[sym.upper()])
+            up_sym = sym.upper()
+            if up_sym in slug_map:
+                slugs.append(slug_map[up_sym])
             else:
-                logger.warning(f"No slug found for {sym}, skipping.")
+                logger.warning(f"No slug found for {sym} in CoinGecko, skipping.")
         if not slugs:
             return {}
 
@@ -100,7 +105,7 @@ class PriceMonitor:
         results = {}
         for slug, price in cg_data.items():
             found_sym = next((s for s, slugval in slug_map.items() if slugval.lower() == slug.lower()), slug)
-            results[found_sym] = price
+            results[found_sym.upper()] = price
 
         self.data_locker.increment_api_report_counter("CoinGecko")
         return results
@@ -117,8 +122,9 @@ class PriceMonitor:
         }
         ids = []
         for sym in self.assets:
-            if sym.upper() in paprika_map:
-                ids.append(paprika_map[sym.upper()])
+            up_sym = sym.upper()
+            if up_sym in paprika_map:
+                ids.append(paprika_map[up_sym])
             else:
                 logger.warning(f"No paprika ID found for {sym}, skipping.")
         if not ids:
@@ -133,7 +139,7 @@ class PriceMonitor:
         Fetch prices from Binance.
         """
         logger.info("Fetching Binance for assets...")
-        binance_symbols = [sym.upper() + "USDT" for sym in self.assets]
+        binance_symbols = [sym.upper() + "USDT" for sym in self.assets if sym.upper() != "SP500"]
         bn_data = await fetch_current_binance(binance_symbols)
         self.data_locker.increment_api_report_counter("Binance")
         return bn_data
@@ -147,23 +153,23 @@ class PriceMonitor:
         self.data_locker.increment_api_report_counter("CoinMarketCap")
         return cmc_data
 
-    async def update_historical_cmc(self, symbol: str, start_date: str, end_date: str):
-        if not self.cmc_enabled:
-            logger.warning("CoinMarketCap is not enabled, skipping historical fetch.")
-            return
-        logger.info("Fetching historical CMC for %s from %s to %s...", symbol, start_date, end_date)
-        records = await fetch_historical_cmc(symbol, start_date, end_date, self.currency, self.cmc_api_key)
-        logger.debug("Fetched %d daily records for %s from CoinMarketCap.", len(records), symbol)
-        for r in records:
-            self.data_locker.insert_historical_ohlc(
-                symbol,
-                r["time_open"],
-                r["open"],
-                r["high"],
-                r["low"],
-                r["close"],
-                r["volume"],
-            )
+    async def _fetch_sp500_prices(self) -> Dict[str, float]:
+        """
+        Fetch the current S&P500 index price using yfinance.
+        Note: yfinance is synchronous so we wrap it in asyncio.to_thread.
+        """
+        import yfinance as yf
+
+        def get_sp500():
+            ticker = yf.Ticker("^GSPC")
+            data = ticker.history(period="1d")
+            # Ensure we get a price (you may wish to add error handling)
+            return data['Close'].iloc[-1]
+
+        price = await asyncio.to_thread(get_sp500)
+        self.data_locker.increment_api_report_counter("S&P500")
+        logger.info("Fetched S&P500 price: %s", price)
+        return {"SP500": price}
 
 if __name__ == "__main__":
     async def main():

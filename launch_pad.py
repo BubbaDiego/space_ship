@@ -293,16 +293,20 @@ def api_delete_row():
 def database_viewer():
     dl = DataLocker.get_instance()
 
-    # Build db_data for wallets (add other tables as needed)
+    def format_table_data(rows: list) -> dict:
+        # Determine columns from the first row (if available)
+        columns = list(rows[0].keys()) if rows else []
+        return {"columns": columns, "rows": rows}
+
     db_data = {
-        'wallets': {
-            "columns": ["name", "public_address", "private_address", "image_path", "balance"],
-            "rows": dl.read_wallets()
-        }
-        # You can add other tables like positions, alerts, etc.
+        'wallets': format_table_data(dl.read_wallets()),
+        'positions': format_table_data(dl.get_positions()),
+        'system_vars': format_table_data([dl.get_last_update_times()]),
+        'prices': format_table_data(dl.get_prices())
+        # Add additional tables as needed...
     }
 
-    # For portfolio_data, supply an empty list or actual data if available.
+    # You might also want to retrieve portfolio data if available.
     portfolio_data = []
     return render_template("database_viewer.html", db_data=db_data, portfolio_data=portfolio_data)
 

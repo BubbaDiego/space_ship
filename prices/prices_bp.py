@@ -4,10 +4,10 @@ Module: prices_bp.py
 Description:
     A production‑ready Flask blueprint for all price‑related endpoints.
     This module handles:
-      - Rendering price charts for assets (BTC, ETH, SOL) over a specified timeframe.
+      - Rendering price charts for assets (BTC, ETH, SOL, SP500) over a specified timeframe.
       - Displaying a price list and manual price updates.
       - Triggering asynchronous price updates via PriceMonitor.
-      
+
     It is structured similarly to our positions and alerts blueprints for consistent
     separation of concerns.
 """
@@ -26,13 +26,13 @@ from config.config_constants import DB_PATH, CONFIG_PATH
 from data.data_locker import DataLocker
 from prices.price_monitor import PriceMonitor
 
+
 # ---------------------------------------------------------------------------
 # Helper Functions (Replace with your actual implementations if available)
 # ---------------------------------------------------------------------------
 def _get_top_prices_for_assets(db_path, assets):
     """
-    Placeholder function to retrieve the latest price for each asset.
-    Replace with your actual implementation.
+    Retrieve the latest price for each asset.
     """
     dl = DataLocker.get_instance(db_path)
     top_prices = []
@@ -42,13 +42,15 @@ def _get_top_prices_for_assets(db_path, assets):
             top_prices.append(row)
     return top_prices
 
+
 def _get_recent_prices(db_path, limit=15):
     """
-    Placeholder function to retrieve the most recent price entries.
-    Replace with your actual implementation.
+    Retrieve the most recent price entries.
     """
     dl = DataLocker.get_instance(db_path)
-    return dl.get_recent_prices(limit)
+    prices = dl.get_prices()
+    return prices[:limit]
+
 
 # ---------------------------------------------------------------------------
 # Logger Setup
@@ -61,13 +63,17 @@ logger.setLevel(logging.DEBUG)
 # ---------------------------------------------------------------------------
 prices_bp = Blueprint("prices", __name__, template_folder="templates")
 
+# Define the asset list to include S&P500 as well as crypto assets.
+ASSETS_LIST = ["BTC", "ETH", "SOL", "SP500"]
+
+
 # ---------------------------------------------------------------------------
 # Price Charts Endpoint
 # ---------------------------------------------------------------------------
 @prices_bp.route("/charts", methods=["GET"])
 def price_charts():
     """
-    Render price charts for BTC, ETH, and SOL over a specified timeframe.
+    Render price charts for BTC, ETH, SOL, and SP500 over a specified timeframe.
     URL Params:
       - hours: (optional, default=6) Number of hours to look back.
     """
@@ -78,8 +84,8 @@ def price_charts():
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
-        chart_data = {"BTC": [], "ETH": [], "SOL": []}
-        for asset in ["BTC", "ETH", "SOL"]:
+        chart_data = {asset: [] for asset in ASSETS_LIST}
+        for asset in ASSETS_LIST:
             cur.execute(
                 """
                 SELECT current_price, last_update_time
@@ -102,6 +108,7 @@ def price_charts():
         logger.error("Error in price_charts: %s", e, exc_info=True)
         return jsonify({"error": str(e)}), 500
 
+
 # ---------------------------------------------------------------------------
 # Price List and Manual Update Endpoint
 # ---------------------------------------------------------------------------
@@ -109,17 +116,17 @@ def price_charts():
 def price_list():
     """
     Handles both GET and POST requests for price data.
-    
+
     GET:
       - Renders a page with:
           - Top prices (latest per asset)
           - Recent price entries
           - API counters (if any)
-    
+
     POST:
       - Accepts a manual price update.
       - Expects form fields:
-            asset: asset type (e.g., "BTC")
+            asset: asset type (e.g., "BTC", "SP500")
             price: the new price value
     """
     dl = DataLocker.get_instance(DB_PATH)
@@ -142,13 +149,15 @@ def price_list():
             return redirect(url_for("prices.price_list"))
     else:
         try:
-            top_prices = _get_top_prices_for_assets(DB_PATH, ["BTC", "ETH", "SOL"])
+            top_prices = _get_top_prices_for_assets(DB_PATH, ASSETS_LIST)
             recent_prices = _get_recent_prices(DB_PATH, limit=15)
             api_counters = dl.read_api_counters()
-            return render_template("prices.html", prices=top_prices, recent_prices=recent_prices, api_counters=api_counters)
+            return render_template("prices.html", prices=top_prices, recent_prices=recent_prices,
+                                   api_counters=api_counters)
         except Exception as e:
             logger.error("Error in rendering price list: %s", e, exc_info=True)
             return jsonify({"error": str(e)}), 500
+
 
 # ---------------------------------------------------------------------------
 # Asynchronous Price Update Endpoint
@@ -178,6 +187,7 @@ def update_prices_route():
         logger.exception("Error updating prices: %s", e)
         return jsonify({"status": "error", "message": str(e)}), 500
 
+
 # ---------------------------------------------------------------------------
 # (Optional) API Endpoint for Price Data
 # ---------------------------------------------------------------------------
@@ -185,21 +195,20 @@ def update_prices_route():
 def prices_data_api():
     """
     Provides an API endpoint that returns:
-      - Mini price data for each asset (BTC, ETH, SOL)
+      - Mini price data for each asset (BTC, ETH, SOL, SP500)
       - Full price list and aggregated totals
     """
     try:
         dl = DataLocker.get_instance(DB_PATH)
         mini_prices = []
-        for asset in ["BTC", "ETH", "SOL"]:
+        for asset in ASSETS_LIST:
             row = dl.get_latest_price(asset)
             if row:
                 mini_prices.append({
                     "asset_type": row["asset_type"],
                     "current_price": float(row["current_price"])
                 })
-        # Reuse our helper functions for price list
-        prices_list = _get_top_prices_for_assets(DB_PATH, ["BTC", "ETH", "SOL"])
+        prices_list = _get_top_prices_for_assets(DB_PATH, ASSETS_LIST)
         totals = dl.read_api_counters()  # Or use a dedicated aggregator if available
         return jsonify({
             "mini_prices": mini_prices,

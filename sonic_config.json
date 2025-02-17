@@ -29,78 +29,192 @@
   },
   "alert_ranges": {
     "heat_index_ranges": {
-      "enabled": true,
+      "enabled": false,
       "low": 444.0,
       "low_notifications": {
-        "call": true
+        "call": false,
+        "sms": false,
+        "email": false
       },
       "medium": 444.0,
-      "high": 777.0
+      "high": 777.0,
+      "medium_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "high_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      }
     },
     "collateral_ranges": {
-      "enabled": true,
+      "enabled": false,
       "low": 1111.0,
       "medium": 1111.0,
-      "high": 11111.0
+      "high": 11111.0,
+      "low_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "medium_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "high_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      }
     },
     "value_ranges": {
-      "enabled": true,
+      "enabled": false,
       "low": 1111.0,
       "medium": 1111.0,
-      "high": 1111.0
+      "high": 1111.0,
+      "low_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "medium_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "high_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      }
     },
     "size_ranges": {
-      "enabled": true,
+      "enabled": false,
       "low": 11111.0,
       "medium": 111111.0,
-      "high": 11111.0
+      "high": 11111.0,
+      "low_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "medium_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "high_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      }
     },
     "leverage_ranges": {
-      "enabled": true,
+      "enabled": false,
       "low": 11111.0,
       "medium": 111111.0,
-      "high": 11111.0
+      "high": 11111.0,
+      "low_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "medium_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "high_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      }
     },
     "liquidation_distance_ranges": {
-      "enabled": true,
+      "enabled": false,
       "low": 1111111.0,
       "medium": 111111.0,
-      "high": 11111.0
+      "high": 11111.0,
+      "low_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "medium_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "high_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      }
     },
     "travel_percent_liquid_ranges": {
-      "enabled": true,
+      "enabled": false,
       "low": -40.0,
       "low_notifications": {
-        "call": false
+        "call": false,
+        "sms": false,
+        "email": false
       },
       "medium": -60.0,
       "medium_notifications": {
-        "call": true
+        "call": false,
+        "sms": false,
+        "email": false
       },
       "high": -75.0,
       "high_notifications": {
-        "call": true
+        "call": false,
+        "sms": false,
+        "email": false
       }
     },
     "travel_percent_profit_ranges": {
-      "enabled": true,
+      "enabled": false,
       "low": 0.0,
       "medium": 0.0,
-      "high": 0.0
+      "high": 0.0,
+      "low_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "medium_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      },
+      "high_notifications": {
+        "call": false,
+        "sms": false,
+        "email": false
+      }
     },
     "profit_ranges": {
-      "enabled": true,
-      "low": 50.0,
+      "enabled": false,
+      "low": 33.0,
       "low_notifications": {
-        "call": false
+        "call": false,
+        "sms": false,
+        "email": false
       },
       "medium": 100.0,
       "medium_notifications": {
-        "call": true
+        "call": false,
+        "sms": false,
+        "email": false
       },
       "high": 222.0,
       "high_notifications": {
-        "call": true
+        "call": false,
+        "sms": false,
+        "email": false
       }
     }
   },

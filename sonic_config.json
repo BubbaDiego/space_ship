@@ -197,24 +197,24 @@
       }
     },
     "profit_ranges": {
-      "enabled": false,
-      "low": 33.0,
+      "enabled": true,
+      "low": 44.0,
       "low_notifications": {
-        "call": false,
-        "sms": false,
-        "email": false
+        "call": true,
+        "sms": true,
+        "email": true
       },
-      "medium": 100.0,
+      "medium": 101.0,
       "medium_notifications": {
-        "call": false,
-        "sms": false,
-        "email": false
+        "call": true,
+        "sms": true,
+        "email": true
       },
-      "high": 222.0,
+      "high": 202.0,
       "high_notifications": {
-        "call": false,
-        "sms": false,
-        "email": false
+        "call": true,
+        "sms": true,
+        "email": true
       }
     }
   },

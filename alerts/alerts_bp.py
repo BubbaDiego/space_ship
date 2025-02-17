@@ -3,7 +3,9 @@ import json
 import logging
 from flask import Blueprint, request, jsonify, render_template
 
-# Set up logger
+# -------------------------------
+# Logger Setup
+# -------------------------------
 logger = logging.getLogger("AlertManagerLogger")
 logger.setLevel(logging.DEBUG)
 if not logger.handlers:
@@ -73,29 +75,59 @@ CONFIG_PATH = os.path.join(os.getcwd(), "sonic_config.json")
 config_mgr = SonicConfigManager(CONFIG_PATH)
 
 
-def parse_nested_form(form) -> dict:
+def convert_types_in_dict(d):
+    """
+    Recursively convert string values:
+      - "true"/"false" into booleans,
+      - Numeric strings to floats.
+    """
+    if isinstance(d, dict):
+        new_d = {}
+        for k, v in d.items():
+            new_d[k] = convert_types_in_dict(v)
+        return new_d
+    elif isinstance(d, list):
+        return [convert_types_in_dict(item) for item in d]
+    elif isinstance(d, str):
+        low = d.lower().strip()
+        if low == "true":
+            return True
+        elif low == "false":
+            return False
+        else:
+            try:
+                return float(d)
+            except ValueError:
+                return d
+    else:
+        return d
+
+
+def parse_nested_form(form: dict) -> dict:
     """
     Convert flat form keys (like:
        alert_ranges[profit_ranges][enabled]
     ) into a nested dictionary.
+    Assumes 'form' is a dict whose values may be lists.
+    It also removes the outer "alert_ranges" key if present.
     """
     updated = {}
     for full_key, value in form.items():
+        # If value is a list (e.g. hidden + checkbox), take the last one.
+        if isinstance(value, list):
+            value = value[-1]
         full_key = full_key.strip()
         keys = []
         part = ""
-        in_brackets = False
         for char in full_key:
-            if char == '[':
+            if char == "[":
                 if part:
                     keys.append(part)
                     part = ""
-                in_brackets = True
-            elif char == ']':
+            elif char == "]":
                 if part:
                     keys.append(part)
                     part = ""
-                in_brackets = False
             else:
                 part += char
         if part:
@@ -103,24 +135,23 @@ def parse_nested_form(form) -> dict:
         # Remove the outer "alert_ranges" if present.
         if keys and keys[0] == "alert_ranges":
             keys = keys[1:]
-        # Build the nested dict.
         current = updated
         for i, key in enumerate(keys):
             if i == len(keys) - 1:
                 if isinstance(value, str):
-                    lower_val = value.lower()
+                    lower_val = value.lower().strip()
                     if lower_val == "true":
-                        val = True
+                        v = True
                     elif lower_val == "false":
-                        val = False
+                        v = False
                     else:
                         try:
-                            val = float(value)
-                        except Exception:
-                            val = value
+                            v = float(value)
+                        except ValueError:
+                            v = value
                 else:
-                    val = value
-                current[key] = val
+                    v = value
+                current[key] = v
             else:
                 if key not in current:
                     current[key] = {}
@@ -166,17 +197,22 @@ def config():
         return "Error loading config", 500
 
 
-@alerts_bp.route('/update_config', methods=['POST'])
+@alerts_bp.route('/update_config', methods=['POST'], endpoint="update_alert_config")
 def update_alert_config():
     """
     Update the alert configuration from the form data.
     """
     try:
-        raw_form = request.form.to_dict(flat=False)
-        logger.debug("POST Data Received:\n%s", json.dumps(raw_form, indent=2))
+        # Use flat=False so that if multiple values exist, we can pick the checkbox's value.
+        flat_form = request.form.to_dict(flat=False)
+        logger.debug("POST Data Received:\n%s", json.dumps(flat_form, indent=2))
 
-        nested_update = parse_nested_form(request.form)
-        logger.debug("Parsed Nested Form Data:\n%s", json.dumps(nested_update, indent=2))
+        nested_update = parse_nested_form(flat_form)
+        logger.debug("Parsed Nested Form Data (raw):\n%s", json.dumps(nested_update, indent=2))
+
+        # Convert types for proper booleans and numbers.
+        nested_update = convert_types_in_dict(nested_update)
+        logger.debug("Parsed Nested Form Data (converted):\n%s", json.dumps(nested_update, indent=2))
 
         config_mgr.update_alert_config(nested_update)
 
@@ -187,7 +223,7 @@ def update_alert_config():
         return jsonify({"success": True, "formatted_table": formatted_table})
     except Exception as e:
         logger.error("Error updating alert config: %s", str(e))
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 # -------------------------------
